@@ -1,0 +1,64 @@
+---
+alwaysApply: true
+---
+# Microservices Framework Rules
+
+## 1. Clear Service Boundaries
+- Each service represents a single business capability.
+- Services must be independently deployable and modifiable.
+- Boundaries should align with business domains, not technical layers.
+
+## 2. Loose Coupling & High Cohesion
+- Services communicate only via stable APIs or events.
+- No service may access another service’s database directly.
+- Changes in one service must not force changes in others.
+
+## 3. API & Contract Design
+- APIs must be versioned, documented, and explicit.
+- Maintain backward compatibility when possible.
+- Use consistent request/response patterns across services.
+
+## 4. Data Ownership
+- Each service owns and manages its own data store.
+- Cross-service data sharing must occur via APIs or events.
+- Prefer event-driven propagation for shared data needs.
+
+## 5. Resilience & Fault Tolerance
+- All network calls must include timeouts, retries, and circuit breakers.
+- Services should handle dependency failures gracefully.
+- Always design with partial failures in mind.
+
+## 6. Observability
+- Use structured logs with correlation/trace IDs.
+- Provide standard metrics and health endpoints.
+- Implement distributed tracing across services.
+
+## 7. Deployment & Configuration
+- Each service must use an independent CI/CD pipeline.
+- Configuration must be externalized and specific per environment.
+- Use immutable build artifacts across all environments.
+
+## 8. Security
+- Service-to-service communication must be authenticated.
+- Secrets must be stored in a secure vault, not in source code.
+- Apply the principle of least privilege for all access.
+
+## 9. Statelessness & Scalability
+- Services must be stateless; otherwise use external state stores.
+- Prefer horizontal scaling (running multiple instances).
+
+## 10. Consistency & Distributed Workflows
+- Prefer eventual consistency over distributed ACID transactions.
+- Use sagas or orchestration for multi-service workflows.
+
+## 11. Testing & Quality
+- Include unit, integration, and contract tests for each service.
+- Execute automated smoke tests after deployments.
+
+## 12. Ownership & Documentation
+- Each service must have a clearly assigned owning team.
+- Maintain minimal documentation:
+  - Service purpose  
+  - APIs/events  
+  - Dependencies  
+  - Runbook for operations  
