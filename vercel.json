@@ -1,13 +1,8 @@
-name: Publish Scheduled Posts
-
-on:
-  schedule:
-    - cron: "* * * * *"
-
-jobs:
-  run:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Call Vercel API
-        run: |
-          curl https://your-app.vercel.app/api/cron/publish-scheduled-posts
+{
+  "crons": [
+    {
+      "path": "/api/cron/publish-scheduled-posts",
+      "schedule": "0 0 * * *"
+    }
+  ]
+}
