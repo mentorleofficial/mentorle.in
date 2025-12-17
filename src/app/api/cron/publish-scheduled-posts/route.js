@@ -16,11 +16,30 @@ export async function GET(request) {
     const supabase = await createServerSupabaseClient();
     const now = new Date().toISOString();
 
+    console.log(`🔍 Checking for scheduled posts at ${now}`);
+
+    // First, check all scheduled posts (for debugging)
+    const { data: allScheduledPosts } = await supabase
+      .from('posts')
+      .select('id, title, status, published_at')
+      .eq('status', 'scheduled');
+
+    console.log(`📋 Found ${allScheduledPosts?.length || 0} scheduled posts total`);
+    if (allScheduledPosts && allScheduledPosts.length > 0) {
+      console.log('📝 Scheduled posts:', allScheduledPosts.map(p => ({
+        id: p.id,
+        title: p.title,
+        published_at: p.published_at,
+        isReady: p.published_at ? new Date(p.published_at) <= new Date(now) : false
+      })));
+    }
+
     // Find all scheduled posts where published_at <= now
     const { data: scheduledPosts, error: fetchError } = await supabase
       .from('posts')
       .select('id, title, published_at')
       .eq('status', 'scheduled')
+      .not('published_at', 'is', null)
       .lte('published_at', now);
 
     if (fetchError) {

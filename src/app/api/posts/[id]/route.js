@@ -85,7 +85,7 @@ export async function PATCH(request, { params }) {
       return NextResponse.json({ error: 'You do not have permission to edit this post' }, { status: 403 });
     }
     const body = await request.json();
-    const { title, summary, content, content_json, tags, status, featured, cover_url } = body;
+    const { title, summary, content, content_json, tags, status, featured, cover_url, published_at } = body;
     const validation = validatePostData({ 
       title: title || existingPost.title, 
       content: content !== undefined ? content : existingPost.content, 
@@ -107,7 +107,13 @@ export async function PATCH(request, { params }) {
       updateData.status = status;
       if (status === 'published' && !existingPost.published_at) {
         updateData.published_at = new Date().toISOString();
+      } else if (status === 'scheduled' && published_at) {
+        // Set published_at when scheduling a post
+        updateData.published_at = new Date(published_at).toISOString();
       }
+    } else if (published_at !== undefined) {
+      // Allow updating published_at even if status isn't changing
+      updateData.published_at = new Date(published_at).toISOString();
     }
     if (featured !== undefined) updateData.featured = featured;
     if (cover_url !== undefined) updateData.cover_url = cover_url || null;
