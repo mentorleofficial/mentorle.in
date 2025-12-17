@@ -204,7 +204,7 @@ export async function POST(request) {
     }
 
     const body = await request.json();
-    const { title, summary, content, content_json, tags, status, featured, cover_url } = body;
+    const { title, summary, content, content_json, tags, status, featured, cover_url, published_at } = body;
 
     // Validate post data
     const validation = validatePostData({ title, content: content || "", status: status || 'draft' });
@@ -233,6 +233,14 @@ export async function POST(request) {
     // Calculate reading time
     const readingTime = calculateReadingTime(content || "");
 
+    // Determine published_at value
+    let publishedAtValue = null;
+    if (status === 'published') {
+      publishedAtValue = new Date().toISOString();
+    } else if (status === 'scheduled' && published_at) {
+      publishedAtValue = new Date(published_at).toISOString();
+    }
+
     // Prepare post data matching the schema
     const postData = {
       author_id: userId,
@@ -246,7 +254,7 @@ export async function POST(request) {
       featured: featured || false,
       cover_url: cover_url || null,
       reading_time_minutes: readingTime,
-      published_at: status === 'published' ? new Date().toISOString() : null,
+      published_at: publishedAtValue,
       updated_at: new Date().toISOString()
     };
 
