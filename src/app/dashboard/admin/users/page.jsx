@@ -327,7 +327,7 @@ function UserManagementContent() {
   }
 
   return (
-    <div className="px-6 py-8 max-w-7xl mx-auto mt-10">
+  <div className="px-6 py-8 max-w-7xl mx-auto mt-10 md:ml-64">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
         <div>
           <h1 className="text-3xl font-bold">User Management</h1>

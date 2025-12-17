@@ -13,6 +13,7 @@ export async function GET(request) {
     const status = searchParams.get('status') || 'all';
     const category = searchParams.get('category');
     const ownOnly = searchParams.get('own') === 'true';
+    const isAdminView = searchParams.get('admin') === 'true';
 
     // Get authenticated user
     let userId = null;
@@ -28,6 +29,17 @@ export async function GET(request) {
         if (user && !error) userId = user.id;
       }
     }
+
+    // Determine user role (for admin views)
+    let userRole = null;
+    if (userId) {
+      try {
+        userRole = await getUserRole(userId, supabase);
+      } catch (err) {
+        console.warn('Failed to get user role for offerings GET:', err);
+      }
+    }
+    const isAdmin = userRole === ROLES.ADMIN;
 
     // Build query
     let query = supabase
@@ -45,8 +57,9 @@ export async function GET(request) {
     // Filter by status
     if (status !== 'all') {
       query = query.eq('status', status);
-    } else if (!ownOnly) {
-      // Public view only shows active offerings
+    } else if (!ownOnly && !(isAdminView && isAdmin)) {
+      // Public/mentor view only shows active offerings
+      // Admin view (admin=true) can see all statuses
       query = query.eq('status', 'active');
     }
 

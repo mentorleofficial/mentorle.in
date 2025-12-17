@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
@@ -15,17 +15,27 @@ function MentorApplicationsContent() {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedApplication, setSelectedApplication] = useState(null);
   const [isApplicationDialogOpen, setIsApplicationDialogOpen] = useState(false);
+  const [statusFilter, setStatusFilter] = useState(MENTOR_STATUS.PENDING);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [domainFilter, setDomainFilter] = useState("");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
   const router = useRouter();
   const { toast } = useToast();
 
   useEffect(() => {
     const fetchApplications = async () => {
       try {
-        // Fetch pending mentor applications
+        // Fetch mentor applications across statuses relevant for verification
         const { data, error } = await supabase
           .from("mentor_data")
           .select(`*`)
-          .eq("status", MENTOR_STATUS.PENDING);
+          .in("status", [
+            MENTOR_STATUS.PENDING,
+            MENTOR_STATUS.APPROVED,
+            MENTOR_STATUS.REJECTED,
+            MENTOR_STATUS.CHANGES_REQUESTED
+          ]);
 
         if (error) throw error;
 
@@ -59,6 +69,68 @@ function MentorApplicationsContent() {
     setIsApplicationDialogOpen(false);
     setSelectedApplication(null);
   };
+
+  const domainOptions = useMemo(() => {
+    const domains = new Set();
+    applications.forEach(app => {
+      if (Array.isArray(app.expertise_area)) {
+        app.expertise_area.forEach(d => {
+          if (d && typeof d === "string") {
+            domains.add(d);
+          }
+        });
+      }
+    });
+    return Array.from(domains);
+  }, [applications]);
+
+  const filteredApplications = useMemo(() => {
+    return applications.filter((app) => {
+      // Status filter
+      if (statusFilter && app.status !== statusFilter) {
+        return false;
+      }
+
+      // Search by name or email
+      if (searchTerm) {
+        const term = searchTerm.toLowerCase();
+        const nameMatch = (app.name || "").toLowerCase().includes(term);
+        const emailMatch = (app.email || "").toLowerCase().includes(term);
+        if (!nameMatch && !emailMatch) {
+          return false;
+        }
+      }
+
+      // Domain / expertise filter
+      if (domainFilter) {
+        const areas = Array.isArray(app.expertise_area) ? app.expertise_area : [];
+        if (!areas.includes(domainFilter)) {
+          return false;
+        }
+      }
+
+      // Date range filter
+      if (dateFrom) {
+        const created = new Date(app.created_at);
+        const from = new Date(dateFrom);
+        if (created < from) {
+          return false;
+        }
+      }
+
+      if (dateTo) {
+        const created = new Date(app.created_at);
+        const to = new Date(dateTo);
+        // include entire end day
+        to.setHours(23, 59, 59, 999);
+        if (created > to) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+  }, [applications, statusFilter, searchTerm, domainFilter, dateFrom, dateTo]);
   
   if (isLoading) {
     return (
@@ -112,8 +184,91 @@ function MentorApplicationsContent() {
           </div>
         </div>
 
+        {/* Filters */}
+        <div className="bg-white border border-black p-4 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] space-y-3">
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-3">
+            <div className="flex flex-col sm:flex-row gap-3 flex-1">
+              {/* Status filter */}
+              <div className="flex-1">
+                <label className="block text-xs font-black text-black uppercase tracking-wider mb-1">
+                  Status
+                </label>
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                  className="w-full border border-black px-2 py-1 text-xs font-bold uppercase tracking-wide bg-white"
+                >
+                  <option value={MENTOR_STATUS.PENDING}>Pending</option>
+                  <option value={MENTOR_STATUS.APPROVED}>Approved</option>
+                  <option value={MENTOR_STATUS.REJECTED}>Rejected</option>
+                  <option value={MENTOR_STATUS.CHANGES_REQUESTED}>Changes Requested</option>
+                </select>
+              </div>
+
+              {/* Domain filter */}
+              <div className="flex-1">
+                <label className="block text-xs font-black text-black uppercase tracking-wider mb-1">
+                  Domain / Expertise
+                </label>
+                <select
+                  value={domainFilter}
+                  onChange={(e) => setDomainFilter(e.target.value)}
+                  className="w-full border border-black px-2 py-1 text-xs font-bold uppercase tracking-wide bg-white"
+                >
+                  <option value="">All</option>
+                  {domainOptions.map((domain) => (
+                    <option key={domain} value={domain}>
+                      {domain}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Search */}
+              <div className="flex-1">
+                <label className="block text-xs font-black text-black uppercase tracking-wider mb-1">
+                  Search (name or email)
+                </label>
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Search mentors..."
+                  className="w-full border border-black px-2 py-1 text-xs font-bold uppercase tracking-wide bg-white"
+                />
+              </div>
+            </div>
+
+            {/* Date range */}
+            <div className="flex gap-3 flex-col sm:flex-row">
+              <div>
+                <label className="block text-xs font-black text-black uppercase tracking-wider mb-1">
+                  From
+                </label>
+                <input
+                  type="date"
+                  value={dateFrom}
+                  onChange={(e) => setDateFrom(e.target.value)}
+                  className="border border-black px-2 py-1 text-xs font-bold uppercase tracking-wide bg-white"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-black text-black uppercase tracking-wider mb-1">
+                  To
+                </label>
+                <input
+                  type="date"
+                  value={dateTo}
+                  onChange={(e) => setDateTo(e.target.value)}
+                  className="border border-black px-2 py-1 text-xs font-bold uppercase tracking-wide bg-white"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Applications List */}
-        {applications.length > 0 ? (
+        {filteredApplications.length > 0 ? (
           <div className="bg-white border border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
             {/* Stats Header */}
             <div className="border-b border-black p-3 bg-black/5">
@@ -122,13 +277,13 @@ function MentorApplicationsContent() {
                   Applications List
                 </h2>
                 <div className="bg-black text-white px-2 py-1 text-xs font-black uppercase tracking-wider">
-                  {applications.length} Pending
+                  {filteredApplications.length} Shown
                 </div>
               </div>
             </div>
 
             <div className="divide-y divide-black/20">
-              {applications.map((application, index) => (
+              {filteredApplications.map((application) => (
                 <div key={application.id} className="p-3 hover:bg-black/5 transition-colors duration-200">
                   <div className="flex items-center justify-between">
                     {/* Application Info */}

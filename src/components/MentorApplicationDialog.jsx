@@ -93,6 +93,36 @@ export default function MentorApplicationDialog({
     }
   };
 
+  const handleRequestChanges = async () => {
+    try {
+      setIsLoading(true);
+
+      const { error } = await supabase
+        .from("mentor_data")
+        .update({ status: MENTOR_STATUS.CHANGES_REQUESTED })
+        .eq("id", application.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Changes Requested",
+        description: "The mentor has been asked to update their application.",
+      });
+
+      onApplicationProcessed(application.id);
+      onClose();
+    } catch (error) {
+      console.error("Error requesting changes:", error);
+      toast({
+        title: "Error",
+        description: "Failed to request changes for this application.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   if (!application) return null;
 
   return (
@@ -190,7 +220,16 @@ export default function MentorApplicationDialog({
             >
               Reject
             </Button>
-            <div className="flex gap-2 flex-1">
+            <div className="flex gap-2 flex-[2]">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleRequestChanges}
+                disabled={isLoading}
+                className="flex-1"
+              >
+                Request Changes
+              </Button>
               <DialogClose asChild>
                 <Button variant="outline" size="sm" disabled={isLoading} className="flex-1">
                   Close

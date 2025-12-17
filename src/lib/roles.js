@@ -16,6 +16,7 @@ export const MENTOR_STATUS = {
   APPROVED: "approved",
   PENDING: "pending",
   REJECTED: "rejected",
+  CHANGES_REQUESTED: "changes_requested",
   DELETED: "deleted"
 };
 

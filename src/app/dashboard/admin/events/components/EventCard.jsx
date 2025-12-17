@@ -17,6 +17,8 @@ export default function EventCard({ event, onEdit, onDelete, onViewParticipants 
   const getTypeColor = (type) => {
     const colors = {
       bootcamp: "bg-purple-100 text-purple-800",
+      course: "bg-indigo-100 text-indigo-800",
+      hackathon: "bg-purple-100 text-purple-800",
       workshop: "bg-indigo-100 text-indigo-800",
       guest_session: "bg-pink-100 text-pink-800",
       event: "bg-yellow-100 text-yellow-800",

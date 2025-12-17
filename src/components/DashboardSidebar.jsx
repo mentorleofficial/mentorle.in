@@ -16,6 +16,8 @@ import {
     Briefcase,
     CalendarCheck,
     MessageCircle,
+    Building2,
+    BarChart3,
 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useUserRole } from "@/lib/userRole";
@@ -43,18 +45,23 @@ function DashboardSidebar() {
             },
             {
                 icon: Briefcase,
-                label: "Offerings",
-                href: "/dashboard/offerings",
+                label: "Mentorship Listings",
+                href: "/dashboard/admin/offerings",
             },
             {
                 icon: CalendarCheck,
-                label: "Bookings",
-                href: "/dashboard/bookings",
+                label: "Sessions",
+                href: "/dashboard/admin/sessions",
             },
             {
                 icon: FileText,
                 label: "Add Events",
                 href: "/dashboard/admin/events",
+            },
+            {
+                icon: BarChart3,
+                label: "Analytics & Earnings",
+                href: "/dashboard/admin/analytics",
             },
             {
                 icon: FileText,
