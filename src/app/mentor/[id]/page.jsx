@@ -5,7 +5,7 @@ import { useRouter, useParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import Image from "next/image";
 import Link from "next/link";
-import MentorVideo from "@/app/dashboard/mentee/Booking/components/MentorVideo";
+import MentorVideo from "@/app/dashboard/mentee/booking/components/MentorVideo";
 import { 
   Briefcase, 
   MapPin, 
