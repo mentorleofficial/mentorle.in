@@ -1,0 +1,52 @@
+name: Publish Scheduled Posts
+
+on:
+  schedule:
+    # Runs every 5 minutes (GitHub Actions uses UTC)
+    # Format: minute hour day month day-of-week
+    - cron: "*/5 * * * *"
+  workflow_dispatch: # Allow manual trigger from Actions tab
+
+jobs:
+  publish-scheduled-posts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Call publish-scheduled-posts endpoint
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          CRON_ENDPOINT: ${{ secrets.CRON_ENDPOINT }}
+        run: |
+          echo "🔄 Checking for scheduled posts to publish..."
+          
+          if [ -z "$CRON_SECRET" ]; then
+            echo "❌ Error: CRON_SECRET is not set in GitHub Secrets"
+            exit 1
+          fi
+          
+          if [ -z "$CRON_ENDPOINT" ]; then
+            echo "❌ Error: CRON_ENDPOINT is not set in GitHub Secrets"
+            exit 1
+          fi
+          
+          response=$(curl -sS -w "\n%{http_code}" -X GET \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            "$CRON_ENDPOINT")
+          
+          http_code=$(echo "$response" | tail -n1)
+          body=$(echo "$response" | sed '$d')
+          
+          echo "📊 Response Status: $http_code"
+          echo "📄 Response Body: $body"
+          
+          if [ "$http_code" -eq 200 ]; then
+            echo "✅ Successfully processed scheduled posts"
+          elif [ "$http_code" -eq 401 ]; then
+            echo "❌ Unauthorized: Check that CRON_SECRET matches your deployment environment"
+            exit 1
+          else
+            echo "⚠️  Unexpected response code: $http_code"
+            exit 1
+          fi
+
