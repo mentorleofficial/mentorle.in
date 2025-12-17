@@ -153,7 +153,7 @@ export default function EventForm({
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="event_type" className="required">Event Type</Label>
+                  <Label htmlFor="event_type" className="required">Event Type / Category</Label>
                   <select
                     id="event_type"
                     name="event_type"
@@ -163,7 +163,9 @@ export default function EventForm({
                     required
                   >
                     <option value="workshop">Workshop</option>
-                    <option value="bootcamp">Bootcamp</option>
+                    <option value="bootcamp">Bootcamp (Course)</option>
+                    <option value="course">Course</option>
+                    <option value="hackathon">Hackathon</option>
                     <option value="guest_session">Guest Session</option>
                     <option value="event">Event</option>
                     <option value="other">Other</option>
@@ -305,13 +307,13 @@ export default function EventForm({
             
             <div className="space-y-4">
               <div>
-                <Label htmlFor="prerequisites">Prerequisites</Label>
+                <Label htmlFor="prerequisites">Registration Rules & Prerequisites</Label>
                 <Textarea
                   id="prerequisites"
                   name="prerequisites"
                   value={formData.prerequisites}
                   onChange={handleInputChange}
-                  placeholder="Enter prerequisites"
+                  placeholder="Mention eligibility, capacity limits, and any prerequisites"
                   rows={3}
                 />
               </div>

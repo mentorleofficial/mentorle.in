@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/supabaseServer';
+import { getUserRole } from '@/lib/auth';
+import { ROLES } from '@/lib/roles';
 
 // GET - Fetch bookings (mentor or mentee view)
 export async function GET(request) {
@@ -7,9 +9,14 @@ export async function GET(request) {
     const supabase = await createServerSupabaseClient();
     const { searchParams } = new URL(request.url);
     
-    const role = searchParams.get('role') || 'mentee'; // mentor or mentee
+    const role = searchParams.get('role') || 'mentee'; // mentor, mentee, or admin
     const status = searchParams.get('status') || 'all';
     const upcoming = searchParams.get('upcoming') === 'true';
+    const adminMode = searchParams.get('admin') === 'true';
+    const from = searchParams.get('from');
+    const to = searchParams.get('to');
+    const mentorIdFilter = searchParams.get('mentor_id');
+    const menteeIdFilter = searchParams.get('mentee_id');
 
     // Get authenticated user
     let userId = null;
@@ -26,6 +33,17 @@ export async function GET(request) {
       }
     }
 
+    // Determine user role (to allow admin-wide views)
+    let userRole = null;
+    if (userId) {
+      try {
+        userRole = await getUserRole(userId, supabase);
+      } catch (err) {
+        console.warn('Failed to get user role for bookings GET:', err);
+      }
+    }
+    const isAdmin = userRole === ROLES.ADMIN;
+
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -40,12 +58,23 @@ export async function GET(request) {
         )
       `)
       .order('scheduled_at', { ascending: true });
-
-    // Filter by role
-    if (role === 'mentor') {
-      query = query.eq('mentor_id', userId);
+    
+    // Filter by role / ownership
+    if (adminMode && isAdmin && role === 'admin') {
+      // Admin view: optionally filter by mentor or mentee
+      if (mentorIdFilter) {
+        query = query.eq('mentor_id', mentorIdFilter);
+      }
+      if (menteeIdFilter) {
+        query = query.eq('mentee_id', menteeIdFilter);
+      }
     } else {
-      query = query.eq('mentee_id', userId);
+      // Normal mentor/mentee scoped view
+      if (role === 'mentor') {
+        query = query.eq('mentor_id', userId);
+      } else {
+        query = query.eq('mentee_id', userId);
+      }
     }
 
     // Filter by status
@@ -53,7 +82,19 @@ export async function GET(request) {
       query = query.eq('status', status);
     }
 
-    // Filter upcoming only
+    // Date range filters
+    if (from) {
+      const fromDate = new Date(from);
+      query = query.gte('scheduled_at', fromDate.toISOString());
+    }
+
+    if (to) {
+      const toDate = new Date(to);
+      toDate.setHours(23, 59, 59, 999);
+      query = query.lte('scheduled_at', toDate.toISOString());
+    }
+
+    // Filter upcoming only (applies on top of date filters)
     if (upcoming) {
       query = query.gte('scheduled_at', new Date().toISOString());
     }

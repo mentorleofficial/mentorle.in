@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/supabaseServer';
+import { getUserRole } from '@/lib/auth';
+import { ROLES } from '@/lib/roles';
 
 // GET - Fetch single booking
 export async function GET(request, { params }) {
@@ -39,8 +41,18 @@ export async function GET(request, { params }) {
       return NextResponse.json({ error: 'Booking not found' }, { status: 404 });
     }
 
-    // Check access (only mentor or mentee can view)
-    if (data.mentor_id !== userId && data.mentee_id !== userId) {
+    // Check access (only mentor, mentee, or admin can view)
+    let userRole = null;
+    if (userId) {
+      try {
+        userRole = await getUserRole(userId, supabase);
+      } catch (err) {
+        console.warn('Failed to get user role for booking GET:', err);
+      }
+    }
+    const isAdmin = userRole === ROLES.ADMIN;
+
+    if (data.mentor_id !== userId && data.mentee_id !== userId && !isAdmin) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -145,7 +157,18 @@ export async function PATCH(request, { params }) {
     const isMentor = booking.mentor_id === userId;
     const isMentee = booking.mentee_id === userId;
 
-    if (!isMentor && !isMentee) {
+    // Determine user role to allow admin overrides
+    let userRole = null;
+    if (userId) {
+      try {
+        userRole = await getUserRole(userId, supabase);
+      } catch (err) {
+        console.warn('Failed to get user role for booking PATCH:', err);
+      }
+    }
+    const isAdmin = userRole === ROLES.ADMIN;
+    
+    if (!isMentor && !isMentee && !isAdmin) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -173,38 +196,38 @@ export async function PATCH(request, { params }) {
       }
 
       // Check permissions for status change
-      if (newStatus === 'confirmed' && !isMentor) {
+      if (newStatus === 'confirmed' && !isMentor && !isAdmin) {
         return NextResponse.json({ error: 'Only mentor can confirm bookings' }, { status: 403 });
       }
 
-      if (newStatus === 'completed' && !isMentor) {
+      if (newStatus === 'completed' && !isMentor && !isAdmin) {
         return NextResponse.json({ error: 'Only mentor can mark as completed' }, { status: 403 });
       }
 
-      if (newStatus === 'no_show' && !isMentor) {
+      if (newStatus === 'no_show' && !isMentor && !isAdmin) {
         return NextResponse.json({ error: 'Only mentor can mark as no-show' }, { status: 403 });
       }
 
       updateData.status = newStatus;
 
       if (newStatus === 'cancelled') {
-        updateData.cancelled_by = isMentor ? 'mentor' : 'mentee';
+        updateData.cancelled_by = isMentor ? 'mentor' : isMentee ? 'mentee' : 'admin';
         updateData.cancellation_reason = body.cancellation_reason || null;
       }
     }
 
-    // Handle meeting link (mentor only)
-    if (body.meeting_link !== undefined && isMentor) {
+    // Handle meeting link (mentor or admin)
+    if (body.meeting_link !== undefined && (isMentor || isAdmin)) {
       updateData.meeting_link = body.meeting_link;
     }
 
-    // Handle mentor notes (mentor only)
-    if (body.mentor_notes !== undefined && isMentor) {
+    // Handle mentor notes (mentor or admin)
+    if (body.mentor_notes !== undefined && (isMentor || isAdmin)) {
       updateData.mentor_notes = body.mentor_notes;
     }
 
-    // Handle rescheduling (mentee or mentor, only for pending/confirmed bookings)
-    if (body.scheduled_at && (isMentee || isMentor)) {
+    // Handle rescheduling (mentee, mentor, or admin; only for pending/confirmed bookings)
+    if (body.scheduled_at && (isMentee || isMentor || isAdmin)) {
       if (!['pending', 'confirmed'].includes(booking.status)) {
         return NextResponse.json({ 
           error: 'Can only reschedule pending or confirmed bookings' 

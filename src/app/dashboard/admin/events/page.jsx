@@ -101,6 +101,8 @@ function AdminEventsContent() {
         learning_outcomes: formData.learning_outcomes || null,
         meeting_link: formData.meeting_link || null,
         status: formData.status,
+        // Keep a simple cancellation flag in sync with status for mentee views
+        is_cancelled: formData.status === "cancelled",
         banner_image_url: null
       };
 
@@ -164,7 +166,8 @@ function AdminEventsContent() {
         prerequisites: formData.prerequisites || null,
         learning_outcomes: formData.learning_outcomes || null,
         meeting_link: formData.meeting_link || null,
-        status: formData.status
+        status: formData.status,
+        is_cancelled: formData.status === "cancelled"
       };
 
       // Handle banner image

@@ -33,7 +33,9 @@ export default function EventFilters({
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="all">All Types</option>
-            <option value="bootcamp">Bootcamp</option>
+            <option value="bootcamp">Bootcamp (Course)</option>
+            <option value="course">Course</option>
+            <option value="hackathon">Hackathon</option>
             <option value="workshop">Workshop</option>
             <option value="guest_session">Guest Session</option>
             <option value="event">Event</option>
