@@ -193,9 +193,18 @@ export async function POST(request) {
 
       return NextResponse.json({ 
         error: 'Failed to create payment order',
-        details: cashfreeData.message || 'Payment gateway error'
+        details: cashfreeData.message || cashfreeData.error || 'Payment gateway error'
       }, { status: 500 });
     }
+
+    // Log Cashfree response for debugging
+    console.log('Cashfree order created:', {
+      order_id: orderId,
+      payment_session_id: cashfreeData.payment_session_id,
+      payment_link: cashfreeData.payment_link,
+      payment_url: cashfreeData.payment_url,
+      all_fields: Object.keys(cashfreeData)
+    });
 
     // Update booking with payment order ID
     await supabase
@@ -206,10 +215,13 @@ export async function POST(request) {
       })
       .eq('id', booking_id);
 
+    // Cashfree may return payment_link or payment_url
+    const paymentUrl = cashfreeData.payment_link || cashfreeData.payment_url || null;
+
     return NextResponse.json({
       order_id: orderId,
-      payment_session_id: cashfreeData.payment_session_id,
-      payment_url: cashfreeData.payment_link || null,
+      payment_session_id: cashfreeData.payment_session_id || null,
+      payment_url: paymentUrl,
       order_amount: amount,
       order_currency: currency
     });

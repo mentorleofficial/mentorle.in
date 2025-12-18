@@ -96,11 +96,13 @@ export default function BookingPaymentDialog({
   };
 
   // Build payment URL using payment_session_id
+  // Cashfree payment URL format: https://payments.cashfree.com/forms/web/pay/{payment_session_id}
   const paymentUrl = paymentSessionId 
     ? `https://payments.cashfree.com/forms/web/pay/${paymentSessionId}`
     : null;
 
-  if (!paymentUrl) {
+  if (!paymentUrl || !paymentSessionId) {
+    console.error('BookingPaymentDialog: Missing payment_session_id', { paymentSessionId, bookingData });
     return null;
   }
 

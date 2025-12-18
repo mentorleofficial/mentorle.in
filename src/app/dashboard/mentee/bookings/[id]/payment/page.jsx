@@ -95,14 +95,23 @@ export default function BookingPaymentPage() {
       return;
     }
 
-    // If no orderId exists, create a payment order first
-    let currentOrderId = orderId || booking.payment_id;
-    
-    if (!currentOrderId && booking.amount > 0 && booking.payment_status === 'pending') {
+    // Always create a new payment order if payment is pending
+    // This ensures we always have fresh payment_url and payment_session_id
+    if (booking.amount > 0 && booking.payment_status === 'pending') {
       try {
         setLoading(true);
         const { supabase } = await import("@/lib/supabase");
         const { data: { session } } = await supabase.auth.getSession();
+
+        if (!session) {
+          toast({
+            title: "Error",
+            description: "Please log in to proceed with payment",
+            variant: "destructive",
+          });
+          setLoading(false);
+          return;
+        }
 
         const paymentResponse = await fetch("/api/payments/create-order", {
           method: "POST",
@@ -120,10 +129,10 @@ export default function BookingPaymentPage() {
         const paymentResult = await paymentResponse.json();
 
         if (!paymentResponse.ok) {
-          throw new Error(paymentResult.error || "Failed to create payment order");
+          throw new Error(paymentResult.error || paymentResult.details || "Failed to create payment order");
         }
 
-        currentOrderId = paymentResult.order_id;
+        const currentOrderId = paymentResult.order_id;
         setOrderId(currentOrderId);
         
         // Store payment session ID and URL for booking payment
@@ -137,85 +146,54 @@ export default function BookingPaymentPage() {
         // Update URL with order_id
         const newUrl = `${window.location.pathname}?order_id=${currentOrderId}`;
         window.history.replaceState({}, '', newUrl);
+
+        // If we have a payment URL, redirect directly to Cashfree payment page
+        if (paymentResult.payment_url) {
+          window.location.href = paymentResult.payment_url;
+          return;
+        }
+
+        // If we have payment_session_id, use payment dialog
+        if (paymentResult.payment_session_id) {
+          setPaymentData({
+            bookingId: booking.id,
+            orderId: currentOrderId,
+            amount: booking.amount,
+            currency: booking.currency || 'INR',
+            offering: booking.offering,
+            paymentSessionId: paymentResult.payment_session_id
+          });
+          setShowPaymentDialog(true);
+          setLoading(false);
+          return;
+        }
+
+        // If neither payment_url nor payment_session_id is available, show error
+        throw new Error("Payment gateway did not return payment URL or session ID");
       } catch (error) {
         console.error("Error creating payment order:", error);
         toast({
           title: "Error",
-          description: error.message || "Failed to initialize payment",
+          description: error.message || "Failed to initialize payment. Please try again.",
           variant: "destructive",
         });
         setLoading(false);
         return;
-      } finally {
-        setLoading(false);
       }
     }
 
-    if (!currentOrderId) {
+    // If booking is free or already paid
+    if (booking.amount === 0) {
       toast({
-        title: "Error",
-        description: "Payment information not available",
-        variant: "destructive",
+        title: "Info",
+        description: "This is a free session. No payment required.",
       });
-      return;
-    }
-
-    // If we have a payment URL, redirect directly to Cashfree payment page
-    if (paymentUrl) {
-      window.location.href = paymentUrl;
-      return;
-    }
-
-    // If we have payment_session_id, use Cashfree SDK
-    if (paymentSessionId) {
-      setPaymentData({
-        bookingId: booking.id,
-        orderId: currentOrderId,
-        amount: booking.amount,
-        currency: booking.currency || 'INR',
-        offering: booking.offering,
-        paymentSessionId: paymentSessionId
+    } else if (booking.payment_status === 'paid') {
+      toast({
+        title: "Payment Complete",
+        description: "This booking has already been paid.",
       });
-      setShowPaymentDialog(true);
-      return;
     }
-
-    // Fallback: try to get payment info from order
-    try {
-      setLoading(true);
-      const { supabase } = await import("@/lib/supabase");
-      const { data: { session } } = await supabase.auth.getSession();
-
-      // Fetch payment order details to get payment URL
-      const verifyResponse = await fetch("/api/payments/verify", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${session.access_token}`
-        },
-        body: JSON.stringify({
-          booking_id: booking.id,
-          order_id: currentOrderId
-        })
-      });
-
-      const verifyResult = await verifyResponse.json();
-      
-      if (verifyResult.payment_url) {
-        window.location.href = verifyResult.payment_url;
-        return;
-      }
-    } catch (error) {
-      console.error("Error fetching payment URL:", error);
-    }
-
-    // If no payment URL available, show error
-    toast({
-      title: "Error",
-      description: "Unable to initialize payment. Please try again.",
-      variant: "destructive",
-    });
-    setLoading(false);
   };
 
   const handlePaymentSuccess = async () => {
