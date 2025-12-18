@@ -62,14 +62,14 @@ export default function BookingPaymentDialog({
 
   // Add event listener when component mounts
   useEffect(() => {
-    if (typeof window !== 'undefined' && isOpen) {
+    if (typeof window !== 'undefined') {
       window.addEventListener('message', handlePaymentMessage);
       
       return () => {
         window.removeEventListener('message', handlePaymentMessage);
       };
     }
-  }, [isOpen]);
+  }, []);
 
   // Iframe loading timeout
   useEffect(() => {
