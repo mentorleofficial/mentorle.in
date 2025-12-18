@@ -198,13 +198,15 @@ export default function BookingPaymentPage() {
         const newUrl = `${window.location.pathname}?order_id=${currentOrderId}`;
         window.history.replaceState({}, '', newUrl);
 
-        // Always use payment dialog with Cashfree form (same as subscription)
+        // Use payment dialog with dynamic payment URL from Cashfree
         setPaymentData({
           bookingId: booking.id,
           orderId: currentOrderId,
           amount: booking.amount,
           currency: booking.currency || 'INR',
-          offering: booking.offering
+          offering: booking.offering,
+          paymentUrl: paymentResult.payment_url,
+          paymentSessionId: paymentResult.payment_session_id
         });
         setShowPaymentDialog(true);
         setLoading(false);
@@ -476,7 +478,8 @@ export default function BookingPaymentPage() {
             setPaymentData(null);
           }}
           onPaymentSuccess={handlePaymentSuccess}
-          paymentSessionId={null}
+          paymentSessionId={paymentData.paymentSessionId}
+          paymentUrl={paymentData.paymentUrl}
           bookingData={{
             bookingId: booking.id,
             orderId: paymentData.orderId,

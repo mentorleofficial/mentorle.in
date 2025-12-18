@@ -13,6 +13,7 @@ export default function BookingPaymentDialog({
   onClose, 
   onPaymentSuccess, 
   paymentSessionId,
+  paymentUrl,
   bookingData
 }) {
   const [paymentStatus, setPaymentStatus] = useState('pending'); // 'pending', 'success', 'failed'
@@ -95,14 +96,21 @@ export default function BookingPaymentDialog({
     setIframeLoaded(true);
   };
 
-  // Use the same Cashfree form as subscription payment
-  // Pass order_id as parameter so webhook can identify the booking
-  const paymentUrl = bookingData?.orderId
-    ? `https://payments.cashfree.com/forms/mentorleprime?redirect_target=_blank&order_id=${bookingData.orderId}`
-    : 'https://payments.cashfree.com/forms/mentorleprime?redirect_target=_blank';
-
-  if (!paymentUrl) {
-    console.error('BookingPaymentDialog: Missing order data', { bookingData });
+  // Use dynamic payment URL from Cashfree API (supports variable amounts)
+  // Fallback to constructing URL from payment_session_id if paymentUrl not provided
+  let finalPaymentUrl = paymentUrl;
+  
+  if (!finalPaymentUrl && paymentSessionId) {
+    // Construct payment URL from session ID
+    finalPaymentUrl = `https://payments.cashfree.com/forms/web/pay/${paymentSessionId}`;
+  }
+  
+  if (!finalPaymentUrl) {
+    console.error('BookingPaymentDialog: Missing payment URL or session ID', { 
+      paymentUrl, 
+      paymentSessionId, 
+      bookingData 
+    });
     return null;
   }
 
@@ -166,7 +174,7 @@ export default function BookingPaymentDialog({
                 )}
                 
                 <iframe
-                  src={paymentUrl}
+                  src={finalPaymentUrl}
                   width="100%"
                   height="100%"
                   frameBorder="0"
