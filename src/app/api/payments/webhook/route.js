@@ -16,9 +16,14 @@ export async function POST(request) {
     }
 
     // Extract booking_id from order_id (format: booking_{booking_id}_{timestamp})
+    // If order_id doesn't match booking format, it might be a subscription payment
     const bookingIdMatch = order_id.match(/^booking_(.+?)_\d+$/);
+    
     if (!bookingIdMatch) {
-      return NextResponse.json({ error: 'Invalid order ID format' }, { status: 400 });
+      // This might be a subscription payment, not a booking payment
+      // Return success but don't update booking
+      console.log('Webhook received non-booking order_id:', order_id);
+      return NextResponse.json({ success: true, message: 'Order processed (not a booking)' });
     }
 
     const bookingId = bookingIdMatch[1];
