@@ -170,7 +170,6 @@ export default function BookingModal({ offering, mentorAvailability, onClose, on
         onClose();
         
         // Navigate to payment confirmation page
-        const router = (await import("next/navigation")).useRouter();
         window.location.href = `/dashboard/mentee/bookings/${booking.id}/payment?order_id=${paymentResult.order_id}`;
       } else {
         // Free session - booking confirmed
