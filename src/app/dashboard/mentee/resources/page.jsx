@@ -113,11 +113,19 @@ export default function Resources() {
       setAvailableDomains(domainsArray);
     } catch (error) {
       console.error("Error fetching available domains:", error);
-      toast({
-        title: "Error",
-        description: "Failed to load available domains",
-        variant: "destructive"
-      });
+      
+      // Fail silently for missing permissions or table, so mentee UX isn't broken
+      const message = (error.message || "").toLowerCase();
+      const isPermissionIssue = message.includes("permission denied");
+      const isMissingTable = message.includes("does not exist") || message.includes("relation") && message.includes("resources");
+
+      if (!isPermissionIssue && !isMissingTable) {
+        toast({
+          title: "Error",
+          description: "Failed to load available domains",
+          variant: "destructive"
+        });
+      }
     }
   };
 
