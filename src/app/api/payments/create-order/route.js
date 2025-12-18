@@ -237,7 +237,7 @@ export async function POST(request) {
           'x-api-version': '2023-08-01'
         },
         body: JSON.stringify({
-          link_id: orderId, // Use same order ID for consistency
+          link_id: `link_${orderId}`, // Payment link ID must be unique
           link_amount: parseFloat(amount),
           link_currency: currency,
           link_purpose: `Booking payment for ${booking.offering?.title || 'Session'}`,
@@ -255,7 +255,9 @@ export async function POST(request) {
             return_url: `${appUrl}/dashboard/mentee/bookings/${booking_id}/payment`,
             notify_url: `${appUrl}/api/payments/webhook`
           },
-          link_auto_reminders: false
+          link_auto_reminders: false,
+          link_partial_payments: false,
+          link_minimum_partial_amount: null
         })
       });
 
@@ -290,24 +292,32 @@ export async function POST(request) {
             console.log('⚠️ Constructed payment URL from link_id:', paymentUrl);
           } else {
             console.error('❌ No payment URL or link_id in response');
-            throw new Error('Payment link created but no URL available');
+            // Don't throw - continue with payment_session_id
           }
         }
       } else {
-        console.error('❌ Payment link creation failed:', linkData);
-        throw new Error(`Payment link creation failed: ${linkData.message || linkData.error || JSON.stringify(linkData)}`);
+        console.error('❌ Payment link creation failed - Status:', linkResponse.status);
+        console.error('❌ Payment link error response:', JSON.stringify(linkData, null, 2));
+        // Don't throw - continue with payment_session_id from order
       }
     } catch (linkError) {
-      console.error('❌ Error creating payment link:', linkError);
-      // Don't use broken fallback - throw error so user sees it
-      return NextResponse.json({ 
-        error: 'Failed to create payment link',
-        details: linkError.message || 'Payment gateway configuration error'
-      }, { status: 500 });
+      console.error('❌ Exception creating payment link:', linkError);
+      // Don't throw - continue with payment_session_id from order
     }
     
-    if (!paymentUrl) {
-      console.error('❌ No payment URL available after all attempts');
+    // If payment link creation failed, we still have payment_session_id from order
+    if (!paymentUrl && cashfreeData.payment_session_id) {
+      console.log('✅ Payment link failed, but order has payment_session_id:', cashfreeData.payment_session_id);
+      // Frontend will need to handle this - for now return null for payment_url
+    }
+    
+    // Only fail if we have neither payment_url nor payment_session_id
+    if (!paymentUrl && !cashfreeData.payment_session_id) {
+      console.error('❌ No payment URL or payment_session_id available');
+      return NextResponse.json({ 
+        error: 'Failed to initialize payment',
+        details: 'Payment gateway did not return payment URL or session ID'
+      }, { status: 500 });
     }
 
     return NextResponse.json({

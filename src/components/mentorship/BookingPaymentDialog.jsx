@@ -97,10 +97,11 @@ export default function BookingPaymentDialog({
     setIframeLoaded(true);
   };
 
-  // ONLY use paymentUrl from API - do NOT construct from payment_session_id
-  // The payment_session_id URL format doesn't work in iframes
-  if (!paymentUrl) {
-    console.error('❌ BookingPaymentDialog: Missing payment URL from API', { 
+  // Use paymentUrl if available, otherwise we'll need to use Cashfree checkout.js SDK
+  // For now, if we have paymentSessionId but no paymentUrl, show error
+  // TODO: Implement Cashfree checkout.js SDK integration
+  if (!paymentUrl && !paymentSessionId) {
+    console.error('❌ BookingPaymentDialog: Missing both payment URL and session ID', { 
       paymentUrl, 
       paymentSessionId, 
       bookingData 
@@ -109,7 +110,7 @@ export default function BookingPaymentDialog({
       <Dialog open={isOpen} onOpenChange={onClose}>
         <DialogContent>
           <div className="text-center py-8">
-            <p className="text-red-600 mb-4">Payment URL not available. Please try again.</p>
+            <p className="text-red-600 mb-4">Payment initialization failed. Please try again.</p>
             <p className="text-sm text-gray-500">If this persists, contact support.</p>
           </div>
         </DialogContent>
@@ -117,7 +118,24 @@ export default function BookingPaymentDialog({
     );
   }
   
-  console.log('✅ BookingPaymentDialog: Using payment URL from API:', paymentUrl);
+  if (paymentUrl) {
+    console.log('✅ BookingPaymentDialog: Using payment URL from API:', paymentUrl);
+  } else if (paymentSessionId) {
+    console.log('⚠️ BookingPaymentDialog: Only payment_session_id available, need checkout.js SDK');
+    // For now, show error - checkout.js SDK integration needed
+    return (
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent>
+          <div className="text-center py-8">
+            <p className="text-red-600 mb-4">Payment link creation failed. Please try again.</p>
+            <p className="text-sm text-gray-500">The payment gateway is being configured.</p>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+  
+  const finalPaymentUrl = paymentUrl;
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
