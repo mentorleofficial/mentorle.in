@@ -41,7 +41,7 @@ export default function SignupPage() {
   }, []);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value.trim() });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
@@ -50,9 +50,25 @@ export default function SignupPage() {
     setIsLoading(true);
 
     try {
+      // Trim form data before processing (but allow spaces during typing)
+      const trimmedName = formData.name.trim();
+      const trimmedEmail = formData.userEmail.trim();
+      const trimmedPhone = formData.phone.trim();
+
+      // Validate required fields after trimming
+      if (!trimmedName) {
+        throw new Error("Please enter your full name");
+      }
+      if (!trimmedEmail) {
+        throw new Error("Please enter your email");
+      }
+      if (!trimmedPhone) {
+        throw new Error("Please enter your phone number");
+      }
+
       // Validate phone number
       const phoneRegex = /^\+?[\d\s-]{10,}$/;
-      if (!phoneRegex.test(formData.phone)) {
+      if (!phoneRegex.test(trimmedPhone)) {
         throw new Error("Invalid phone number format");
       }
 
@@ -60,19 +76,19 @@ export default function SignupPage() {
       const { data: existingMentee } = await supabase
         .from("mentee_data")
         .select("email")
-        .eq("email", formData.userEmail)
+        .eq("email", trimmedEmail)
         .single();
 
       const { data: existingMentor } = await supabase
         .from("mentor_data")
         .select("email")
-        .eq("email", formData.userEmail)
+        .eq("email", trimmedEmail)
         .single();
 
       const { data: existingAdmin } = await supabase
         .from("admin_data")
         .select("email")
-        .eq("email", formData.userEmail)
+        .eq("email", trimmedEmail)
         .single();
 
       if (existingMentee || existingMentor || existingAdmin) {
@@ -83,7 +99,7 @@ export default function SignupPage() {
 
       // Sign up with Supabase Auth
       const { data, error: authError } = await supabase.auth.signUp({
-        email: formData.userEmail,
+        email: trimmedEmail,
         password: formData.userPassword,
       });
 
@@ -108,9 +124,9 @@ export default function SignupPage() {
       const { error: dbError } = await supabase.from("mentee_data").insert([
         {
           user_id: data.user.id,
-          name: formData.name,
-          email: formData.userEmail,
-          phone: formData.phone,
+          name: trimmedName,
+          email: trimmedEmail,
+          phone: trimmedPhone,
           created_at: new Date().toISOString(),
         },
       ]);
@@ -144,7 +160,7 @@ export default function SignupPage() {
           {
             user_id: data.user.id,
             role_id: menteeRole.id,
-            name: formData.name
+            name: trimmedName
           },
         ]);
 
