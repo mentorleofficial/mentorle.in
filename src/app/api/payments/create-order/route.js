@@ -162,7 +162,7 @@ export async function POST(request) {
         customer_phone: menteeData?.phone || '9999999999'
       },
       order_meta: {
-        return_url: `${appUrl}/dashboard/mentee/bookings/payment/callback?booking_id=${booking_id}`,
+        return_url: `${appUrl}/dashboard/mentee/bookings/${booking_id}/payment?order_id=${orderId}`,
         notify_url: `${appUrl}/api/payments/webhook`
       }
     };
