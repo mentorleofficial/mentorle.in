@@ -11,7 +11,7 @@ import {
   Calendar, Clock, IndianRupee, User, CheckCircle, 
   Loader2, ArrowLeft, AlertCircle, CreditCard
 } from "lucide-react";
-import PaymentDialog from "@/app/dashboard/mentee/resources/components/PaymentDialog";
+import BookingPaymentDialog from "@/components/mentorship/BookingPaymentDialog";
 
 export default function BookingPaymentPage() {
   const params = useParams();
@@ -24,6 +24,8 @@ export default function BookingPaymentPage() {
   const [paymentData, setPaymentData] = useState(null);
   const [showPaymentDialog, setShowPaymentDialog] = useState(false);
   const [verifying, setVerifying] = useState(false);
+  const [paymentSessionId, setPaymentSessionId] = useState(null);
+  const [paymentUrl, setPaymentUrl] = useState(null);
 
   const bookingId = params.id;
   const orderIdFromUrl = searchParams.get('order_id');
@@ -124,6 +126,14 @@ export default function BookingPaymentPage() {
         currentOrderId = paymentResult.order_id;
         setOrderId(currentOrderId);
         
+        // Store payment session ID and URL for booking payment
+        if (paymentResult.payment_session_id) {
+          setPaymentSessionId(paymentResult.payment_session_id);
+        }
+        if (paymentResult.payment_url) {
+          setPaymentUrl(paymentResult.payment_url);
+        }
+        
         // Update URL with order_id
         const newUrl = `${window.location.pathname}?order_id=${currentOrderId}`;
         window.history.replaceState({}, '', newUrl);
@@ -150,14 +160,62 @@ export default function BookingPaymentPage() {
       return;
     }
 
-    setPaymentData({
-      bookingId: booking.id,
-      orderId: currentOrderId,
-      amount: booking.amount,
-      currency: booking.currency || 'INR',
-      offering: booking.offering
+    // If we have a payment URL, redirect directly to Cashfree payment page
+    if (paymentUrl) {
+      window.location.href = paymentUrl;
+      return;
+    }
+
+    // If we have payment_session_id, use Cashfree SDK
+    if (paymentSessionId) {
+      setPaymentData({
+        bookingId: booking.id,
+        orderId: currentOrderId,
+        amount: booking.amount,
+        currency: booking.currency || 'INR',
+        offering: booking.offering,
+        paymentSessionId: paymentSessionId
+      });
+      setShowPaymentDialog(true);
+      return;
+    }
+
+    // Fallback: try to get payment info from order
+    try {
+      setLoading(true);
+      const { supabase } = await import("@/lib/supabase");
+      const { data: { session } } = await supabase.auth.getSession();
+
+      // Fetch payment order details to get payment URL
+      const verifyResponse = await fetch("/api/payments/verify", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${session.access_token}`
+        },
+        body: JSON.stringify({
+          booking_id: booking.id,
+          order_id: currentOrderId
+        })
+      });
+
+      const verifyResult = await verifyResponse.json();
+      
+      if (verifyResult.payment_url) {
+        window.location.href = verifyResult.payment_url;
+        return;
+      }
+    } catch (error) {
+      console.error("Error fetching payment URL:", error);
+    }
+
+    // If no payment URL available, show error
+    toast({
+      title: "Error",
+      description: "Unable to initialize payment. Please try again.",
+      variant: "destructive",
     });
-    setShowPaymentDialog(true);
+    setLoading(false);
   };
 
   const handlePaymentSuccess = async () => {
@@ -393,21 +451,21 @@ export default function BookingPaymentPage() {
       )}
 
       {/* Payment Dialog */}
-      {showPaymentDialog && paymentData && (
-        <PaymentDialog
+      {showPaymentDialog && paymentData && paymentData.paymentSessionId && (
+        <BookingPaymentDialog
           isOpen={showPaymentDialog}
           onClose={() => {
             setShowPaymentDialog(false);
             setPaymentData(null);
           }}
           onPaymentSuccess={handlePaymentSuccess}
-          subscriptionData={{
-            channel: {
-              name: booking.offering?.title || "Mentorship Session",
-              id: booking.offering_id
-            },
-            subscriptionId: booking.id,
-            amount: booking.amount
+          paymentSessionId={paymentData.paymentSessionId}
+          bookingData={{
+            bookingId: booking.id,
+            orderId: paymentData.orderId,
+            amount: booking.amount,
+            currency: booking.currency || 'INR',
+            offering: booking.offering
           }}
         />
       )}
