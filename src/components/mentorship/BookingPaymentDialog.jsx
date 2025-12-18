@@ -95,14 +95,14 @@ export default function BookingPaymentDialog({
     setIframeLoaded(true);
   };
 
-  // Build payment URL using payment_session_id
-  // Cashfree payment URL format: https://payments.cashfree.com/forms/web/pay/{payment_session_id}
-  const paymentUrl = paymentSessionId 
-    ? `https://payments.cashfree.com/forms/web/pay/${paymentSessionId}`
-    : null;
+  // Use the same Cashfree form as subscription payment
+  // Pass order_id as parameter so webhook can identify the booking
+  const paymentUrl = bookingData?.orderId
+    ? `https://payments.cashfree.com/forms/mentorleprime?redirect_target=_blank&order_id=${bookingData.orderId}`
+    : 'https://payments.cashfree.com/forms/mentorleprime?redirect_target=_blank';
 
-  if (!paymentUrl || !paymentSessionId) {
-    console.error('BookingPaymentDialog: Missing payment_session_id', { paymentSessionId, bookingData });
+  if (!paymentUrl) {
+    console.error('BookingPaymentDialog: Missing order data', { bookingData });
     return null;
   }
 
@@ -113,10 +113,10 @@ export default function BookingPaymentDialog({
           <DialogTitle className="flex items-center gap-3">
             <div className="min-w-0 flex-1">
               <h3 className="text-base sm:text-lg font-semibold text-gray-900">
-                Complete Payment
+                Payment for {bookingData?.offering?.title || "Mentorship Session"}
               </h3>
               <p className="text-xs sm:text-sm text-gray-600 font-medium">
-                {bookingData?.offering?.title || "Mentorship Session"} • ₹{bookingData?.amount || 0}
+                ₹{bookingData?.amount || 0} • One-time Payment
               </p>
             </div>
           </DialogTitle>

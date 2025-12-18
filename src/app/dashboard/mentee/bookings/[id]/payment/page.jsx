@@ -198,29 +198,17 @@ export default function BookingPaymentPage() {
         const newUrl = `${window.location.pathname}?order_id=${currentOrderId}`;
         window.history.replaceState({}, '', newUrl);
 
-        // If we have a payment URL, redirect directly to Cashfree payment page
-        if (paymentResult.payment_url) {
-          window.location.href = paymentResult.payment_url;
-          return;
-        }
-
-        // If we have payment_session_id, use payment dialog
-        if (paymentResult.payment_session_id) {
-          setPaymentData({
-            bookingId: booking.id,
-            orderId: currentOrderId,
-            amount: booking.amount,
-            currency: booking.currency || 'INR',
-            offering: booking.offering,
-            paymentSessionId: paymentResult.payment_session_id
-          });
-          setShowPaymentDialog(true);
-          setLoading(false);
-          return;
-        }
-
-        // If neither payment_url nor payment_session_id is available, show error
-        throw new Error("Payment gateway did not return payment URL or session ID");
+        // Always use payment dialog with Cashfree form (same as subscription)
+        setPaymentData({
+          bookingId: booking.id,
+          orderId: currentOrderId,
+          amount: booking.amount,
+          currency: booking.currency || 'INR',
+          offering: booking.offering
+        });
+        setShowPaymentDialog(true);
+        setLoading(false);
+        return;
       } catch (error) {
         console.error("Error creating payment order:", error);
         toast({
@@ -480,7 +468,7 @@ export default function BookingPaymentPage() {
       )}
 
       {/* Payment Dialog */}
-      {showPaymentDialog && paymentData && paymentData.paymentSessionId && (
+      {showPaymentDialog && paymentData && (
         <BookingPaymentDialog
           isOpen={showPaymentDialog}
           onClose={() => {
@@ -488,7 +476,7 @@ export default function BookingPaymentPage() {
             setPaymentData(null);
           }}
           onPaymentSuccess={handlePaymentSuccess}
-          paymentSessionId={paymentData.paymentSessionId}
+          paymentSessionId={null}
           bookingData={{
             bookingId: booking.id,
             orderId: paymentData.orderId,
