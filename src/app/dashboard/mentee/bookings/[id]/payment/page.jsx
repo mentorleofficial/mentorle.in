@@ -37,6 +37,57 @@ export default function BookingPaymentPage() {
     }
   }, [bookingId]);
 
+  // Auto-verify payment if order_id is in URL (returned from Cashfree)
+  useEffect(() => {
+    if (orderIdFromUrl && booking && booking.payment_status === 'pending' && !verifying) {
+      // Small delay to ensure booking data is loaded
+      const timer = setTimeout(async () => {
+        setVerifying(true);
+        try {
+          const { supabase } = await import("@/lib/supabase");
+          const { data: { session } } = await supabase.auth.getSession();
+
+          if (!session) return;
+
+          // Verify payment
+          const verifyResponse = await fetch("/api/payments/verify", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${session.access_token}`
+            },
+            body: JSON.stringify({
+              booking_id: bookingId,
+              order_id: orderIdFromUrl
+            })
+          });
+
+          const verifyResult = await verifyResponse.json();
+
+          if (verifyResult.payment_status === 'paid') {
+            // Refresh booking
+            await fetchBooking();
+            
+            toast({
+              title: "Payment Successful!",
+              description: "Your booking has been confirmed",
+            });
+
+            // Redirect to booking details after a moment
+            setTimeout(() => {
+              router.push(`/dashboard/mentee/bookings/${bookingId}`);
+            }, 2000);
+          }
+        } catch (error) {
+          console.error("Error verifying payment:", error);
+        } finally {
+          setVerifying(false);
+        }
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [orderIdFromUrl, booking, bookingId, verifying]);
+
   const fetchBooking = async () => {
     try {
       setLoading(true);
