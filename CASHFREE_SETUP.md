@@ -81,3 +81,85 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 - Ensure your Cashfree account is active
 - Check Cashfree dashboard for API error logs
 
+### ❌ "Transactions are not enabled for your payment gateway account" Error
+
+**This is a Cashfree account configuration issue, not a code issue.**
+
+#### For Sandbox/Testing Environment:
+
+1. **Log in to Cashfree Dashboard**
+   - Go to [https://merchant.cashfree.com](https://merchant.cashfree.com)
+   - Log in with your account
+
+2. **Enable Sandbox Transactions**
+   - Navigate to **Settings** → **Account Settings**
+   - Look for **"Sandbox Mode"** or **"Test Mode"** section
+   - Ensure **"Enable Transactions"** or **"Activate Sandbox"** is turned ON
+   - Some accounts may need to activate sandbox mode explicitly
+
+3. **Check API Access**
+   - Go to **Developers** → **API Keys**
+   - Verify you're using **Sandbox** environment keys
+   - Ensure API access is enabled for your account
+
+4. **Contact Cashfree Support (if needed)**
+   - If you can't find the option, contact Cashfree support
+   - Email: support@cashfree.com
+   - Request: "Please enable transactions for my sandbox account"
+
+#### For Production Environment:
+
+1. **Complete KYC Verification**
+   - Go to **Settings** → **KYC Documents**
+   - Upload required documents:
+     - Business registration documents
+     - Bank account details
+     - PAN card
+     - Address proof
+   - Wait for verification (usually 24-48 hours)
+
+2. **Activate Production Account**
+   - After KYC approval, go to **Settings** → **Account Settings**
+   - Activate your production account
+   - Enable payment gateway features
+
+3. **Enable Payment Gateway**
+   - Navigate to **Payment Gateway** → **Settings**
+   - Enable **"Accept Payments"** or **"Activate Gateway"**
+   - Configure your business details
+
+4. **Verify Account Status**
+   - Check **Dashboard** → **Account Status**
+   - Should show: **"Active"** or **"Live"**
+   - If it shows **"Pending"** or **"Inactive"**, complete the steps above
+
+#### Quick Checklist:
+
+- ✅ Account is verified (KYC completed for production)
+- ✅ API keys are correct and match the environment
+- ✅ Transactions are enabled in account settings
+- ✅ Account status is "Active" or "Live"
+- ✅ Using correct environment (sandbox for testing, production for live)
+
+#### Alternative: Use Sandbox for Testing
+
+If you're just testing, make sure:
+- `CASHFREE_ENVIRONMENT=PRODUCTION` is changed to `CASHFREE_ENVIRONMENT=sandbox` (or remove it)
+- You're using **Sandbox API keys** (from Developers → API Keys → Sandbox)
+- Sandbox mode is enabled in your Cashfree dashboard
+
+#### Still Having Issues?
+
+1. **Check Cashfree Dashboard Logs**
+   - Go to **Developers** → **API Logs**
+   - Look for the exact error message
+   - Check the response code and details
+
+2. **Verify API Keys**
+   - Regenerate API keys if needed
+   - Ensure you're using the correct keys for the environment
+
+3. **Contact Cashfree Support**
+   - Email: support@cashfree.com
+   - Include: Your account email, error message, and what you're trying to do
+
