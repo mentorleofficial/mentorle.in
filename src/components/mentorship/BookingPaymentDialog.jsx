@@ -96,18 +96,24 @@ export default function BookingPaymentDialog({
     setIframeLoaded(true);
   };
 
-  // Use payment link URL from Cashfree (created via payment links API)
-  // This works in iframe just like the subscription form
+  // Use payment URL from API or construct from payment_session_id
   let finalPaymentUrl = paymentUrl;
   
+  // If no paymentUrl provided, construct from payment_session_id
+  if (!finalPaymentUrl && paymentSessionId) {
+    finalPaymentUrl = `https://payments.cashfree.com/forms/web/pay/${paymentSessionId}`;
+  }
+  
   if (!finalPaymentUrl) {
-    console.error('BookingPaymentDialog: Missing payment URL', { 
+    console.error('BookingPaymentDialog: Missing payment URL and session ID', { 
       paymentUrl, 
       paymentSessionId, 
       bookingData 
     });
     return null;
   }
+  
+  console.log('BookingPaymentDialog: Using payment URL:', finalPaymentUrl);
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
