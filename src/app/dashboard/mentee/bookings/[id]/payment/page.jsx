@@ -11,7 +11,7 @@ import {
   Calendar, Clock, IndianRupee, User, CheckCircle, 
   Loader2, ArrowLeft, AlertCircle, CreditCard
 } from "lucide-react";
-import BookingPaymentDialog from "@/components/mentorship/BookingPaymentDialog";
+import PaymentDialog from "@/app/dashboard/mentee/resources/components/PaymentDialog";
 
 export default function BookingPaymentPage() {
   const params = useParams();
@@ -469,23 +469,24 @@ export default function BookingPaymentPage() {
         </Card>
       )}
 
-      {/* Payment Dialog */}
+      {/* Payment Dialog - Using subscription PaymentDialog */}
       {showPaymentDialog && paymentData && (
-        <BookingPaymentDialog
+        <PaymentDialog
           isOpen={showPaymentDialog}
           onClose={() => {
             setShowPaymentDialog(false);
             setPaymentData(null);
           }}
           onPaymentSuccess={handlePaymentSuccess}
-          paymentSessionId={paymentData.paymentSessionId}
-          paymentUrl={paymentData.paymentUrl}
-          bookingData={{
-            bookingId: booking.id,
-            orderId: paymentData.orderId,
-            amount: booking.amount,
-            currency: booking.currency || 'INR',
-            offering: booking.offering
+          subscriptionData={{
+            channel: {
+              name: booking.offering?.title || "Mentorship Session",
+              id: booking.offering_id,
+              icon: "💼",
+              gradient: "from-blue-400 to-blue-600"
+            },
+            subscriptionId: booking.id,
+            amount: booking.amount
           }}
         />
       )}
