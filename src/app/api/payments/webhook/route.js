@@ -15,20 +15,42 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Order ID required' }, { status: 400 });
     }
 
-    // Extract booking_id from order_id (format: booking_{booking_id}_{timestamp})
-    // If order_id doesn't match booking format, it might be a subscription payment
-    const bookingIdMatch = order_id.match(/^booking_(.+?)_\d+$/);
+    const supabase = await createServerSupabaseClient();
     
-    if (!bookingIdMatch) {
+    // Extract booking_id from order_id
+    // Format 1: booking_{booking_id}_{timestamp} (from order API)
+    // Format 2: booking_link_booking_{booking_id}_{timestamp} (from payment link API)
+    let bookingId = null;
+    
+    // Try order format first
+    const bookingIdMatch = order_id.match(/^booking_(.+?)_\d+$/);
+    if (bookingIdMatch) {
+      bookingId = bookingIdMatch[1];
+    } else {
+      // Try payment link format
+      const linkMatch = order_id.match(/^booking_link_booking_(.+?)_\d+$/);
+      if (linkMatch) {
+        bookingId = linkMatch[1];
+      } else {
+        // Check if it's a payment link order (Cashfree might use link_id as order_id)
+        // Try to find booking by payment_id in database
+        const { data: booking } = await supabase
+          .from('mentorship_bookings')
+          .select('id')
+          .eq('payment_id', order_id)
+          .single();
+        
+        if (booking) {
+          bookingId = booking.id;
+        }
+      }
+    }
+    
+    if (!bookingId) {
       // This might be a subscription payment, not a booking payment
-      // Return success but don't update booking
       console.log('Webhook received non-booking order_id:', order_id);
       return NextResponse.json({ success: true, message: 'Order processed (not a booking)' });
     }
-
-    const bookingId = bookingIdMatch[1];
-
-    const supabase = await createServerSupabaseClient();
 
     // Update booking payment status
     const updateData = {

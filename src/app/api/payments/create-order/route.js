@@ -210,61 +210,63 @@ export async function POST(request) {
       })
       .eq('id', booking_id);
 
-    // Cashfree returns payment_session_id, we need to create payment link or use correct format
-    // Try different possible field names
-    let paymentUrl = cashfreeData.payment_link || 
-                     cashfreeData.payment_url || 
-                     cashfreeData.payment_link_url ||
-                     cashfreeData.link ||
-                     null;
-
-    // If no payment URL, construct from payment_session_id using Cashfree's standard format
-    if (!paymentUrl && cashfreeData.payment_session_id) {
-      // Cashfree payment link format: https://payments.cashfree.com/forms/web/pay/{payment_session_id}
-      paymentUrl = `https://payments.cashfree.com/forms/web/pay/${cashfreeData.payment_session_id}`;
-    }
-
-    // If still no URL, try creating a payment link via API
-    if (!paymentUrl && cashfreeData.payment_session_id) {
-      try {
-        // Create payment link using Cashfree payment links API
-        const linkResponse = await fetch(`${baseUrl}/pg/links`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-client-id': cashfreeAppId,
-            'x-client-secret': cashfreeSecretKey,
-            'x-api-version': '2023-08-01'
+    // For bookings, we need to create a payment link (not use order payment_session_id directly)
+    // This allows variable amounts and proper iframe embedding like subscription form
+    let paymentUrl = null;
+    
+    try {
+      // Create payment link using Cashfree payment links API
+      // This creates a shareable payment link that works in iframe
+      const linkResponse = await fetch(`${baseUrl}/pg/links`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-client-id': cashfreeAppId,
+          'x-client-secret': cashfreeSecretKey,
+          'x-api-version': '2023-08-01'
+        },
+        body: JSON.stringify({
+          link_id: `booking_link_${orderId}`,
+          link_amount: parseFloat(amount),
+          link_currency: currency,
+          link_purpose: `Booking payment for ${booking.offering?.title || 'Session'}`,
+          customer_details: {
+            customer_id: userId,
+            customer_name: userName,
+            customer_email: userEmail || 'user@example.com',
+            customer_phone: menteeData?.phone || '9999999999'
           },
-          body: JSON.stringify({
-            link_id: `link_${orderId}`,
-            link_amount: parseFloat(amount),
-            link_currency: currency,
-            link_purpose: `Booking payment for ${booking.offering?.title || 'Session'}`,
-            customer_details: {
-              customer_id: userId,
-              customer_name: userName,
-              customer_email: userEmail || 'user@example.com',
-              customer_phone: menteeData?.phone || '9999999999'
-            },
-            link_notify: {
-              send_sms: false,
-              send_email: false
-            },
-            link_meta: {
-              return_url: `${appUrl}/dashboard/mentee/bookings/${booking_id}/payment?order_id=${orderId}`,
-              notify_url: `${appUrl}/api/payments/webhook`
-            }
-          })
-        });
+          link_notify: {
+            send_sms: false,
+            send_email: false
+          },
+          link_meta: {
+            return_url: `${appUrl}/dashboard/mentee/bookings/${booking_id}/payment?order_id=${orderId}`,
+            notify_url: `${appUrl}/api/payments/webhook`
+          },
+          link_auto_reminders: false
+        })
+      });
 
-        const linkData = await linkResponse.json();
-        if (linkResponse.ok && linkData.link_url) {
-          paymentUrl = linkData.link_url;
-          console.log('Created payment link via API:', paymentUrl);
+      const linkData = await linkResponse.json();
+      
+      if (linkResponse.ok) {
+        // Payment link created successfully
+        paymentUrl = linkData.link_url || linkData.short_url || null;
+        console.log('Payment link created:', paymentUrl);
+        console.log('Link data:', JSON.stringify(linkData, null, 2));
+      } else {
+        console.error('Error creating payment link:', linkData);
+        // Fallback: try to use payment_session_id from order
+        if (cashfreeData.payment_session_id) {
+          paymentUrl = `https://payments.cashfree.com/forms/web/pay/${cashfreeData.payment_session_id}`;
         }
-      } catch (linkError) {
-        console.error('Error creating payment link:', linkError);
+      }
+    } catch (linkError) {
+      console.error('Error creating payment link:', linkError);
+      // Fallback: try to use payment_session_id from order
+      if (cashfreeData.payment_session_id) {
+        paymentUrl = `https://payments.cashfree.com/forms/web/pay/${cashfreeData.payment_session_id}`;
       }
     }
 

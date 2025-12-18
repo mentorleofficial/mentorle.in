@@ -198,20 +198,7 @@ export default function BookingPaymentPage() {
         const newUrl = `${window.location.pathname}?order_id=${currentOrderId}`;
         window.history.replaceState({}, '', newUrl);
 
-        // If we have a payment URL, redirect directly to Cashfree (avoids iframe issues)
-        if (paymentResult.payment_url) {
-          window.location.href = paymentResult.payment_url;
-          return;
-        }
-
-        // If we have payment_session_id, construct payment URL
-        if (paymentResult.payment_session_id) {
-          const paymentUrl = `https://payments.cashfree.com/forms/web/pay/${paymentResult.payment_session_id}`;
-          window.location.href = paymentUrl;
-          return;
-        }
-
-        // Fallback: use payment dialog
+        // Always use payment dialog with iframe (like subscription payment)
         setPaymentData({
           bookingId: booking.id,
           orderId: currentOrderId,
