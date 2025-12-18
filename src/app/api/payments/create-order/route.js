@@ -219,6 +219,14 @@ export async function POST(request) {
     // This creates a shareable payment link that works reliably in iframes
     let paymentUrl = null;
     
+    console.log('Creating payment link with baseUrl:', baseUrl);
+    console.log('Link payload:', JSON.stringify({
+      link_id: orderId,
+      link_amount: parseFloat(amount),
+      link_currency: currency,
+      link_purpose: `Booking payment for ${booking.offering?.title || 'Session'}`,
+    }, null, 2));
+    
     try {
       const linkResponse = await fetch(`${baseUrl}/pg/links`, {
         method: 'POST',
@@ -252,33 +260,50 @@ export async function POST(request) {
       });
 
       const linkData = await linkResponse.json();
+      console.log('=== PAYMENT LINK API RESPONSE ===');
+      console.log('Status:', linkResponse.status);
+      console.log('Full response:', JSON.stringify(linkData, null, 2));
+      console.log('All fields:', Object.keys(linkData));
+      console.log('==================================');
       
-      if (linkResponse.ok && linkData.link_url) {
-        paymentUrl = linkData.link_url;
-        console.log('✅ Payment link created successfully:', paymentUrl);
+      if (linkResponse.ok) {
+        // Payment Links API returns different fields - check all possibilities
+        paymentUrl = linkData.link_url || 
+                     linkData.short_url || 
+                     linkData.url || 
+                     linkData.payment_url ||
+                     linkData.link ||
+                     null;
+        
+        if (paymentUrl) {
+          console.log('✅ Payment link URL found:', paymentUrl);
+        } else {
+          // If no direct URL, try constructing from link_id
+          if (linkData.link_id || linkData.linkId) {
+            const linkId = linkData.link_id || linkData.linkId;
+            const isProduction = cashfreeEnvironment.toUpperCase() === 'PRODUCTION';
+            const paymentBaseUrl = isProduction 
+              ? 'https://payments.cashfree.com'
+              : 'https://sandbox.cashfree.com';
+            // Try different URL formats for payment links
+            paymentUrl = `${paymentBaseUrl}/pg/links/${linkId}`;
+            console.log('⚠️ Constructed payment URL from link_id:', paymentUrl);
+          } else {
+            console.error('❌ No payment URL or link_id in response');
+            throw new Error('Payment link created but no URL available');
+          }
+        }
       } else {
         console.error('❌ Payment link creation failed:', linkData);
-        // Fallback: try using payment_session_id
-        if (cashfreeData.payment_session_id) {
-          const isProduction = cashfreeEnvironment.toUpperCase() === 'PRODUCTION';
-          const paymentBaseUrl = isProduction 
-            ? 'https://payments.cashfree.com'
-            : 'https://sandbox.cashfree.com';
-          paymentUrl = `${paymentBaseUrl}/forms/web/pay/${cashfreeData.payment_session_id}`;
-          console.log('⚠️ Using fallback payment URL:', paymentUrl);
-        }
+        throw new Error(`Payment link creation failed: ${linkData.message || linkData.error || JSON.stringify(linkData)}`);
       }
     } catch (linkError) {
       console.error('❌ Error creating payment link:', linkError);
-      // Fallback: try using payment_session_id
-      if (cashfreeData.payment_session_id) {
-        const isProduction = cashfreeEnvironment.toUpperCase() === 'PRODUCTION';
-        const paymentBaseUrl = isProduction 
-          ? 'https://payments.cashfree.com'
-          : 'https://sandbox.cashfree.com';
-        paymentUrl = `${paymentBaseUrl}/forms/web/pay/${cashfreeData.payment_session_id}`;
-        console.log('⚠️ Using fallback payment URL:', paymentUrl);
-      }
+      // Don't use broken fallback - throw error so user sees it
+      return NextResponse.json({ 
+        error: 'Failed to create payment link',
+        details: linkError.message || 'Payment gateway configuration error'
+      }, { status: 500 });
     }
     
     if (!paymentUrl) {

@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Dialog,
   DialogContent,
@@ -19,6 +19,7 @@ export default function BookingPaymentDialog({
   const [paymentStatus, setPaymentStatus] = useState('pending'); // 'pending', 'success', 'failed'
   const [showThankYou, setShowThankYou] = useState(false);
   const [iframeLoaded, setIframeLoaded] = useState(false);
+  const checkoutContainerRef = useRef(null);
 
   const handlePaymentMessage = (event) => {
     // Listen for payment completion messages from Cashfree
@@ -96,24 +97,27 @@ export default function BookingPaymentDialog({
     setIframeLoaded(true);
   };
 
-  // Use payment URL from API or construct from payment_session_id
-  let finalPaymentUrl = paymentUrl;
-  
-  // If no paymentUrl provided, construct from payment_session_id
-  if (!finalPaymentUrl && paymentSessionId) {
-    finalPaymentUrl = `https://payments.cashfree.com/forms/web/pay/${paymentSessionId}`;
-  }
-  
-  if (!finalPaymentUrl) {
-    console.error('BookingPaymentDialog: Missing payment URL and session ID', { 
+  // ONLY use paymentUrl from API - do NOT construct from payment_session_id
+  // The payment_session_id URL format doesn't work in iframes
+  if (!paymentUrl) {
+    console.error('❌ BookingPaymentDialog: Missing payment URL from API', { 
       paymentUrl, 
       paymentSessionId, 
       bookingData 
     });
-    return null;
+    return (
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent>
+          <div className="text-center py-8">
+            <p className="text-red-600 mb-4">Payment URL not available. Please try again.</p>
+            <p className="text-sm text-gray-500">If this persists, contact support.</p>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
   }
   
-  console.log('BookingPaymentDialog: Using payment URL:', finalPaymentUrl);
+  console.log('✅ BookingPaymentDialog: Using payment URL from API:', paymentUrl);
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
