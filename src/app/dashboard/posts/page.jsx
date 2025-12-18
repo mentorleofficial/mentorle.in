@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, Edit, Trash2, Eye, Search } from "lucide-react";
+import Image from "next/image";
+import { Plus, Edit, Trash2, Eye, Search, Calendar, Clock, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -178,33 +179,23 @@ export default function PostsPage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredPosts.map((post) => (
-            <Card key={post.id}>
-              <CardHeader>
-                <div className="flex justify-between items-start">
-                  <div className="flex-1">
-                    <CardTitle className="mb-2">{post.title}</CardTitle>
-                    <div className="flex items-center gap-4 text-sm text-gray-500">
-                      <span>
-                        {post.status === "scheduled" && post.published_at
-                          ? `Scheduled: ${format(new Date(post.published_at), "MMM d, yyyy h:mm a")}`
-                          : post.published_at
-                          ? format(new Date(post.published_at), "MMM d, yyyy")
-                          : "Not published"}
-                      </span>
-                      {post.reading_time_minutes && (
-                        <span>{post.reading_time_minutes} min read</span>
-                      )}
-                      {post.view_count > 0 && (
-                        <span className="flex items-center gap-1">
-                          <Eye className="w-3 h-3" />
-                          {post.view_count} views
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
+            <Card 
+              key={post.id} 
+              className="group hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col"
+            >
+              {/* Cover Image */}
+              {post.cover_url ? (
+                <div className="relative w-full h-48 overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200">
+                  <Image
+                    src={post.cover_url}
+                    alt={post.title}
+                    fill
+                    className="object-cover group-hover:scale-110 transition-transform duration-500"
+                  />
+                  {/* Status Badge Overlay */}
+                  <div className="absolute top-3 right-3 flex gap-2">
                     <Badge
                       variant={
                         post.status === "published"
@@ -215,28 +206,127 @@ export default function PostsPage() {
                           ? "secondary"
                           : "outline"
                       }
-                      className={post.status === "scheduled" ? "bg-blue-600" : ""}
+                      className={
+                        post.status === "scheduled" 
+                          ? "bg-blue-600 text-white" 
+                          : post.status === "published"
+                          ? "bg-green-600 text-white"
+                          : ""
+                      }
                     >
                       {post.status}
                     </Badge>
                     {post.featured && (
-                      <Badge variant="outline">Featured</Badge>
+                      <Badge variant="outline" className="bg-yellow-100 text-yellow-800 border-yellow-300">
+                        ⭐ Featured
+                      </Badge>
                     )}
                   </div>
                 </div>
-              </CardHeader>
-              <CardContent>
+              ) : (
+                <div className="relative w-full h-48 overflow-hidden bg-gradient-to-br from-blue-400 via-purple-500 to-pink-500 flex items-center justify-center">
+                  <div className="text-white text-4xl font-bold opacity-20">
+                    {post.title.charAt(0).toUpperCase()}
+                  </div>
+                  {/* Status Badge Overlay */}
+                  <div className="absolute top-3 right-3 flex gap-2">
+                    <Badge
+                      variant={
+                        post.status === "published"
+                          ? "default"
+                          : post.status === "scheduled"
+                          ? "default"
+                          : post.status === "draft"
+                          ? "secondary"
+                          : "outline"
+                      }
+                      className={
+                        post.status === "scheduled" 
+                          ? "bg-blue-600 text-white" 
+                          : post.status === "published"
+                          ? "bg-green-600 text-white"
+                          : ""
+                      }
+                    >
+                      {post.status}
+                    </Badge>
+                    {post.featured && (
+                      <Badge variant="outline" className="bg-yellow-100 text-yellow-800 border-yellow-300">
+                        ⭐ Featured
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              <CardHeader className="flex-1">
+                <CardTitle className="mb-3 line-clamp-2 group-hover:text-blue-600 transition-colors">
+                  {post.title}
+                </CardTitle>
+                
+                {/* Meta Information */}
+                <div className="flex flex-wrap items-center gap-3 text-xs text-gray-500 mb-3">
+                  {post.published_at && (
+                    <div className="flex items-center gap-1">
+                      <Calendar className="w-3 h-3" />
+                      <span>
+                        {post.status === "scheduled" && post.published_at
+                          ? format(new Date(post.published_at), "MMM d, h:mm a")
+                          : format(new Date(post.published_at), "MMM d, yyyy")}
+                      </span>
+                    </div>
+                  )}
+                  {post.reading_time_minutes && (
+                    <div className="flex items-center gap-1">
+                      <Clock className="w-3 h-3" />
+                      <span>{post.reading_time_minutes} min</span>
+                    </div>
+                  )}
+                  {post.view_count > 0 && (
+                    <div className="flex items-center gap-1">
+                      <Eye className="w-3 h-3" />
+                      <span>{post.view_count}</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Summary */}
                 {post.summary && (
-                  <p className="text-gray-600 mb-4 line-clamp-2">
+                  <p className="text-sm text-gray-600 line-clamp-2 mb-3">
                     {post.summary}
                   </p>
                 )}
-                <div className="flex gap-2">
+
+                {/* Tags */}
+                {post.tags && post.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 mb-3">
+                    {post.tags.slice(0, 3).map((tag, index) => (
+                      <Badge 
+                        key={index} 
+                        variant="secondary" 
+                        className="text-xs bg-gray-100 text-gray-700"
+                      >
+                        <Tag className="w-2.5 h-2.5 mr-1" />
+                        {tag}
+                      </Badge>
+                    ))}
+                    {post.tags.length > 3 && (
+                      <Badge variant="outline" className="text-xs">
+                        +{post.tags.length - 3}
+                      </Badge>
+                    )}
+                  </div>
+                )}
+              </CardHeader>
+
+              <CardContent className="pt-0">
+                <div className="flex flex-wrap gap-2">
                   {post.status === "published" && (
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => router.push(`/blogs/${post.slug}`)}
+                      className="flex-1 min-w-[100px]"
                     >
                       <Eye className="w-4 h-4 mr-2" />
                       View
@@ -246,6 +336,7 @@ export default function PostsPage() {
                     variant="outline"
                     size="sm"
                     onClick={() => router.push(`/dashboard/posts/${post.id}/edit`)}
+                    className="flex-1 min-w-[100px]"
                   >
                     <Edit className="w-4 h-4 mr-2" />
                     Edit
@@ -254,10 +345,9 @@ export default function PostsPage() {
                     variant="outline"
                     size="sm"
                     onClick={() => handleDelete(post.id)}
-                    className="text-red-600 hover:text-red-700"
+                    className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
                   >
-                    <Trash2 className="w-4 h-4 mr-2" />
-                    Delete
+                    <Trash2 className="w-4 h-4" />
                   </Button>
                 </div>
               </CardContent>
