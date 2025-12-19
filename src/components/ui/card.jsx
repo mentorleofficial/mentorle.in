@@ -96,7 +96,7 @@ const CardHeader = React.forwardRef(({ className, style, ...props }, ref) => {
   return (
     <div
       ref={ref}
-      className={cn("flex flex-col space-y-1.5 p-6", className)}
+      className={cn("flex flex-col space-y-1.5 p-4 sm:p-6", className)}
       style={filteredStyle}
       {...props}
     />
@@ -114,7 +114,7 @@ const CardTitle = React.forwardRef(({ className, style, ...props }, ref) => {
     <h3
       ref={ref}
       className={cn(
-        "text-2xl font-semibold leading-none tracking-tight",
+        "text-xl sm:text-2xl font-semibold leading-none tracking-tight",
         className
       )}
       style={filteredStyle}
@@ -150,7 +150,7 @@ const CardContent = React.forwardRef(({ className, style, ...props }, ref) => {
   return (
     <div 
       ref={ref} 
-      className={cn("p-6 pt-0", className)} 
+      className={cn("p-4 sm:p-6 pt-0", className)} 
       style={filteredStyle}
       {...props} 
     />
@@ -167,7 +167,7 @@ const CardFooter = React.forwardRef(({ className, style, ...props }, ref) => {
   return (
     <div
       ref={ref}
-      className={cn("flex items-center p-6 pt-0", className)}
+      className={cn("flex items-center p-4 sm:p-6 pt-0", className)}
       style={filteredStyle}
       {...props}
     />

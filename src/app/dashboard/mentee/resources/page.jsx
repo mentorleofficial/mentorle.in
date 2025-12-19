@@ -373,13 +373,13 @@ export default function Resources() {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="max-w-7xl mx-auto mt-10 p-3">
+      <div className="max-w-7xl mx-auto mt-6 sm:mt-8 md:mt-10 p-3 sm:p-4">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-black mb-2">
+        <div className="mb-4 sm:mb-6 md:mb-8">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-black mb-2">
             Learning Resources
           </h1>
-          <p className="text-gray-600 text-lg">
+          <p className="text-gray-600 text-sm sm:text-base md:text-lg">
             Discover curated study materials and trending news across tech domains
           </p>
         </div>

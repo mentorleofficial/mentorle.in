@@ -238,7 +238,7 @@ function DashboardSidebar() {
              </div>
              
              {/* Navigation Links */}
-             <nav className="flex flex-col gap-1 p-4 flex-1 overflow-y-auto">
+             <nav className="flex flex-col gap-1 p-3 sm:p-4 flex-1 overflow-y-auto">
                  {navItems.map(({ href, label, icon: Icon }) => {
                      // Handle dynamic dashboard routing
                      const actualHref = href === "dashboard" ? getBaseDashboardPath() : href;
@@ -257,17 +257,17 @@ function DashboardSidebar() {
                              key={href}
                              href={actualHref}
                              className={cn(
-                                 "flex items-center gap-3 p-3 rounded-lg transition-all duration-200 group",
+                                 "flex items-center gap-3 p-3 rounded-lg transition-all duration-200 group min-h-[44px]",
                                  isActive
                                      ? "bg-white text-black shadow-lg"
                                      : "text-gray-300 hover:bg-gray-900 hover:text-white hover:translate-x-1"
                              )}
                          >
                              <Icon className={cn(
-                                 "h-5 w-5 transition-colors",
+                                 "h-5 w-5 transition-colors flex-shrink-0",
                                  isActive ? "text-black" : "text-gray-400 group-hover:text-white"
                              )} />
-                             <span className="font-medium">{label}</span>
+                             <span className="font-medium text-sm sm:text-base">{label}</span>
                          </Link>
                      );
                  })}

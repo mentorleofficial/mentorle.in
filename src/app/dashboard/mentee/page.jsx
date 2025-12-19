@@ -285,22 +285,22 @@ function MenteeDashboardContent() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto p-6">
+      <div className="max-w-7xl mx-auto p-3 sm:p-4 md:p-6">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">
+        <div className="mb-4 sm:mb-6 md:mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
             Welcome back, {profile?.name?.split(" ")[0] || profile?.first_name || "there"}!
           </h1>
-          <p className="text-gray-600 mt-1">
+          <p className="text-gray-600 mt-1 text-sm sm:text-base">
             Here's your learning journey overview
           </p>
         </div>
 
         {/* Notifications & Alerts */}
         {notifications.length > 0 && (
-          <div className="mb-6">
+          <div className="mb-4 sm:mb-6">
             <Card className="border-gray-200 bg-gray-50">
-              <CardContent className="pt-6">
+              <CardContent className="pt-4 sm:pt-6">
                 <div className="flex items-start gap-3">
                   <Bell className="w-5 h-5 text-gray-700 mt-0.5" />
                   <div className="flex-1">
@@ -327,7 +327,7 @@ function MenteeDashboardContent() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 mb-4 sm:mb-6">
           {/* Progress Snapshot */}
           <div className="lg:col-span-1">
             <Card className="border-gray-200">
