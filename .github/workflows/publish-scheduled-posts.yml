@@ -30,7 +30,18 @@ jobs:
             exit 1
           fi
           
-          response=$(curl -sS -w "\n%{http_code}" -X GET \
+          # Validate URL format
+          if [[ ! "$CRON_ENDPOINT" =~ ^https:// ]]; then
+            echo "⚠️  Warning: CRON_ENDPOINT should use HTTPS. Current: $CRON_ENDPOINT"
+          fi
+          
+          # Ensure URL doesn't have trailing slash (Next.js API routes don't need it)
+          CRON_ENDPOINT=$(echo "$CRON_ENDPOINT" | sed 's|/$||')
+          
+          echo "🔗 Calling endpoint: $CRON_ENDPOINT"
+          
+          # Use -L to follow redirects (handles 308 Permanent Redirect)
+          response=$(curl -sS -L -w "\n%{http_code}" -X GET \
             -H "Authorization: Bearer $CRON_SECRET" \
             "$CRON_ENDPOINT")
           
@@ -44,6 +55,10 @@ jobs:
             echo "✅ Successfully processed scheduled posts"
           elif [ "$http_code" -eq 401 ]; then
             echo "❌ Unauthorized: Check that CRON_SECRET matches your deployment environment"
+            exit 1
+          elif [ "$http_code" -eq 308 ] || [ "$http_code" -eq 301 ] || [ "$http_code" -eq 302 ]; then
+            echo "⚠️  Redirect detected (${http_code}). Ensure CRON_ENDPOINT uses HTTPS and correct URL format."
+            echo "💡 Example: https://yourdomain.com/api/cron/publish-scheduled-posts"
             exit 1
           else
             echo "⚠️  Unexpected response code: $http_code"
