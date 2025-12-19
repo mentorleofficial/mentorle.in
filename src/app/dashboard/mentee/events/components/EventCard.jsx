@@ -210,11 +210,11 @@ export default function EventCard({ event, user }) {
       </div>
       
       {/* Content Section */}
-      <div className="p-4 space-y-3 flex flex-col flex-grow">
+      <div className="p-3 sm:p-4 space-y-2 sm:space-y-3 flex flex-col flex-grow">
         
         {/* Title and College */}
         <div className="space-y-2 flex-shrink-0">
-          <h3 className="font-bold text-lg text-gray-900 leading-tight line-clamp-2 group-hover:text-blue-600 transition-colors duration-300 min-h-[3.5rem]">
+          <h3 className="font-bold text-base sm:text-lg text-gray-900 leading-tight line-clamp-2 group-hover:text-blue-600 transition-colors duration-300 min-h-[3rem] sm:min-h-[3.5rem]">
             {event.title}
           </h3>
           {event.college_name && (
@@ -284,7 +284,7 @@ export default function EventCard({ event, user }) {
             <Button 
               onClick={handleRegister}
               disabled={isRegistering}
-              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-2.5 rounded-lg transition-all duration-300 hover:shadow-xl hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100 text-sm"
+              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3 sm:py-2.5 rounded-lg transition-all duration-300 hover:shadow-xl hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100 text-sm min-h-[44px]"
             >
               {isRegistering ? (
                 <div className="flex items-center justify-center gap-2">

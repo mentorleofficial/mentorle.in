@@ -173,7 +173,7 @@ function DashboardHeader() {
 
   return (
     <div className="fixed top-2 right-2 md:top-4 md:right-4 z-50">
-      <div className="bg-white rounded-full shadow-lg border border-gray-200 p-1 md:p-2 flex items-center gap-1 md:gap-2">
+      <div className="bg-white rounded-full shadow-lg border border-gray-200 p-1.5 md:p-2 flex items-center gap-1.5 md:gap-2">
         {/* Notification Button */}
         {/* <Button
           variant="ghost"
@@ -193,9 +193,9 @@ function DashboardHeader() {
           variant="ghost"
           size="sm"
           onClick={handleProfileClick}
-          className="rounded-full h-8 w-8 md:h-10 md:w-10 p-0 hover:bg-gray-100"
+          className="rounded-full h-10 w-10 md:h-10 md:w-10 p-0 hover:bg-gray-100 min-h-[44px] min-w-[44px]"
         >
-          <div className="h-6 w-6 md:h-8 md:w-8 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden relative">
+          <div className="h-8 w-8 md:h-8 md:w-8 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden relative">
             {profileUrl ? (
               <>
                 <img
@@ -236,9 +236,9 @@ function DashboardHeader() {
           variant="ghost"
           size="sm"
           onClick={handleLogout}
-          className="rounded-full h-8 w-8 md:h-10 md:w-10 p-0 hover:bg-gray-100"
+          className="rounded-full h-10 w-10 md:h-10 md:w-10 p-0 hover:bg-gray-100 min-h-[44px] min-w-[44px]"
         >
-          <LogOut className="h-3 w-3 md:h-4 md:w-4 text-gray-600" />
+          <LogOut className="h-4 w-4 md:h-4 md:w-4 text-gray-600" />
         </Button>
       </div>
     </div>

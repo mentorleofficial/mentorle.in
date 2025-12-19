@@ -170,19 +170,19 @@ function MenteeBookingsContent() {
   );
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-6xl">
+    <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6 md:py-8 max-w-6xl">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">My Bookings</h1>
-        <p className="text-gray-600 mt-1">View and manage your mentorship session bookings</p>
+      <div className="mb-4 sm:mb-6 md:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">My Bookings</h1>
+        <p className="text-gray-600 mt-1 text-sm sm:text-base">View and manage your mentorship session bookings</p>
       </div>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
         <Card>
-          <CardContent className="pt-6">
-            <div className="text-2xl font-bold">{upcomingBookings.length}</div>
-            <p className="text-sm text-gray-500">Upcoming</p>
+          <CardContent className="pt-4 sm:pt-6">
+            <div className="text-xl sm:text-2xl font-bold">{upcomingBookings.length}</div>
+            <p className="text-xs sm:text-sm text-gray-500">Upcoming</p>
           </CardContent>
         </Card>
         <Card>
@@ -212,11 +212,11 @@ function MenteeBookingsContent() {
       </div>
 
       {/* Filters */}
-      <div className="mb-6">
+      <div className="mb-4 sm:mb-6">
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="rounded-md border border-input bg-transparent px-3 py-2 text-sm"
+          className="w-full sm:w-auto rounded-md border border-input bg-transparent px-3 py-2.5 text-sm min-h-[44px]"
         >
           <option value="all">All Bookings</option>
           <option value="pending">Pending</option>
@@ -256,8 +256,8 @@ function MenteeBookingsContent() {
         <div className="space-y-4">
           {bookings.map((booking) => (
             <Card key={booking.id} className="hover:shadow-md transition-shadow">
-              <CardContent className="p-6">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <CardContent className="p-4 sm:p-6">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
                   {/* Left: Info */}
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
@@ -269,7 +269,7 @@ function MenteeBookingsContent() {
                       </span>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm text-gray-600">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-2 sm:gap-3 text-xs sm:text-sm text-gray-600">
                       <div className="flex items-center gap-2">
                         <Calendar className="w-4 h-4" />
                         {format(new Date(booking.scheduled_at), "MMM d, yyyy")}
@@ -351,7 +351,7 @@ function MenteeBookingsContent() {
                   </div>
 
                   {/* Right: Actions */}
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-2 sm:gap-3">
                     {["pending", "confirmed"].includes(booking.status) && 
                      new Date(booking.scheduled_at) > new Date() && (
                       <>

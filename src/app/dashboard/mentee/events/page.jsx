@@ -183,17 +183,17 @@ export default function MenteeEventsPage() {
   const stats = getEventStats();
   return (
     <div className="max-w-8xl min-h-screen bg-gradient-to-br from-blue-50/30 via-white to-indigo-50/30">
-      <div className="container max-w-8xl mt-10 mx-auto px-4 py-4">        
+      <div className="container max-w-8xl mt-6 sm:mt-8 md:mt-10 mx-auto px-3 sm:px-4 py-3 sm:py-4">        
         {/* Header Section with Stats */}
-        <div className="mb-3">
-          <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-2 lg:gap-3">
+        <div className="mb-3 sm:mb-4">
+          <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-3 sm:gap-4 lg:gap-3">
             <div className="flex-1 min-w-0">
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-black to-black bg-clip-text text-transparent mb-2">
+              <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-black to-black bg-clip-text text-transparent mb-2">
                 Events & Programs
               </h1>
-              <p className="text-gray-600 flex items-center">
-                <Calendar className="h-4 w-4 mr-2 text-blue-500" />
-                Discover upcoming bootcamps, workshops, and events
+              <p className="text-gray-600 flex items-center text-sm sm:text-base">
+                <Calendar className="h-4 w-4 mr-2 text-blue-500 flex-shrink-0" />
+                <span>Discover upcoming bootcamps, workshops, and events</span>
               </p>
             </div>
 
