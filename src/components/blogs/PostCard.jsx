@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { Calendar, Clock, User, Tag, ArrowRight } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -18,11 +17,14 @@ export default function PostCard({ post }) {
         {/* Cover Image */}
         {post.cover_url ? (
           <div className="relative w-full h-56 overflow-hidden bg-black">
-            <Image
+            <img
               src={post.cover_url}
               alt={post.title}
-              fill
-              className="object-cover group-hover:scale-110 transition-transform duration-500 grayscale group-hover:grayscale-0"
+              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 grayscale group-hover:grayscale-0"
+              onError={(e) => {
+                console.error('Blog cover image failed to load:', post.cover_url);
+                e.target.style.display = 'none';
+              }}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
           </div>
