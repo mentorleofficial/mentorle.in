@@ -31,6 +31,29 @@ export default function DashboardClient() {
   useEffect(() => {
     const checkUserAndRedirect = async () => {
       try {
+        // CRITICAL: Check for recovery token FIRST - if found, redirect to reset-password
+        const hashParams = new URLSearchParams(window.location.hash.substring(1));
+        const hasRecoveryToken = hashParams.get('type') === 'recovery' || hashParams.has('access_token');
+        
+        if (hasRecoveryToken) {
+          // We have a recovery token - redirect to reset-password page immediately
+          sessionStorage.setItem('isPasswordResetFlow', 'true');
+          router.push('/reset-password');
+          return;
+        }
+
+        // CRITICAL: Don't redirect if we're in password reset flow
+        const currentPath = window.location.pathname;
+        
+        if (currentPath === '/reset-password' || 
+            (typeof window !== 'undefined' && sessionStorage.getItem('isPasswordResetFlow') === 'true')) {
+          // If we're on reset-password page, stay there
+          if (currentPath !== '/reset-password') {
+            router.push('/reset-password');
+          }
+          return;
+        }
+
         const userWithRole = await getCurrentUserWithRole();
 
         if (!userWithRole) {

@@ -223,6 +223,32 @@ export default function Template({ children }) {
   const pathname = usePathname();
   const router = useRouter();
 
+  // CRITICAL: Check for recovery token and redirect to reset-password if needed
+  useEffect(() => {
+    const hashParams = new URLSearchParams(window.location.hash.substring(1));
+    const hasRecoveryToken = hashParams.get('type') === 'recovery' || hashParams.has('access_token');
+    
+    // If we have a recovery token but we're not on reset-password, redirect there
+    if (hasRecoveryToken && pathname !== '/reset-password') {
+      sessionStorage.setItem('isPasswordResetFlow', 'true');
+      // Preserve the hash when redirecting
+      const hash = window.location.hash;
+      router.push('/reset-password' + hash);
+      return;
+    }
+
+    // If we're on dashboard but have the password reset flag, redirect to reset-password
+    if (pathname.startsWith('/dashboard') && 
+        sessionStorage.getItem('isPasswordResetFlow') === 'true') {
+      if (hasRecoveryToken) {
+        router.push('/reset-password' + window.location.hash);
+      } else {
+        router.push('/reset-password');
+      }
+      return;
+    }
+  }, [pathname, router]);
+
   useEffect(() => {
     const token = typeof window !== 'undefined' ? localStorage.getItem("auth_token") : null;
     setIsAuthenticated(!!token);
@@ -237,6 +263,13 @@ export default function Template({ children }) {
   // Fetch user name and role from any of the three tables
   useEffect(() => {
     const fetchUserNameAndRole = async () => {
+      // CRITICAL: Don't do anything if we're on reset-password page
+      // This prevents any redirects during password reset flow
+      if (pathname === '/reset-password' || 
+          (typeof window !== 'undefined' && sessionStorage.getItem('isPasswordResetFlow') === 'true')) {
+        return;
+      }
+      
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
       let userName = "";

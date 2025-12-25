@@ -22,6 +22,40 @@ export default function RootLayout({ children }) {  return (
     <>
       <html lang="en">
         <body className={""}>
+          {/* CRITICAL: Set password reset flag and redirect BEFORE any React code runs */}
+          <Script
+            id="prevent-reset-redirect"
+            strategy="beforeInteractive"
+            dangerouslySetInnerHTML={{
+              __html: `
+                (function() {
+                  if (typeof window !== 'undefined') {
+                    const hashParams = new URLSearchParams(window.location.hash.substring(1));
+                    const hasRecoveryToken = hashParams.get('type') === 'recovery' || hashParams.has('access_token');
+                    const currentPath = window.location.pathname;
+                    
+                    if (hasRecoveryToken || currentPath === '/reset-password') {
+                      sessionStorage.setItem('isPasswordResetFlow', 'true');
+                      
+                      // If we have a recovery token but we're not on reset-password, redirect there
+                      if (hasRecoveryToken && currentPath !== '/reset-password') {
+                        const hash = window.location.hash;
+                        window.location.href = '/reset-password' + hash;
+                        return;
+                      }
+                      
+                      // If we're on dashboard but have the flag, redirect to reset-password
+                      if (currentPath.startsWith('/dashboard') && sessionStorage.getItem('isPasswordResetFlow') === 'true') {
+                        const hash = window.location.hash;
+                        window.location.href = '/reset-password' + hash;
+                        return;
+                      }
+                    }
+                  }
+                })();
+              `,
+            }}
+          />
           {children}
           <Toaster />
           <GlobalFeedbackButton />

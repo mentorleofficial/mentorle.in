@@ -21,6 +21,19 @@ export default function LoginForm() {
   useEffect(() => {
     const checkAuthStatus = async () => {
       try {
+        // CRITICAL: Don't redirect if we're on reset-password page or in password reset flow
+        // Check pathname first - if we're on reset-password, don't redirect
+        const currentPath = window.location.pathname;
+        const hashParams = new URLSearchParams(window.location.hash.substring(1));
+        const hasRecoveryToken = hashParams.get('type') === 'recovery' || hashParams.has('access_token');
+        
+        if (currentPath === '/reset-password' || hasRecoveryToken || 
+            (typeof window !== 'undefined' && sessionStorage.getItem('isPasswordResetFlow') === 'true')) {
+          setIsCheckingAuth(false);
+          setIsLoading(false);
+          return;
+        }
+
         const {
           data: { session },
         } = await supabase.auth.getSession();
