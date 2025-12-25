@@ -13,6 +13,10 @@ export async function sendPasswordResetEmail(email) {
 
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/reset-password`,
+      // Note: Email deliverability (avoiding spam) is primarily controlled by Supabase configuration:
+      // - SPF/DKIM records in Supabase Dashboard > Authentication > Email Templates
+      // - Custom SMTP configuration (if using custom email provider)
+      // - Sender reputation and domain authentication
     });
 
     if (error) {

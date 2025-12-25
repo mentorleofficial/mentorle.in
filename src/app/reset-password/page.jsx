@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { updateUserPassword, checkPasswordResetSession, validatePassword } from "@/lib/passwordReset";
+import { supabase } from "@/lib/supabase";
 
 function ResetPasswordContent() {
   const [password, setPassword] = useState("");
@@ -58,6 +59,9 @@ function ResetPasswordContent() {
       
       if (result.success) {
         setMessage("Password successfully reset! Redirecting to login...");
+        
+        // Sign out the user to clear the session before redirecting to login
+        await supabase.auth.signOut();
         
         // Redirect to login after 2 seconds
         setTimeout(() => {
