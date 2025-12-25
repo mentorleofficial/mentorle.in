@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 
@@ -115,8 +117,8 @@ export default function Campus() {
             "Sign up for updates to be the first to know when we launch!"
           </p>
           <Link
-            href="#"
-            className="bg-black text-white px-8 py-3 rounded-full text-lg font-semibold hover:bg-gray-100 transition duration-300"
+            href="/subscribe/payment"
+            className="bg-black text-white px-8 py-3 rounded-full text-lg font-semibold hover:bg-gray-100 transition duration-300 inline-block"
           >
             Subscribe for Updates
           </Link>
