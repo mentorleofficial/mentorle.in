@@ -17,22 +17,88 @@ function ResetPasswordContent() {
   const searchParams = useSearchParams();
 
   useEffect(() => {
+    let subscription = null;
+    let isProcessing = false;
+
     const checkSession = async () => {
+      // Prevent multiple simultaneous checks
+      if (isProcessing) return;
+      isProcessing = true;
+
       try {
+        // CRITICAL: Set flag IMMEDIATELY before anything else
+        if (typeof window !== 'undefined') {
+          sessionStorage.setItem('isPasswordResetFlow', 'true');
+        }
+
+        // CRITICAL: Check for recovery token in URL hash FIRST
+        // Supabase adds access_token and type=recovery to the URL hash
+        const hashParams = new URLSearchParams(window.location.hash.substring(1));
+        const hasRecoveryToken = hashParams.get('type') === 'recovery' || hashParams.has('access_token');
+        
+        if (!hasRecoveryToken) {
+          // No recovery token - this is not a valid reset password flow
+          setError("Invalid reset link. Please request a new password reset link.");
+          if (typeof window !== 'undefined') {
+            sessionStorage.removeItem('isPasswordResetFlow');
+          }
+          isProcessing = false;
+          return;
+        }
+
+        // Listen for auth state changes to catch recovery token processing
+        const { data: { subscription: authSubscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+          if (event === 'PASSWORD_RECOVERY' || (event === 'SIGNED_IN' && hasRecoveryToken)) {
+            // Recovery session established, check if valid
+            const result = await checkPasswordResetSession();
+            if (result.success) {
+              setIsValidSession(true);
+            } else {
+              setError(result.error || "Invalid or expired reset link. Please request a new reset link.");
+            }
+          }
+        });
+        subscription = authSubscription;
+
+        // Wait a moment for Supabase to process the recovery token
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        // Check session after recovery token processing
         const result = await checkPasswordResetSession();
         if (result.success) {
           setIsValidSession(true);
         } else {
-          setError(result.error || "Invalid or expired reset link. Please request a new reset link.");
+          // Wait a bit more and retry
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          const retryResult = await checkPasswordResetSession();
+          if (retryResult.success) {
+            setIsValidSession(true);
+          } else {
+            setError("Processing reset link... Please wait.");
+          }
         }
       } catch (err) {
         console.error("Session check error:", err);
         setError("Error occurred during session check.");
+      } finally {
+        isProcessing = false;
       }
     };
 
+    // Run immediately on mount
     checkSession();
-  }, []);
+
+    // Cleanup subscription and remove flag on unmount
+    return () => {
+      if (subscription) {
+        subscription.unsubscribe();
+      }
+      // Remove the flag when component unmounts (but only if password wasn't reset)
+      if (typeof window !== 'undefined' && !message.includes('successfully reset')) {
+        sessionStorage.removeItem('isPasswordResetFlow');
+      }
+    };
+  }, [message]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -59,6 +125,11 @@ function ResetPasswordContent() {
       
       if (result.success) {
         setMessage("Password successfully reset! Redirecting to login...");
+        
+        // Clear the password reset flow flag
+        if (typeof window !== 'undefined') {
+          sessionStorage.removeItem('isPasswordResetFlow');
+        }
         
         // Sign out the user to clear the session before redirecting to login
         await supabase.auth.signOut();

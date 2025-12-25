@@ -22,6 +22,16 @@ export default function SignupPage() {
   useEffect(() => {
     const checkAuthStatus = async () => {
       try {
+        // CRITICAL: Don't redirect if we're in password reset flow
+        const currentPath = window.location.pathname;
+        const hashParams = new URLSearchParams(window.location.hash.substring(1));
+        const hasRecoveryToken = hashParams.get('type') === 'recovery' || hashParams.has('access_token');
+        
+        if (currentPath === '/reset-password' || hasRecoveryToken || 
+            (typeof window !== 'undefined' && sessionStorage.getItem('isPasswordResetFlow') === 'true')) {
+          return;
+        }
+
         const { data: { session } } = await supabase.auth.getSession();
         
         if (session) {

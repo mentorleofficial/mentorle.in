@@ -8,6 +8,12 @@ export async function middleware(request) {
     },
   });
 
+  // CRITICAL: Allow reset-password route to pass through without any redirects
+  // This is essential for password reset flow to work correctly
+  if (request.nextUrl.pathname === '/reset-password' || request.nextUrl.pathname.startsWith('/reset-password')) {
+    return response;
+  }
+
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
