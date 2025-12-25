@@ -450,7 +450,7 @@ export default function Template({ children }) {
 
           {/* Enhanced Mobile Menu */}
           {menuOpen && (
-            <div className="fixed top-[88px] left-4 right-4 z-50 flex flex-col lg:hidden bg-white/95 backdrop-blur-xl shadow-2xl rounded-2xl p-6 space-y-6 border border-gray-200 animate-in slide-in-from-top-5 duration-500 overflow-hidden">
+            <div className="fixed top-[88px] left-2 right-2 sm:left-4 sm:right-4 z-50 flex flex-col lg:hidden bg-white/95 backdrop-blur-xl shadow-2xl rounded-2xl p-4 sm:p-6 space-y-4 sm:space-y-6 border border-gray-200 animate-in slide-in-from-top-5 duration-500 overflow-y-auto max-h-[calc(100vh-120px)]">
               <div className="absolute inset-0 bg-gradient-to-br from-gray-50/50 to-white/50"></div>
               <div className="relative z-10">
                 {/* Direct Links */}

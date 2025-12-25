@@ -437,9 +437,9 @@ export default function ProfileForm({ profile, onSave, onCancel }) {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-semibold text-gray-900">Edit Profile</h2>
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 w-full overflow-x-hidden">
+      <div className="flex items-center justify-between mb-4 sm:mb-6">
+        <h2 className="text-lg sm:text-xl font-semibold text-gray-900 break-words">Edit Profile</h2>
         <button
           onClick={onCancel}
           className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
@@ -823,17 +823,29 @@ export default function ProfileForm({ profile, onSave, onCancel }) {
             Interests
           </label>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-            {INTERESTS.map(interest => (
-              <label key={interest} className="flex items-center space-x-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={formData.interests.includes(interest)}
-                  onChange={() => handleArrayChange("interests", interest)}
-                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                />
-                <span className="text-sm text-gray-700">{interest}</span>
-              </label>
-            ))}
+            {INTERESTS.map(interest => {
+              const isSelected = formData.interests.includes(interest);
+              return (
+                <label 
+                  key={interest} 
+                  className={`flex items-center space-x-2 cursor-pointer px-3 py-2 rounded-lg transition-colors ${
+                    isSelected 
+                      ? "bg-blue-100 border-2 border-blue-500" 
+                      : "border-2 border-transparent hover:bg-gray-50"
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={isSelected}
+                    onChange={() => handleArrayChange("interests", interest)}
+                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  />
+                  <span className={`text-sm ${isSelected ? "text-blue-900 font-medium" : "text-gray-700"}`}>
+                    {interest}
+                  </span>
+                </label>
+              );
+            })}
           </div>
         </div>
 
@@ -843,17 +855,29 @@ export default function ProfileForm({ profile, onSave, onCancel }) {
             Preferred Industries
           </label>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-            {INDUSTRIES.map(industry => (
-              <label key={industry} className="flex items-center space-x-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={formData.preferred_industries.includes(industry)}
-                  onChange={() => handleArrayChange("preferred_industries", industry)}
-                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                />
-                <span className="text-sm text-gray-700">{industry}</span>
-              </label>
-            ))}
+            {INDUSTRIES.map(industry => {
+              const isSelected = formData.preferred_industries.includes(industry);
+              return (
+                <label 
+                  key={industry} 
+                  className={`flex items-center space-x-2 cursor-pointer px-3 py-2 rounded-lg transition-colors ${
+                    isSelected 
+                      ? "bg-blue-100 border-2 border-blue-500" 
+                      : "border-2 border-transparent hover:bg-gray-50"
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={isSelected}
+                    onChange={() => handleArrayChange("preferred_industries", industry)}
+                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  />
+                  <span className={`text-sm ${isSelected ? "text-blue-900 font-medium" : "text-gray-700"}`}>
+                    {industry}
+                  </span>
+                </label>
+              );
+            })}
           </div>
         </div>
 
@@ -888,23 +912,35 @@ export default function ProfileForm({ profile, onSave, onCancel }) {
                 Preferred Mentor Qualities
               </label>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2">
-                {MENTOR_QUALITIES.map(quality => (
-                  <label key={quality} className="flex items-center space-x-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={formData.preferences?.mentor_qualities?.includes(quality) || false}
-                      onChange={() => {
-                        const current = formData.preferences?.mentor_qualities || [];
-                        const updated = current.includes(quality)
-                          ? current.filter(q => q !== quality)
-                          : [...current, quality];
-                        handlePreferencesChange("mentor_qualities", updated);
-                      }}
-                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                    />
-                    <span className="text-sm text-gray-700">{quality}</span>
-                  </label>
-                ))}
+                {MENTOR_QUALITIES.map(quality => {
+                  const isSelected = formData.preferences?.mentor_qualities?.includes(quality) || false;
+                  return (
+                    <label 
+                      key={quality} 
+                      className={`flex items-center space-x-2 cursor-pointer px-3 py-2 rounded-lg transition-colors ${
+                        isSelected 
+                          ? "bg-orange-100 border-2 border-orange-500" 
+                          : "border-2 border-transparent hover:bg-orange-50"
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={isSelected}
+                        onChange={() => {
+                          const current = formData.preferences?.mentor_qualities || [];
+                          const updated = current.includes(quality)
+                            ? current.filter(q => q !== quality)
+                            : [...current, quality];
+                          handlePreferencesChange("mentor_qualities", updated);
+                        }}
+                        className="rounded border-gray-300 text-orange-600 focus:ring-orange-500"
+                      />
+                      <span className={`text-sm ${isSelected ? "text-orange-900 font-medium" : "text-gray-700"}`}>
+                        {quality}
+                      </span>
+                    </label>
+                  );
+                })}
               </div>
             </div>
 
@@ -913,23 +949,35 @@ export default function ProfileForm({ profile, onSave, onCancel }) {
                 Preferred Session Types
               </label>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-                {SESSION_TYPES.map(type => (
-                  <label key={type} className="flex items-center space-x-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={formData.preferences?.session_type?.includes(type) || false}
-                      onChange={() => {
-                        const current = formData.preferences?.session_type || [];
-                        const updated = current.includes(type)
-                          ? current.filter(t => t !== type)
-                          : [...current, type];
-                        handlePreferencesChange("session_type", updated);
-                      }}
-                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                    />
-                    <span className="text-sm text-gray-700">{type}</span>
-                  </label>
-                ))}
+                {SESSION_TYPES.map(type => {
+                  const isSelected = formData.preferences?.session_type?.includes(type) || false;
+                  return (
+                    <label 
+                      key={type} 
+                      className={`flex items-center space-x-2 cursor-pointer px-3 py-2 rounded-lg transition-colors ${
+                        isSelected 
+                          ? "bg-orange-100 border-2 border-orange-500" 
+                          : "border-2 border-transparent hover:bg-orange-50"
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={isSelected}
+                        onChange={() => {
+                          const current = formData.preferences?.session_type || [];
+                          const updated = current.includes(type)
+                            ? current.filter(t => t !== type)
+                            : [...current, type];
+                          handlePreferencesChange("session_type", updated);
+                        }}
+                        className="rounded border-gray-300 text-orange-600 focus:ring-orange-500"
+                      />
+                      <span className={`text-sm ${isSelected ? "text-orange-900 font-medium" : "text-gray-700"}`}>
+                        {type}
+                      </span>
+                    </label>
+                  );
+                })}
               </div>
             </div>
 
@@ -943,17 +991,29 @@ export default function ProfileForm({ profile, onSave, onCancel }) {
                   { key: "afternoon", label: "Afternoon (12 PM - 5 PM)" },
                   { key: "evening", label: "Evening (5 PM - 9 PM)" },
                   { key: "weekend", label: "Weekend" }
-                ].map(({ key, label }) => (
-                  <label key={key} className="flex items-center space-x-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={formData.preferences?.preferred_time_windows?.[key] || false}
-                      onChange={(e) => handleTimeWindowChange(key, e.target.checked)}
-                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                    />
-                    <span className="text-sm text-gray-700">{label}</span>
-                  </label>
-                ))}
+                ].map(({ key, label }) => {
+                  const isSelected = formData.preferences?.preferred_time_windows?.[key] || false;
+                  return (
+                    <label 
+                      key={key} 
+                      className={`flex items-center space-x-2 cursor-pointer px-3 py-2 rounded-lg transition-colors ${
+                        isSelected 
+                          ? "bg-orange-100 border-2 border-orange-500" 
+                          : "border-2 border-transparent hover:bg-orange-50"
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={isSelected}
+                        onChange={(e) => handleTimeWindowChange(key, e.target.checked)}
+                        className="rounded border-gray-300 text-orange-600 focus:ring-orange-500"
+                      />
+                      <span className={`text-sm ${isSelected ? "text-orange-900 font-medium" : "text-gray-700"}`}>
+                        {label}
+                      </span>
+                    </label>
+                  );
+                })}
               </div>
             </div>
           </div>
