@@ -115,25 +115,25 @@ export default function ProfileDisplay({ profile }) {
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-              <div className="flex items-center gap-2 text-gray-900">
-                <User className="h-4 w-4 text-gray-400" />
-                <span>{profile?.name || "Not specified"}</span>
+              <div className="flex items-center gap-2 text-gray-900 min-w-0">
+                <User className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                <span className="break-words">{profile?.name || "Not specified"}</span>
               </div>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-              <div className="flex items-center gap-2 text-gray-900">
-                <Mail className="h-4 w-4 text-gray-400" />
-                <span>{profile?.email || "Not specified"}</span>
+              <div className="flex items-center gap-2 text-gray-900 min-w-0">
+                <Mail className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                <span className="break-all overflow-wrap-anywhere">{profile?.email || "Not specified"}</span>
               </div>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-              <div className="flex items-center gap-2 text-gray-900">
-                <Phone className="h-4 w-4 text-gray-400" />
-                <span>{profile?.phone || "Not specified"}</span>
+              <div className="flex items-center gap-2 text-gray-900 min-w-0">
+                <Phone className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                <span className="break-words">{profile?.phone || "Not specified"}</span>
               </div>
             </div>
           </div>
@@ -141,25 +141,25 @@ export default function ProfileDisplay({ profile }) {
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Current Status</label>
-              <div className="flex items-center gap-2 text-gray-900">
-                <Building className="h-4 w-4 text-gray-400" />
-                <span>{profile?.current_status || "Not specified"}</span>
+              <div className="flex items-center gap-2 text-gray-900 min-w-0">
+                <Building className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                <span className="break-words">{profile?.current_status || "Not specified"}</span>
               </div>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Education Level</label>
-              <div className="flex items-center gap-2 text-gray-900">
-                <GraduationCap className="h-4 w-4 text-gray-400" />
-                <span>{profile?.education_level || "Not specified"}</span>
+              <div className="flex items-center gap-2 text-gray-900 min-w-0">
+                <GraduationCap className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                <span className="break-words">{profile?.education_level || "Not specified"}</span>
               </div>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
-              <div className="flex items-center gap-2 text-gray-900">
-                <MapPin className="h-4 w-4 text-gray-400" />
-                <span>{profile?.location || "Not specified"}</span>
+              <div className="flex items-center gap-2 text-gray-900 min-w-0">
+                <MapPin className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                <span className="break-words">{profile?.location || "Not specified"}</span>
               </div>
             </div>
           </div>
