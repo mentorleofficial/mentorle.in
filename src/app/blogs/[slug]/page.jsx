@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
-import Image from "next/image";
 import { Calendar, Clock, User, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -116,7 +115,7 @@ export default function BlogPostPage() {
     : null;
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
+    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 max-w-4xl w-full">
       <Link href="/blogs">
         <Button variant="ghost" className="mb-6">
           <ArrowLeft className="w-4 h-4 mr-2" />
@@ -124,23 +123,26 @@ export default function BlogPostPage() {
         </Button>
       </Link>
 
-      <article>
-        <header className="mb-8">
+      <article className="w-full">
+        <header className="mb-8 w-full">
           {post.cover_url && (
-            <div className="relative w-full h-64 md:h-96 mb-6 rounded-lg overflow-hidden">
-              <Image
+            <div className="relative w-full h-64 sm:h-80 md:h-96 lg:h-[500px] mb-6 rounded-lg overflow-hidden bg-gray-100">
+              <img
                 src={post.cover_url}
                 alt={post.title}
-                fill
-                className="object-cover"
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  console.error('Blog cover image failed to load:', post.cover_url);
+                  e.target.style.display = 'none';
+                }}
               />
             </div>
           )}
 
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">{post.title}</h1>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 break-words">{post.title}</h1>
 
           {post.summary && (
-            <p className="text-xl text-gray-600 mb-6">{post.summary}</p>
+            <p className="text-lg sm:text-xl text-gray-600 mb-6 break-words">{post.summary}</p>
           )}
 
           <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 mb-4">
@@ -164,7 +166,7 @@ export default function BlogPostPage() {
             )}
           </div>
 
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <TagList tags={post.tags} />
             {currentUser && (
               <LikeButton
@@ -180,11 +182,13 @@ export default function BlogPostPage() {
           </div>
         </header>
 
-        <div className="prose prose-lg max-w-none mb-12">
-          <div className="whitespace-pre-wrap">{post.content}</div>
+        <div className="prose prose-lg max-w-none mb-12 w-full">
+          <div className="whitespace-pre-wrap break-words overflow-wrap-anywhere text-base sm:text-lg leading-relaxed max-w-full">
+            {post.content}
+          </div>
         </div>
 
-        <footer className="border-t pt-8 space-y-8">
+        <footer className="border-t pt-8 space-y-8 w-full">
           <FeedbackSection feedbackType="article" referenceId={post.id} />
           <CommentSection postId={post.id} />
         </footer>
