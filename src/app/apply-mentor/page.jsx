@@ -178,7 +178,8 @@ export default function ApplyMentor() {
 
   return (
     <div className="max-w-2xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6">Apply to Become a Mentor</h1>      <form onSubmit={handleSubmit} className="space-y-4">
+      <h1 className="text-3xl font-bold mb-6">Apply to Become a Mentor</h1>
+      <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block text-sm font-medium">
             Full Name <span className="text-red-500">*</span>

@@ -121,7 +121,7 @@ let contributors = [
 ];
 export default function Resources() {
   return (
-    <div className="my-20 min-h-[60vh] sm:h-auto flex flex-col mx-10 lg:mx-28">
+    <div className="my-20 min-h-[60vh] sm:h-auto flex flex-col mx-4 sm:mx-10 lg:mx-28 max-w-full overflow-x-hidden">
       <OverlapHeading lower={"TEAM"} upper={"MEET OUR TEAM"} />
       <h1 className="text-xl text-center lg:text-2xl font-semibold mb-7">
         A passionate group driven by dedication, time, and effort. Together, we
@@ -137,10 +137,10 @@ export default function Resources() {
         </TabsList>
 
         <TabsContent value="team">
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10 mt-5">
+          <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10 mt-5">
             {team.map((card, index) => {
               return (
-                <div key={index} className="min-w-[350px]">
+                <div key={index} className="w-full">
                   <Teamcard {...card} />
                 </div>
               );
@@ -148,10 +148,10 @@ export default function Resources() {
           </div>
         </TabsContent>
         <TabsContent value="mentor">
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10 mt-5">
+          <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10 mt-5">
             {mentor.map((card, index) => {
               return (
-                <div key={index} className="min-w-[350px]">
+                <div key={index} className="w-full">
                   <Teamcard {...card} />
                 </div>
               );
@@ -159,10 +159,10 @@ export default function Resources() {
           </div>
         </TabsContent>
         <TabsContent value="contributors">
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10 mt-5">
+          <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10 mt-5">
             {contributors.map((card, index) => {
               return (
-                <div key={index} className="min-w-[350px]">
+                <div key={index} className="w-full">
                   <Teamcard {...card} />
                 </div>
               );

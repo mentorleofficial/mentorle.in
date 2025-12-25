@@ -382,19 +382,33 @@ export default function Resources() {
                 </TabsContent>
                 <TabsContent value="fellowships">
                     <p className="mt-8"></p>
-                    <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10">
-                        {fellowships.map((card, index) => (
-                            <Card key={index} {...card} />
-                        ))}
-                    </div>
+                    {fellowships.length > 0 ? (
+                        <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10">
+                            {fellowships.map((card, index) => (
+                                <Card key={index} {...card} />
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="text-center py-12">
+                            <p className="text-gray-500 text-lg">No fellowship programs available at the moment.</p>
+                            <p className="text-gray-400 text-sm mt-2">Check back soon for updates!</p>
+                        </div>
+                    )}
                 </TabsContent>
                 <TabsContent value="blogs">
                     <p className="mt-8"></p>
-                    <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10">
-                        {blogs.map((card, index) => (
-                            <Card key={index} {...card} />
-                        ))}
-                    </div>
+                    {blogs.length > 0 ? (
+                        <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10">
+                            {blogs.map((card, index) => (
+                                <Card key={index} {...card} />
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="text-center py-12">
+                            <p className="text-gray-500 text-lg">No blog posts available at the moment.</p>
+                            <p className="text-gray-400 text-sm mt-2">Check back soon for updates!</p>
+                        </div>
+                    )}
                 </TabsContent>
             </Tabs>
 
