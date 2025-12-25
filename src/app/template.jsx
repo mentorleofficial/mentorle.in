@@ -121,8 +121,8 @@ const footerLinks = [
 ];
 
 // Mobile menu data
+// Note: Community removed since Events is already a direct link, avoiding redundancy
 const mobileMenuItems = [
-  { title: "Community", items: navigationData.community },
   { title: "Resources", items: navigationData.resources },
   { title: "For University", items: navigationData.university },
   { title: "About Us", items: navigationData.about },
