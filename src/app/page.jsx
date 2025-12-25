@@ -27,12 +27,12 @@ export default function Home() {
   return (
     <>
       <main>
-        <section className="mt-20 lg:mt-18 px-10 sm:px-24 flex justify-around items-center mb-20">
-          <div className="lg:w-[45%]">
-            <h1 className="text-black text-2xl font-extrabold sm:text-3xl lg:text-5xl text-center lg:text-left ">
+        <section className="mt-20 lg:mt-18 px-4 sm:px-6 md:px-10 lg:px-24 flex flex-col lg:flex-row justify-around items-center mb-12 sm:mb-20 gap-8 lg:gap-0">
+          <div className="w-full lg:w-[45%]">
+            <h1 className="text-black text-2xl font-extrabold sm:text-3xl lg:text-5xl text-center lg:text-left break-words">
               Unlock Your Potential with Verified Mentors in IT & Electronics
             </h1>
-            <p className="text-base font-normal sm:text-lg lg:text-xl text-black mt-4 mb-5 text-center lg:text-left">
+            <p className="text-base font-normal sm:text-lg lg:text-xl text-black mt-4 mb-5 text-center lg:text-left break-words">
               Connect with verified expert mentors who have real-world
               experience in IT, AI, cybersecurity, cloud computing, and more. We
               match you with mentors tailored to your specific goals, ensuring
@@ -49,13 +49,13 @@ export default function Home() {
               <Button text="Join Mentorle Now" />
             </a>
           </div>
-          <div className="hidden lg:block ">
+          <div className="hidden lg:block w-full lg:w-auto">
             <Image
               src="https://zzocepwobcnmflkewzss.supabase.co/storage/v1/object/sign/media/hero_no.1.png?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJtZWRpYS9oZXJvX25vLjEucG5nIiwiaWF0IjoxNzQzNjI4MTI5LCJleHAiOjIwNTg5ODgxMjl9.UzjWC9D1sNE7FBZ0IEy70kkt_lXvRBMz8K7h-okIZY8"
               alt="Hero Image"
               width={700}
               height={700}
-              className="w-[550px] -mt-16"
+              className="w-full max-w-[550px] -mt-16"
             />
           </div>
         </section>
@@ -91,11 +91,11 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="my-16">
-          <h2 className="text-xl sm:text-2xl lg:text-4xl font-semibold text-center">
+        <section className="my-12 sm:my-16 px-4 sm:px-6">
+          <h2 className="text-xl sm:text-2xl lg:text-4xl font-semibold text-center break-words">
             Supported & Backed By
           </h2>
-          <div className="flex flex-wrap pb-5 items-center gap-10 lg:gap-14 justify-center mt-5">
+          <div className="flex flex-wrap pb-5 items-center gap-6 sm:gap-8 md:gap-10 lg:gap-14 justify-center mt-5">
             <Image
               src="https://zzocepwobcnmflkewzss.supabase.co/storage/v1/object/sign/media/awsactivate.png?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJtZWRpYS9hd3NhY3RpdmF0ZS5wbmciLCJpYXQiOjE3NDM1OTQ5OTIsImV4cCI6MjA1ODk1NDk5Mn0.yyXM0qTLVB8pkfFV1Qj4RRKHNas3Qy15ZhXe9_FIzI8"
               alt="AWS"

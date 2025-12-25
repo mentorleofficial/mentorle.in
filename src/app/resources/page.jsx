@@ -325,34 +325,34 @@ let blogs = [
 
 export default function Resources() {
     return (
-        <div className="my-20 min-h-[60vh] sm:h-auto flex flex-col mx-10 lg:mx-28">
+        <div className="my-12 sm:my-20 min-h-[60vh] sm:h-auto flex flex-col mx-4 sm:mx-6 md:mx-10 lg:mx-28 max-w-full overflow-x-hidden">
 
-            <h1 className="text-4xl lg:text-6xl font-semibold mb-7">Resources</h1>
+            <h1 className="text-3xl sm:text-4xl lg:text-6xl font-semibold mb-7 break-words">Resources</h1>
             <Tabs defaultValue="backend" className="w-full">
-                <TabsList>
-                    <TabsTrigger value="backend">Backend</TabsTrigger>
-                    <TabsTrigger value="webdev">Frontend</TabsTrigger>
-                    <TabsTrigger value="games">Games</TabsTrigger>
-                    <TabsTrigger value="fellowships">Fellowships</TabsTrigger>
-                    <TabsTrigger value="blogs">Blogs</TabsTrigger>
+                <TabsList className="flex-wrap">
+                    <TabsTrigger value="backend" className="text-xs sm:text-sm">Backend</TabsTrigger>
+                    <TabsTrigger value="webdev" className="text-xs sm:text-sm">Frontend</TabsTrigger>
+                    <TabsTrigger value="games" className="text-xs sm:text-sm">Games</TabsTrigger>
+                    <TabsTrigger value="fellowships" className="text-xs sm:text-sm">Fellowships</TabsTrigger>
+                    <TabsTrigger value="blogs" className="text-xs sm:text-sm">Blogs</TabsTrigger>
 
 
                 </TabsList>
                 <TabsContent value="backend">
-                    <h2 className="text-3xl sm:text-4xl font-bold mt-8 mb-5">Cloud Platforms</h2>
-                    <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10">
+                    <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mt-6 sm:mt-8 mb-4 sm:mb-5 break-words">Cloud Platforms</h2>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8 lg:gap-10">
                         {backendCloud.map((card, index) => (
                             <Card key={index} {...card} />
                         ))}
                     </div>
-                    <h2 className="text-3xl sm:text-4xl font-bold mt-14 mb-5">Authentication</h2>
-                    <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10">
+                    <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mt-8 sm:mt-14 mb-4 sm:mb-5 break-words">Authentication</h2>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8 lg:gap-10">
                         {cloudAuthentication.map((card, index) => (
                             <Card key={index} {...card} />
                         ))}
                     </div>
-                    <h2 className="text-3xl sm:text-4xl font-bold mt-8 mb-5">Hosting</h2>
-                    <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10">
+                    <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mt-6 sm:mt-8 mb-4 sm:mb-5 break-words">Hosting</h2>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8 lg:gap-10">
                         {backendHosting.map((card, index) => (
                             <Card key={index} {...card} />
                         ))}
@@ -362,8 +362,8 @@ export default function Resources() {
                     {
                         webdev.map((section, index) => (
                             <div key={index}>
-                                <h2 className="text-3xl sm:text-4xl font-bold mt-8 mb-5">{section.title}</h2>
-                                <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10">
+                                <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mt-6 sm:mt-8 mb-4 sm:mb-5 break-words">{section.title}</h2>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8 lg:gap-10">
                                     {section.items.map((card, index) => {
                                         return <Card key={index} {...card} />
                                     })}
@@ -373,39 +373,39 @@ export default function Resources() {
                     }
                 </TabsContent>
                 <TabsContent value="games">
-                    <p className="mt-8"></p>
-                    <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10">
+                    <p className="mt-6 sm:mt-8"></p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8 lg:gap-10">
                         {games.map((card, index) => (
                             <Card key={index} {...card} />
                         ))}
                     </div>
                 </TabsContent>
                 <TabsContent value="fellowships">
-                    <p className="mt-8"></p>
+                    <p className="mt-6 sm:mt-8"></p>
                     {fellowships.length > 0 ? (
-                        <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8 lg:gap-10">
                             {fellowships.map((card, index) => (
                                 <Card key={index} {...card} />
                             ))}
                         </div>
                     ) : (
-                        <div className="text-center py-12">
-                            <p className="text-gray-500 text-lg">No fellowship programs available at the moment.</p>
+                        <div className="text-center py-8 sm:py-12">
+                            <p className="text-gray-500 text-base sm:text-lg">No fellowship programs available at the moment.</p>
                             <p className="text-gray-400 text-sm mt-2">Check back soon for updates!</p>
                         </div>
                     )}
                 </TabsContent>
                 <TabsContent value="blogs">
-                    <p className="mt-8"></p>
+                    <p className="mt-6 sm:mt-8"></p>
                     {blogs.length > 0 ? (
-                        <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8 lg:gap-10">
                             {blogs.map((card, index) => (
                                 <Card key={index} {...card} />
                             ))}
                         </div>
                     ) : (
-                        <div className="text-center py-12">
-                            <p className="text-gray-500 text-lg">No blog posts available at the moment.</p>
+                        <div className="text-center py-8 sm:py-12">
+                            <p className="text-gray-500 text-base sm:text-lg">No blog posts available at the moment.</p>
                             <p className="text-gray-400 text-sm mt-2">Check back soon for updates!</p>
                         </div>
                     )}

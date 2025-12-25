@@ -284,8 +284,8 @@ function MenteeDashboardContent() {
     : 0;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto p-3 sm:p-4 md:p-6">
+    <div className="min-h-screen bg-gray-50 overflow-x-hidden">
+      <div className="max-w-7xl mx-auto p-3 sm:p-4 md:p-6 w-full">
         {/* Header */}
         <div className="mb-4 sm:mb-6 md:mb-8">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
@@ -389,49 +389,49 @@ function MenteeDashboardContent() {
                 <CardTitle className="text-lg">Quick Actions</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3">
                   <Link href="/dashboard/mentee/findmentor">
-                    <Button variant="outline" className="w-full justify-start h-auto py-3" size="lg">
-                      <Search className="w-4 h-4 mr-2" />
-                      <div className="text-left">
-                        <div className="font-medium">Find Mentor</div>
-                        <div className="text-xs text-gray-500">Discover mentors</div>
+                    <Button variant="outline" className="w-full justify-start h-auto py-2 sm:py-3 text-sm sm:text-base" size="lg">
+                      <Search className="w-4 h-4 mr-2 flex-shrink-0" />
+                      <div className="text-left min-w-0 flex-1">
+                        <div className="font-medium truncate">Find Mentor</div>
+                        <div className="text-xs text-gray-500 truncate">Discover mentors</div>
                       </div>
                     </Button>
                   </Link>
                   <Link href="/dashboard/mentee/book">
-                    <Button variant="outline" className="w-full justify-start h-auto py-3" size="lg">
-                      <Briefcase className="w-4 h-4 mr-2" />
-                      <div className="text-left">
-                        <div className="font-medium">Book Session</div>
-                        <div className="text-xs text-gray-500">Schedule now</div>
+                    <Button variant="outline" className="w-full justify-start h-auto py-2 sm:py-3 text-sm sm:text-base" size="lg">
+                      <Briefcase className="w-4 h-4 mr-2 flex-shrink-0" />
+                      <div className="text-left min-w-0 flex-1">
+                        <div className="font-medium truncate">Book Session</div>
+                        <div className="text-xs text-gray-500 truncate">Schedule now</div>
                       </div>
                     </Button>
                   </Link>
                   <Link href="/dashboard/mentee/events">
-                    <Button variant="outline" className="w-full justify-start h-auto py-3" size="lg">
-                      <Calendar className="w-4 h-4 mr-2" />
-                      <div className="text-left">
-                        <div className="font-medium">Browse Events</div>
-                        <div className="text-xs text-gray-500">Find events</div>
+                    <Button variant="outline" className="w-full justify-start h-auto py-2 sm:py-3 text-sm sm:text-base" size="lg">
+                      <Calendar className="w-4 h-4 mr-2 flex-shrink-0" />
+                      <div className="text-left min-w-0 flex-1">
+                        <div className="font-medium truncate">Browse Events</div>
+                        <div className="text-xs text-gray-500 truncate">Find events</div>
                       </div>
                     </Button>
                   </Link>
                   <Link href="/dashboard/mentee/resources">
-                    <Button variant="outline" className="w-full justify-start h-auto py-3" size="lg">
-                      <Play className="w-4 h-4 mr-2" />
-                      <div className="text-left">
-                        <div className="font-medium">Continue Course</div>
-                        <div className="text-xs text-gray-500">Resume learning</div>
+                    <Button variant="outline" className="w-full justify-start h-auto py-2 sm:py-3 text-sm sm:text-base" size="lg">
+                      <Play className="w-4 h-4 mr-2 flex-shrink-0" />
+                      <div className="text-left min-w-0 flex-1">
+                        <div className="font-medium truncate">Continue Course</div>
+                        <div className="text-xs text-gray-500 truncate">Resume learning</div>
                       </div>
                     </Button>
                   </Link>
                   <Link href="/dashboard/mentee/profile">
-                    <Button variant="outline" className="w-full justify-start h-auto py-3" size="lg">
-                      <Settings className="w-4 h-4 mr-2" />
-                      <div className="text-left">
-                        <div className="font-medium">Edit Profile</div>
-                        <div className="text-xs text-gray-500">Update info</div>
+                    <Button variant="outline" className="w-full justify-start h-auto py-2 sm:py-3 text-sm sm:text-base" size="lg">
+                      <Settings className="w-4 h-4 mr-2 flex-shrink-0" />
+                      <div className="text-left min-w-0 flex-1">
+                        <div className="font-medium truncate">Edit Profile</div>
+                        <div className="text-xs text-gray-500 truncate">Update info</div>
                       </div>
                     </Button>
                   </Link>

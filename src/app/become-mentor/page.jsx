@@ -31,19 +31,19 @@ export default function BecomeMentor() {
       {/* Main Content */}
       <main>
         {/* Hero Section */}
-        <section className="bg-gradient-to-r from-black text-white py-20 md:py-32">
-          <div className="container mx-auto px-4 text-center">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6">
+        <section className="bg-gradient-to-r from-black text-white py-12 sm:py-16 md:py-20 lg:py-32">
+          <div className="container mx-auto px-4 sm:px-6 text-center">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6 break-words">
               Make a Difference – Become a Mentor
             </h1>
-            <p className="text-xl md:text-2xl mb-12 max-w-3xl mx-auto">
+            <p className="text-base sm:text-lg md:text-xl lg:text-2xl mb-8 sm:mb-12 max-w-3xl mx-auto break-words">
               "Share your knowledge, inspire the next generation, and grow your
               leadership skills."
             </p>
             {/* <button></button> */}
             <Link
               href="/apply-mentor"
-              className="bg-white text-blue-600 font-bold py-3 px-8 rounded-full text-lg hover:bg-blue-100 transition duration-300"
+              className="bg-white text-blue-600 font-bold py-2 sm:py-3 px-6 sm:px-8 rounded-full text-base sm:text-lg hover:bg-blue-100 transition duration-300 inline-block"
             >
               Apply Now
             </Link>
@@ -57,12 +57,12 @@ export default function BecomeMentor() {
         </section>
 
         {/* Benefits Section */}
-        <section className="py-20">
-          <div className="container mx-auto px-4">
-            <h2 className="text-3xl md:text-4xl font-bold text-center mb-16">
+        <section className="py-12 sm:py-16 md:py-20">
+          <div className="container mx-auto px-4 sm:px-6">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-8 sm:mb-12 md:mb-16 break-words">
               Why Be a Mentor?
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-10 md:gap-12">
               {[
                 {
                   icon: <Radio className="w-16 h-16" />,
@@ -97,9 +97,9 @@ export default function BecomeMentor() {
           </div>
         </section>
         {/* eligiblity Section */}
-        <section className="py-20">
-          <div className="container text-center mx-auto px-4">
-            <h2 className="text-3xl md:text-4xl font-bold text-center mb-16">
+        <section className="py-12 sm:py-16 md:py-20">
+          <div className="container text-center mx-auto px-4 sm:px-6">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-8 sm:mb-12 md:mb-16 break-words">
               Eligibility Criteria
             </h2>
             <div className="gap-12">
@@ -125,12 +125,12 @@ export default function BecomeMentor() {
         </section>
 
         {/* Application Process */}
-        <section className="py-20">
-          <div className="container mx-auto px-4">
-            <h2 className="text-3xl md:text-4xl font-bold text-center mb-16">
+        <section className="py-12 sm:py-16 md:py-20">
+          <div className="container mx-auto px-4 sm:px-6">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-8 sm:mb-12 md:mb-16 break-words">
               Application Process
             </h2>
-            <div className="flex flex-col md:flex-row justify-center items-start space-y-8 md:space-y-0 md:space-x-8">
+            <div className="flex flex-col md:flex-row justify-center items-start space-y-6 sm:space-y-8 md:space-y-0 md:space-x-6 lg:space-x-8">
               {[
                 {
                   step: <GitCommitHorizontal className="w-6 h-6" />,
@@ -274,17 +274,17 @@ export default function BecomeMentor() {
           <FAQ />
         </section>
         {/* Final CTA */}
-        <section className="bg-gray-100 mb-10 text-black py-20">
-          <div className="container mx-auto px-4 text-center">
-            <h2 className="text-3xl md:text-4xl font-bold mb-6">
+        <section className="bg-gray-100 mb-6 sm:mb-10 text-black py-12 sm:py-16 md:py-20">
+          <div className="container mx-auto px-4 sm:px-6 text-center">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 sm:mb-6 break-words">
               Ready to Make an Impact?
             </h2>
-            <p className="text-xl mb-8 max-w-2xl mx-auto">
+            <p className="text-base sm:text-lg md:text-xl mb-6 sm:mb-8 max-w-2xl mx-auto break-words">
               Join our community of mentors and help shape the future of design.
             </p>
             <Link
               href="/apply-mentor"
-              className="bg-black text-white font-bold py-3 px-8 rounded-full text-lg hover:bg-blue-100 transition duration-300"
+              className="bg-black text-white font-bold py-2 sm:py-3 px-6 sm:px-8 rounded-full text-base sm:text-lg hover:bg-blue-100 transition duration-300 inline-block"
             >
               Apply to Be a Mentor
             </Link>

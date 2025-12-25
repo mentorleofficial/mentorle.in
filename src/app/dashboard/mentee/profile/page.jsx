@@ -142,8 +142,8 @@ function ProfileContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto p-6">
+    <div className="min-h-screen bg-gray-50 overflow-x-hidden">
+      <div className="max-w-4xl mx-auto p-3 sm:p-4 md:p-6 w-full">
         <ProfileHeader 
           profile={profile} 
           isEditing={isEditing}

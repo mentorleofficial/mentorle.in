@@ -182,16 +182,16 @@ export default function RegisteredEventsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50/30 via-white to-indigo-50/30">
-      <div className="max-w-7xl mx-auto px-4 py-8 mt-10">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50/30 via-white to-indigo-50/30 overflow-x-hidden">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 py-6 sm:py-8 mt-6 sm:mt-10 w-full">
         {/* Header */}
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-black mb-2">My Registered Events</h1>
-          <p className="text-gray-600">View and manage all events, hackathons, and courses you've registered for</p>
+        <div className="mb-4 sm:mb-6">
+          <h1 className="text-2xl sm:text-3xl font-bold text-black mb-2 break-words">My Registered Events</h1>
+          <p className="text-sm sm:text-base text-gray-600 break-words">View and manage all events, hackathons, and courses you've registered for</p>
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6">
           <Card className="p-4 border-gray-200">
             <div className="text-2xl font-bold text-black">{stats.total}</div>
             <div className="text-sm text-gray-600">Total Registered</div>
@@ -211,13 +211,13 @@ export default function RegisteredEventsPage() {
         </div>
 
         {/* Filters */}
-        <div className="flex gap-2 mb-6">
+        <div className="flex flex-wrap gap-2 mb-4 sm:mb-6">
           {["all", "upcoming", "ongoing", "completed"].map((status) => (
             <Button
               key={status}
               variant={filterStatus === status ? "default" : "outline"}
               onClick={() => setFilterStatus(status)}
-              className={filterStatus === status ? "bg-black text-white" : ""}
+              className={`text-xs sm:text-sm ${filterStatus === status ? "bg-black text-white" : ""}`}
             >
               {status.charAt(0).toUpperCase() + status.slice(1)}
             </Button>
@@ -239,7 +239,7 @@ export default function RegisteredEventsPage() {
             </Button>
           </Card>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {filteredEvents.map((event) => {
               const status = getEventStatus(event);
               const type = getEventType(event);

@@ -20,21 +20,21 @@ export default function Campus() {
   ];
 
   return (
-    <div className="min-h-screen bg-white text-gray-900">
+    <div className="min-h-screen bg-white text-gray-900 overflow-x-hidden">
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-black text-white  py-20">
-        <div className="container  mx-auto px-4">
+      <section className="bg-gradient-to-r from-black text-white py-12 sm:py-16 md:py-20">
+        <div className="container mx-auto px-4 sm:px-6">
           <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6 break-words">
               Campus Program – Coming Soon!
             </h1>
-            <p className="text-xl mb-8">
+            <p className="text-base sm:text-lg md:text-xl mb-6 sm:mb-8 break-words">
               Build anticipation for an upcoming feature that integrates
               Mentorle into university campuses.
             </p>
             <Link
               href="#"
-              className="bg-black text-white px-8 py-3 rounded-full text-lg font-semibold hover:bg-blue-700 transition duration-300"
+              className="bg-black text-white px-6 sm:px-8 py-2 sm:py-3 rounded-full text-base sm:text-lg font-semibold hover:bg-blue-700 transition duration-300 inline-block"
             >
               Explore Programs
             </Link>
@@ -42,12 +42,12 @@ export default function Campus() {
         </div>
       </section>
       {/* Programs Section */}
-      <section className="py-20">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">
+      <section className="py-12 sm:py-16 md:py-20">
+        <div className="container mx-auto px-4 sm:px-6">
+          <h2 className="text-2xl sm:text-3xl font-bold text-center mb-8 sm:mb-12 break-words">
             What to Expect
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             {programSection.map(({ title, image }, index) => (
               <div
                 key={index}
@@ -110,15 +110,15 @@ export default function Campus() {
         </div>
       </section> */}
       {/* CTA Section */}
-      <section className="bg-gray-100 text-black py-20 mb-10">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold mb-6">Stay Updated</h2>
-          <p className="text-xl mb-8">
+      <section className="bg-gray-100 text-black py-12 sm:py-16 md:py-20 mb-6 sm:mb-10">
+        <div className="container mx-auto px-4 sm:px-6 text-center">
+          <h2 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 break-words">Stay Updated</h2>
+          <p className="text-base sm:text-lg md:text-xl mb-6 sm:mb-8 break-words">
             "Sign up for updates to be the first to know when we launch!"
           </p>
           <Link
             href="/subscribe/payment"
-            className="bg-black text-white px-8 py-3 rounded-full text-lg font-semibold hover:bg-gray-100 transition duration-300 inline-block"
+            className="bg-black text-white px-6 sm:px-8 py-2 sm:py-3 rounded-full text-base sm:text-lg font-semibold hover:bg-gray-100 transition duration-300 inline-block"
           >
             Subscribe for Updates
           </Link>
