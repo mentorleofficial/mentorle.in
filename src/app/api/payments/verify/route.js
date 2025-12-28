@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/supabaseServer';
+import { verifyPayment } from '@/lib/cashfreeGateway';
 
 // Verify payment status for a booking
 export async function POST(request) {
@@ -46,38 +47,10 @@ export async function POST(request) {
 
     // If order_id provided, verify with Cashfree
     if (order_id) {
-      // Using exact variable names from .env file
-      const cashfreeAppId = process.env.CASHFREE_APP_ID;
-      const cashfreeSecretKey = process.env.CASHFREE_SECRET_KEY;
-      const cashfreeEnvironment = process.env.CASHFREE_ENVIRONMENT || 'PRODUCTION';
-      const cashfreeApiUrl = process.env.CASHFREE_API_URL;
-
-      // Use CASHFREE_API_URL if provided, otherwise construct from environment
-      let baseUrl;
-      if (cashfreeApiUrl) {
-        // Remove /pg suffix if present, we'll add it in the fetch call
-        baseUrl = cashfreeApiUrl.replace(/\/pg$/, '');
-      } else {
-        // Fallback: construct URL from environment
-        const isProduction = cashfreeEnvironment.toUpperCase() === 'PRODUCTION';
-        baseUrl = isProduction 
-          ? 'https://api.cashfree.com' 
-          : 'https://sandbox.cashfree.com';
-      }
-
       try {
-        const cashfreeResponse = await fetch(`${baseUrl}/pg/orders/${order_id}`, {
-          method: 'GET',
-          headers: {
-            'x-client-id': cashfreeAppId,
-            'x-client-secret': cashfreeSecretKey,
-            'x-api-version': '2023-08-01'
-          }
-        });
+        const verificationResult = await verifyPayment(order_id);
 
-        const cashfreeData = await cashfreeResponse.json();
-
-        if (cashfreeResponse.ok && cashfreeData.order_status === 'PAID') {
+        if (verificationResult.is_paid) {
           // Update booking if payment confirmed
           if (booking.payment_status !== 'paid') {
             await supabase
@@ -93,11 +66,13 @@ export async function POST(request) {
           return NextResponse.json({
             payment_status: 'paid',
             booking_status: 'confirmed',
-            verified: true
+            verified: true,
+            order_status: verificationResult.order_status
           });
         }
       } catch (error) {
         console.error('Error verifying with Cashfree:', error);
+        // Continue to return current booking status
       }
     }
 

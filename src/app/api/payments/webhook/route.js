@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/supabaseServer';
+import { processWebhook } from '@/lib/cashfreeGateway';
 
 // Cashfree payment webhook handler
 export async function POST(request) {
@@ -9,58 +10,47 @@ export async function POST(request) {
     // Verify webhook signature (implement based on Cashfree docs)
     // For now, we'll process the webhook
     
-    const { order_id, order_amount, payment_status, payment_message } = body;
-
-    if (!order_id) {
+    if (!body.order_id) {
       return NextResponse.json({ error: 'Order ID required' }, { status: 400 });
     }
 
     const supabase = await createServerSupabaseClient();
     
-    // Extract booking_id from order_id
-    // Format 1: booking_{booking_id}_{timestamp} (from order API)
-    // Format 2: booking_link_booking_{booking_id}_{timestamp} (from payment link API)
-    let bookingId = null;
+    // Process webhook data using the gateway service
+    const webhookData = processWebhook(body);
     
-    // Try order format first
-    const bookingIdMatch = order_id.match(/^booking_(.+?)_\d+$/);
-    if (bookingIdMatch) {
-      bookingId = bookingIdMatch[1];
-    } else {
-      // Try payment link format
-      const linkMatch = order_id.match(/^booking_link_booking_(.+?)_\d+$/);
-      if (linkMatch) {
-        bookingId = linkMatch[1];
-      } else {
-        // Check if it's a payment link order (Cashfree might use link_id as order_id)
-        // Try to find booking by payment_id in database
-        const { data: booking } = await supabase
-          .from('mentorship_bookings')
-          .select('id')
-          .eq('payment_id', order_id)
-          .single();
-        
-        if (booking) {
-          bookingId = booking.id;
-        }
-      }
-    }
-    
-    if (!bookingId) {
+    if (!webhookData.booking_id) {
       // This might be a subscription payment, not a booking payment
-      console.log('Webhook received non-booking order_id:', order_id);
+      console.log('Webhook received non-booking order_id:', body.order_id);
       return NextResponse.json({ success: true, message: 'Order processed (not a booking)' });
+    }
+
+    // Try to find booking by payment_id if booking_id extraction failed
+    let bookingId = webhookData.booking_id;
+    if (!bookingId) {
+      const { data: booking } = await supabase
+        .from('mentorship_bookings')
+        .select('id')
+        .eq('payment_id', body.order_id)
+        .single();
+      
+      if (booking) {
+        bookingId = booking.id;
+      } else {
+        console.log('Webhook received order_id with no matching booking:', body.order_id);
+        return NextResponse.json({ success: true, message: 'Order processed (no booking found)' });
+      }
     }
 
     // Update booking payment status
     const updateData = {
-      payment_status: payment_status === 'SUCCESS' ? 'paid' : 
-                     payment_status === 'FAILED' ? 'failed' : 'pending',
+      payment_status: webhookData.is_success ? 'paid' : 
+                     webhookData.is_failed ? 'failed' : 'pending',
       updated_at: new Date().toISOString()
     };
 
     // If payment successful, confirm booking
-    if (payment_status === 'SUCCESS') {
+    if (webhookData.is_success) {
       updateData.status = 'confirmed';
     }
 
@@ -76,7 +66,11 @@ export async function POST(request) {
 
     // TODO: Send notification to mentor and mentee
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ 
+      success: true,
+      booking_id: bookingId,
+      payment_status: updateData.payment_status
+    });
   } catch (error) {
     console.error('Error processing webhook:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
