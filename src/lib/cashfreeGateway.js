@@ -96,12 +96,18 @@ async function createPaymentOrder({
     const returnUrl = `${config.returnUrl}${returnUrlPath}`;
     const notifyUrl = `${config.returnUrl}/api/payments/webhook`;
 
+    // Validate and parse amount
+    const orderAmount = parseFloat(amount);
+    if (!orderAmount || orderAmount <= 0 || isNaN(orderAmount)) {
+      throw new Error(`Invalid order amount: ${amount}. Amount must be a positive number.`);
+    }
+
     // Create order payload
     const orderPayload = {
       order_id: orderId,
-      order_amount: parseFloat(amount),
+      order_amount: orderAmount,
       order_currency: currency,
-      order_note: `Booking payment for ${offeringTitle}`,
+      order_note: `Booking payment for ${offeringTitle} - ₹${orderAmount}`,
       customer_details: {
         customer_id: customerId,
         customer_name: customerName || 'User',
@@ -113,6 +119,14 @@ async function createPaymentOrder({
         notify_url: notifyUrl
       }
     };
+
+    // Log order creation for debugging
+    console.log('💰 Creating Cashfree order:', {
+      order_id: orderId,
+      order_amount: orderAmount,
+      currency: currency,
+      offering: offeringTitle
+    });
 
     // Create order via Cashfree API
     const response = await fetch(`${config.baseUrl}/pg/orders`, {
@@ -129,7 +143,7 @@ async function createPaymentOrder({
     const data = await response.json();
 
     if (!response.ok) {
-      console.error('Cashfree order creation failed:', data);
+      console.error('❌ Cashfree order creation failed:', data);
       throw new Error(
         data.message || 
         data.error || 
@@ -137,9 +151,24 @@ async function createPaymentOrder({
       );
     }
 
+    // Validate response amount matches request amount
+    if (data.order_amount && parseFloat(data.order_amount) !== orderAmount) {
+      console.warn('⚠️ Cashfree order amount mismatch:', {
+        requested: orderAmount,
+        received: data.order_amount
+      });
+    }
+
     // Extract payment information
     const paymentSessionId = data.payment_session_id || null;
     const paymentUrl = data.payment_url || data.payment_link || null;
+
+    console.log('✅ Cashfree order created successfully:', {
+      order_id: data.order_id || orderId,
+      order_amount: data.order_amount || orderAmount,
+      payment_session_id: paymentSessionId ? 'present' : 'missing',
+      payment_url: paymentUrl ? 'present' : 'missing'
+    });
 
     // If no payment URL from order, try creating a payment link
     let finalPaymentUrl = paymentUrl;
