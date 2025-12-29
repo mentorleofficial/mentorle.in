@@ -28,14 +28,14 @@ export async function POST(request) {
     // Try to find booking by payment_id if booking_id extraction failed
     let bookingId = webhookData.booking_id;
     if (!bookingId) {
-      const { data: booking } = await supabase
-        .from('mentorship_bookings')
-        .select('id')
+        const { data: booking } = await supabase
+          .from('mentorship_bookings')
+          .select('id')
         .eq('payment_id', body.order_id)
-        .single();
-      
-      if (booking) {
-        bookingId = booking.id;
+          .single();
+        
+        if (booking) {
+          bookingId = booking.id;
       } else {
         console.log('Webhook received order_id with no matching booking:', body.order_id);
         return NextResponse.json({ success: true, message: 'Order processed (no booking found)' });

@@ -219,27 +219,36 @@ export default function BookingPaymentPage() {
         if (paymentResult.payment_session_id) {
           setPaymentSessionId(paymentResult.payment_session_id);
         }
+        // Validate and sanitize payment URL - reject subscription forms
+        let validPaymentUrl = null;
         if (paymentResult.payment_url) {
-          // Validate payment URL is not a subscription form
           if (paymentResult.payment_url.includes('mentorleprime')) {
-            console.error('❌ Payment URL appears to be subscription form!', paymentResult.payment_url);
-            throw new Error("Invalid payment URL. Please try again or contact support.");
+            console.error('❌ Payment URL is subscription form! Will use checkout.js SDK instead.', paymentResult.payment_url);
+            // Don't set paymentUrl - will use checkout.js SDK with payment_session_id
+          } else {
+            validPaymentUrl = paymentResult.payment_url;
+            setPaymentUrl(validPaymentUrl);
           }
-          setPaymentUrl(paymentResult.payment_url);
+        }
+        
+        // Ensure we have either valid payment URL or payment_session_id
+        if (!validPaymentUrl && !paymentResult.payment_session_id) {
+          console.error('❌ No valid payment URL or payment_session_id received!', paymentResult);
+          throw new Error("Payment gateway did not return valid payment information. Please try again.");
         }
         
         // Update URL with order_id
         const newUrl = `${window.location.pathname}?order_id=${currentOrderId}`;
         window.history.replaceState({}, '', newUrl);
 
-        // Always use payment dialog with iframe (like subscription payment)
+        // Use payment dialog - prefer checkout.js SDK if payment_session_id is available
         setPaymentData({
           bookingId: booking.id,
           orderId: currentOrderId,
           amount: bookingAmount, // Use validated amount
           currency: booking.currency || 'INR',
           offering: booking.offering,
-          paymentUrl: paymentResult.payment_url,
+          paymentUrl: validPaymentUrl, // Only set if valid (not subscription form)
           paymentSessionId: paymentResult.payment_session_id
         });
         setShowPaymentDialog(true);

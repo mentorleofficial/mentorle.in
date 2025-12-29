@@ -165,11 +165,11 @@ export async function POST(request) {
     const body = await request.json().catch(() => ({}));
     if (body?.booking_id) {
       try {
-        await supabase
-          .from('mentorship_bookings')
-          .delete()
-          .eq('id', body.booking_id)
-          .eq('payment_status', 'pending');
+      await supabase
+        .from('mentorship_bookings')
+        .delete()
+        .eq('id', body.booking_id)
+        .eq('payment_status', 'pending');
       } catch (rollbackError) {
         console.error('Error rolling back booking:', rollbackError);
       }
