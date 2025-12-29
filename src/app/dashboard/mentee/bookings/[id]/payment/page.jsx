@@ -164,6 +164,19 @@ export default function BookingPaymentPage() {
           return;
         }
 
+        // Validate booking amount before creating payment order
+        const bookingAmount = parseFloat(booking.amount);
+        if (!bookingAmount || bookingAmount <= 0) {
+          throw new Error("Invalid booking amount. Please contact support.");
+        }
+
+        console.log('💰 Creating payment order for booking:', {
+          bookingId: booking.id,
+          amount: bookingAmount,
+          currency: booking.currency || 'INR',
+          offering: booking.offering?.title
+        });
+
         const paymentResponse = await fetch("/api/payments/create-order", {
           method: "POST",
           headers: {
@@ -172,7 +185,7 @@ export default function BookingPaymentPage() {
           },
           body: JSON.stringify({
             booking_id: booking.id,
-            amount: booking.amount,
+            amount: bookingAmount,
             currency: booking.currency || 'INR'
           })
         });
@@ -183,6 +196,22 @@ export default function BookingPaymentPage() {
           throw new Error(paymentResult.error || paymentResult.details || "Failed to create payment order");
         }
 
+        // Validate payment result
+        console.log('💰 Payment order created:', {
+          order_id: paymentResult.order_id,
+          order_amount: paymentResult.order_amount,
+          payment_url: paymentResult.payment_url,
+          payment_session_id: paymentResult.payment_session_id
+        });
+
+        // Ensure order amount matches booking amount
+        if (paymentResult.order_amount && parseFloat(paymentResult.order_amount) !== bookingAmount) {
+          console.error('⚠️ Order amount mismatch!', {
+            bookingAmount,
+            orderAmount: paymentResult.order_amount
+          });
+        }
+
         const currentOrderId = paymentResult.order_id;
         setOrderId(currentOrderId);
         
@@ -191,6 +220,11 @@ export default function BookingPaymentPage() {
           setPaymentSessionId(paymentResult.payment_session_id);
         }
         if (paymentResult.payment_url) {
+          // Validate payment URL is not a subscription form
+          if (paymentResult.payment_url.includes('mentorleprime')) {
+            console.error('❌ Payment URL appears to be subscription form!', paymentResult.payment_url);
+            throw new Error("Invalid payment URL. Please try again or contact support.");
+          }
           setPaymentUrl(paymentResult.payment_url);
         }
         
@@ -202,7 +236,7 @@ export default function BookingPaymentPage() {
         setPaymentData({
           bookingId: booking.id,
           orderId: currentOrderId,
-          amount: booking.amount,
+          amount: bookingAmount, // Use validated amount
           currency: booking.currency || 'INR',
           offering: booking.offering,
           paymentUrl: paymentResult.payment_url,

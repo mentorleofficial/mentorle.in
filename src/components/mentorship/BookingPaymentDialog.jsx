@@ -204,11 +204,28 @@ export default function BookingPaymentDialog({
     );
   }
   
+  // Debug logging
   if (paymentUrl) {
     console.log('✅ BookingPaymentDialog: Using payment URL from API:', paymentUrl);
+    console.log('💰 Booking Amount:', displayAmount, 'Title:', displayTitle);
   } else if (paymentSessionId) {
     console.log('✅ BookingPaymentDialog: Using payment_session_id with checkout.js SDK');
+    console.log('💰 Booking Amount:', displayAmount, 'Title:', displayTitle);
   }
+  
+  // Validate that we have the correct amount
+  if (displayAmount === 0 || !displayAmount) {
+    console.warn('⚠️ BookingPaymentDialog: Amount is 0 or missing!', { bookingData, displayAmount });
+  }
+  
+  // Validate payment URL is not a subscription form
+  if (paymentUrl && paymentUrl.includes('mentorleprime')) {
+    console.error('❌ BookingPaymentDialog: Payment URL appears to be subscription form!', paymentUrl);
+  }
+
+  // Ensure amount is always displayed correctly
+  const displayAmount = bookingData?.amount || 0;
+  const displayTitle = bookingData?.offering?.title || "Mentorship Session";
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -217,11 +234,15 @@ export default function BookingPaymentDialog({
           <DialogTitle className="flex items-center gap-3">
             <div className="min-w-0 flex-1">
               <h3 className="text-base sm:text-lg font-semibold text-gray-900">
-                Payment for {bookingData?.offering?.title || "Mentorship Session"}
+                Payment for {displayTitle}
               </h3>
               <p className="text-xs sm:text-sm text-gray-600 font-medium">
-                ₹{bookingData?.amount || 0} • One-time Payment
+                ₹{displayAmount.toFixed(2)} • One-time Payment
               </p>
+            </div>
+            <div className="flex-shrink-0 bg-black text-white px-4 py-2 rounded-lg">
+              <div className="text-xs text-gray-300">Total Amount</div>
+              <div className="text-lg font-bold">₹{displayAmount.toFixed(2)}</div>
             </div>
           </DialogTitle>
         </DialogHeader>
@@ -241,15 +262,21 @@ export default function BookingPaymentDialog({
             </div>
           ) : (
             <div className="h-full flex flex-col">
-              {/* Security Notice */}
+              {/* Security Notice with Amount Display */}
               <div className="px-4 sm:px-6 py-3 sm:py-4 bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 border-b">
-                <div className="flex items-center gap-2 sm:gap-3">
-                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse flex-shrink-0"></div>
-                  <div>
-                    <h4 className="font-semibold text-blue-900 text-sm sm:text-base">🔒 Secure Payment Gateway</h4>
-                    <p className="text-xs sm:text-sm text-blue-800">
-                      Powered by Cashfree • SSL Encrypted • PCI DSS Compliant
-                    </p>
+                <div className="flex items-center justify-between gap-2 sm:gap-3">
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse flex-shrink-0"></div>
+                    <div>
+                      <h4 className="font-semibold text-blue-900 text-sm sm:text-base">🔒 Secure Payment Gateway</h4>
+                      <p className="text-xs sm:text-sm text-blue-800">
+                        Powered by Cashfree • SSL Encrypted • PCI DSS Compliant
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex-shrink-0 text-right">
+                    <div className="text-xs text-blue-700 font-medium">Amount to Pay</div>
+                    <div className="text-lg sm:text-xl font-bold text-blue-900">₹{displayAmount.toFixed(2)}</div>
                   </div>
                 </div>
               </div>
@@ -271,27 +298,51 @@ export default function BookingPaymentDialog({
                 
                 {/* Use iframe for paymentUrl, checkout.js container for paymentSessionId */}
                 {paymentUrl ? (
-                  <iframe
-                    src={paymentUrl}
-                    width="100%"
-                    height="100%"
-                    frameBorder="0"
-                    sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"
-                    className="w-full h-full min-h-[500px] sm:min-h-[600px] transition-opacity duration-300"
-                    title="Cashfree Payment Gateway"
-                    onLoad={handleIframeLoad}
-                    style={{ 
-                      minHeight: 'calc(95vh - 180px)',
-                      border: 'none',
-                      opacity: iframeLoaded ? 1 : 0
-                    }}
-                  />
+                  <>
+                    {/* Amount reminder banner */}
+                    <div className="absolute top-0 left-0 right-0 bg-yellow-50 border-b border-yellow-200 px-4 py-2 z-20">
+                      <div className="flex items-center justify-center gap-2 text-sm">
+                        <span className="font-medium text-yellow-900">Paying:</span>
+                        <span className="font-bold text-lg text-yellow-900">₹{displayAmount.toFixed(2)}</span>
+                        <span className="text-yellow-700">for {displayTitle}</span>
+                      </div>
+                    </div>
+                    <iframe
+                      src={paymentUrl}
+                      width="100%"
+                      height="100%"
+                      frameBorder="0"
+                      sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"
+                      className="w-full h-full min-h-[500px] sm:min-h-[600px] transition-opacity duration-300"
+                      title={`Cashfree Payment Gateway - ₹${displayAmount.toFixed(2)}`}
+                      onLoad={handleIframeLoad}
+                      style={{ 
+                        minHeight: 'calc(95vh - 180px)',
+                        border: 'none',
+                        opacity: iframeLoaded ? 1 : 0,
+                        marginTop: '40px' // Space for amount banner
+                      }}
+                    />
+                  </>
                 ) : (
-                  <div 
-                    ref={checkoutContainerRef}
-                    className="w-full h-full min-h-[500px] sm:min-h-[600px]"
-                    style={{ minHeight: 'calc(95vh - 180px)' }}
-                  />
+                  <>
+                    {/* Amount reminder for checkout.js */}
+                    <div className="absolute top-0 left-0 right-0 bg-yellow-50 border-b border-yellow-200 px-4 py-2 z-20">
+                      <div className="flex items-center justify-center gap-2 text-sm">
+                        <span className="font-medium text-yellow-900">Paying:</span>
+                        <span className="font-bold text-lg text-yellow-900">₹{displayAmount.toFixed(2)}</span>
+                        <span className="text-yellow-700">for {displayTitle}</span>
+                      </div>
+                    </div>
+                    <div 
+                      ref={checkoutContainerRef}
+                      className="w-full h-full min-h-[500px] sm:min-h-[600px]"
+                      style={{ 
+                        minHeight: 'calc(95vh - 180px)',
+                        marginTop: '40px' // Space for amount banner
+                      }}
+                    />
+                  </>
                 )}
               </div>
 
