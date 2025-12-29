@@ -161,7 +161,13 @@ async function createPaymentOrder({
 
     // Extract payment information
     const paymentSessionId = data.payment_session_id || null;
-    const paymentUrl = data.payment_url || data.payment_link || null;
+    let paymentUrl = data.payment_url || data.payment_link || null;
+
+    // Validate payment URL is not a subscription form
+    if (paymentUrl && paymentUrl.includes('mentorleprime')) {
+      console.warn('⚠️ Cashfree returned subscription form URL. Will use checkout.js SDK instead.', paymentUrl);
+      paymentUrl = null; // Reject subscription form URLs
+    }
 
     console.log('✅ Cashfree order created successfully:', {
       order_id: data.order_id || orderId,
@@ -170,18 +176,23 @@ async function createPaymentOrder({
       payment_url: paymentUrl ? 'present' : 'missing'
     });
 
-    // If no payment URL from order, try creating a payment link
-    let finalPaymentUrl = paymentUrl;
-    if (!finalPaymentUrl && paymentSessionId) {
-      // Payment session ID is available, frontend can use checkout.js SDK
-      console.log('Order created with payment_session_id, frontend can use checkout.js');
+    // If no payment URL but we have payment_session_id, that's fine - use checkout.js SDK
+    if (!paymentUrl && paymentSessionId) {
+      console.log('✅ Order created with payment_session_id - frontend will use checkout.js SDK');
+    } else if (!paymentUrl && !paymentSessionId) {
+      // Last resort: construct payment URL from order_id (may not work for all Cashfree setups)
+      const paymentBaseUrl = config.isProduction 
+        ? 'https://payments.cashfree.com'
+        : 'https://sandbox.cashfree.com';
+      paymentUrl = `${paymentBaseUrl}/pg/orders/${orderId}`;
+      console.warn('⚠️ No payment URL or session ID. Constructed fallback URL:', paymentUrl);
     }
 
     return {
       order_id: orderId,
       payment_session_id: paymentSessionId,
-      payment_url: finalPaymentUrl,
-      order_amount: amount,
+      payment_url: paymentUrl,
+      order_amount: orderAmount,
       order_currency: currency,
       raw_response: data
     };

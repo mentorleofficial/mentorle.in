@@ -76,7 +76,7 @@ export default function BookingPaymentDialog({
 
   // Initialize Cashfree checkout.js SDK when dialog opens and we have payment_session_id
   useEffect(() => {
-    if (isOpen && paymentSessionId && !paymentUrl && !checkoutInitialized && checkoutContainerRef.current) {
+    if (isOpen && paymentSessionId && !validPaymentUrl && !checkoutInitialized && checkoutContainerRef.current) {
       const initializeCheckout = async () => {
         try {
           // Load Cashfree checkout.js SDK
@@ -155,18 +155,18 @@ export default function BookingPaymentDialog({
 
       initializeCheckout();
     }
-  }, [isOpen, paymentSessionId, paymentUrl, checkoutInitialized, bookingData]);
+  }, [isOpen, paymentSessionId, validPaymentUrl, checkoutInitialized, bookingData]);
 
-  // Iframe loading timeout (for paymentUrl)
+  // Iframe loading timeout (for validPaymentUrl)
   useEffect(() => {
-    if (isOpen && paymentUrl && !iframeLoaded) {
+    if (isOpen && validPaymentUrl && !iframeLoaded) {
       const timeout = setTimeout(() => {
         setIframeLoaded(true);
       }, 10000);
       
       return () => clearTimeout(timeout);
     }
-  }, [isOpen, paymentUrl, iframeLoaded]);
+  }, [isOpen, validPaymentUrl, iframeLoaded]);
 
   const handleClose = () => {
     if (paymentStatus !== 'success') {
@@ -182,10 +182,11 @@ export default function BookingPaymentDialog({
     setIframeLoaded(true);
   };
 
-  // Must have either paymentUrl or paymentSessionId
-  if (!paymentUrl && !paymentSessionId) {
-    console.error('❌ BookingPaymentDialog: Missing both payment URL and session ID', { 
+  // Must have either valid paymentUrl or paymentSessionId
+  if (!validPaymentUrl && !paymentSessionId) {
+    console.error('❌ BookingPaymentDialog: Missing both valid payment URL and session ID', { 
       paymentUrl, 
+      validPaymentUrl,
       paymentSessionId, 
       bookingData 
     });
@@ -205,8 +206,8 @@ export default function BookingPaymentDialog({
   }
   
   // Debug logging
-  if (paymentUrl) {
-    console.log('✅ BookingPaymentDialog: Using payment URL from API:', paymentUrl);
+  if (validPaymentUrl) {
+    console.log('✅ BookingPaymentDialog: Using payment URL from API:', validPaymentUrl);
     console.log('💰 Booking Amount:', displayAmount, 'Title:', displayTitle);
   } else if (paymentSessionId) {
     console.log('✅ BookingPaymentDialog: Using payment_session_id with checkout.js SDK');
@@ -218,14 +219,20 @@ export default function BookingPaymentDialog({
     console.warn('⚠️ BookingPaymentDialog: Amount is 0 or missing!', { bookingData, displayAmount });
   }
   
-  // Validate payment URL is not a subscription form
-  if (paymentUrl && paymentUrl.includes('mentorleprime')) {
-    console.error('❌ BookingPaymentDialog: Payment URL appears to be subscription form!', paymentUrl);
-  }
-
   // Ensure amount is always displayed correctly
   const displayAmount = bookingData?.amount || 0;
   const displayTitle = bookingData?.offering?.title || "Mentorship Session";
+
+  // Validate and sanitize payment URL - reject subscription forms
+  let validPaymentUrl = paymentUrl;
+  if (paymentUrl && paymentUrl.includes('mentorleprime')) {
+    console.error('❌ BookingPaymentDialog: Payment URL is subscription form! Rejecting and using payment_session_id instead.', paymentUrl);
+    validPaymentUrl = null; // Force use of checkout.js SDK instead
+  }
+  
+  // If payment URL is invalid but we have payment_session_id, prefer checkout.js
+  const shouldUseCheckoutJs = !validPaymentUrl && paymentSessionId;
+  const shouldUseIframe = validPaymentUrl && !paymentSessionId;
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -265,13 +272,13 @@ export default function BookingPaymentDialog({
               {/* Security Notice with Amount Display */}
               <div className="px-4 sm:px-6 py-3 sm:py-4 bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 border-b">
                 <div className="flex items-center justify-between gap-2 sm:gap-3">
-                  <div className="flex items-center gap-2 sm:gap-3">
-                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse flex-shrink-0"></div>
-                    <div>
-                      <h4 className="font-semibold text-blue-900 text-sm sm:text-base">🔒 Secure Payment Gateway</h4>
-                      <p className="text-xs sm:text-sm text-blue-800">
-                        Powered by Cashfree • SSL Encrypted • PCI DSS Compliant
-                      </p>
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse flex-shrink-0"></div>
+                  <div>
+                    <h4 className="font-semibold text-blue-900 text-sm sm:text-base">🔒 Secure Payment Gateway</h4>
+                    <p className="text-xs sm:text-sm text-blue-800">
+                      Powered by Cashfree • SSL Encrypted • PCI DSS Compliant
+                    </p>
                     </div>
                   </div>
                   <div className="flex-shrink-0 text-right">
@@ -284,7 +291,7 @@ export default function BookingPaymentDialog({
               {/* Payment Frame */}
               <div className="flex-1 bg-white relative overflow-hidden">
                 {/* Loading state */}
-                {((paymentUrl && !iframeLoaded) || (paymentSessionId && !checkoutInitialized)) && (
+                {((validPaymentUrl && !iframeLoaded) || (paymentSessionId && !checkoutInitialized)) && (
                   <div className="absolute inset-0 bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center z-10">
                     <div className="text-center max-w-sm mx-auto px-4">
                       <Loader2 className="w-10 h-10 animate-spin mx-auto mb-4 text-blue-500" />
@@ -292,57 +299,49 @@ export default function BookingPaymentDialog({
                       <p className="text-xs text-gray-500">
                         Establishing secure connection with Cashfree
                       </p>
+                      <div className="mt-4 text-sm font-semibold text-gray-700">
+                        Amount: ₹{displayAmount.toFixed(2)}
+                      </div>
                     </div>
                   </div>
                 )}
                 
-                {/* Use iframe for paymentUrl, checkout.js container for paymentSessionId */}
-                {paymentUrl ? (
-                  <>
-                    {/* Amount reminder banner */}
-                    <div className="absolute top-0 left-0 right-0 bg-yellow-50 border-b border-yellow-200 px-4 py-2 z-20">
-                      <div className="flex items-center justify-center gap-2 text-sm">
-                        <span className="font-medium text-yellow-900">Paying:</span>
-                        <span className="font-bold text-lg text-yellow-900">₹{displayAmount.toFixed(2)}</span>
-                        <span className="text-yellow-700">for {displayTitle}</span>
-                      </div>
-                    </div>
-                    <iframe
-                      src={paymentUrl}
-                      width="100%"
-                      height="100%"
-                      frameBorder="0"
-                      sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"
-                      className="w-full h-full min-h-[500px] sm:min-h-[600px] transition-opacity duration-300"
-                      title={`Cashfree Payment Gateway - ₹${displayAmount.toFixed(2)}`}
-                      onLoad={handleIframeLoad}
-                      style={{ 
-                        minHeight: 'calc(95vh - 180px)',
-                        border: 'none',
-                        opacity: iframeLoaded ? 1 : 0,
-                        marginTop: '40px' // Space for amount banner
-                      }}
-                    />
-                  </>
+                {/* Amount reminder banner - always show */}
+                <div className="absolute top-0 left-0 right-0 bg-yellow-50 border-b border-yellow-200 px-4 py-2 z-20">
+                  <div className="flex items-center justify-center gap-2 text-sm">
+                    <span className="font-medium text-yellow-900">Paying:</span>
+                    <span className="font-bold text-lg text-yellow-900">₹{displayAmount.toFixed(2)}</span>
+                    <span className="text-yellow-700">for {displayTitle}</span>
+                  </div>
+                </div>
+                
+                {/* Use iframe for validPaymentUrl, checkout.js container for paymentSessionId */}
+                {validPaymentUrl && shouldUseIframe ? (
+                  <iframe
+                    src={validPaymentUrl}
+                    width="100%"
+                    height="100%"
+                    frameBorder="0"
+                    sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"
+                    className="w-full h-full min-h-[500px] sm:min-h-[600px] transition-opacity duration-300"
+                    title={`Cashfree Payment Gateway - ₹${displayAmount.toFixed(2)}`}
+                    onLoad={handleIframeLoad}
+                    style={{ 
+                      minHeight: 'calc(95vh - 180px)',
+                      border: 'none',
+                      opacity: iframeLoaded ? 1 : 0,
+                      marginTop: '40px' // Space for amount banner
+                    }}
+                  />
                 ) : (
-                  <>
-                    {/* Amount reminder for checkout.js */}
-                    <div className="absolute top-0 left-0 right-0 bg-yellow-50 border-b border-yellow-200 px-4 py-2 z-20">
-                      <div className="flex items-center justify-center gap-2 text-sm">
-                        <span className="font-medium text-yellow-900">Paying:</span>
-                        <span className="font-bold text-lg text-yellow-900">₹{displayAmount.toFixed(2)}</span>
-                        <span className="text-yellow-700">for {displayTitle}</span>
-                      </div>
-                    </div>
-                    <div 
-                      ref={checkoutContainerRef}
-                      className="w-full h-full min-h-[500px] sm:min-h-[600px]"
-                      style={{ 
-                        minHeight: 'calc(95vh - 180px)',
-                        marginTop: '40px' // Space for amount banner
-                      }}
-                    />
-                  </>
+                  <div 
+                    ref={checkoutContainerRef}
+                    className="w-full h-full min-h-[500px] sm:min-h-[600px]"
+                    style={{ 
+                      minHeight: 'calc(95vh - 180px)',
+                      marginTop: '40px' // Space for amount banner
+                    }}
+                  />
                 )}
               </div>
 
