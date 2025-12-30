@@ -22,6 +22,35 @@ export default function BookingPaymentDialog({
   const [checkoutInitialized, setCheckoutInitialized] = useState(false);
   const checkoutContainerRef = useRef(null);
 
+  // Ensure amount is always displayed correctly - define FIRST
+  const displayAmount = bookingData?.amount || 0;
+  const displayTitle = bookingData?.offering?.title || "Mentorship Session";
+
+  // Validate and sanitize payment URL - reject subscription forms IMMEDIATELY
+  // This must be defined early so it can be used in useEffect hooks
+  let validPaymentUrl = null;
+  if (paymentUrl) {
+    // Block any subscription form URLs - STRICT VALIDATION
+    if (paymentUrl.includes('mentorleprime') || 
+        paymentUrl.includes('/forms/') ||
+        paymentUrl.includes('subscription') ||
+        paymentUrl.includes('prime')) {
+      console.error('❌ BookingPaymentDialog: BLOCKED subscription form URL!', paymentUrl);
+      console.error('❌ This URL will NOT be used. Using checkout.js SDK instead.');
+      validPaymentUrl = null; // Force use of checkout.js SDK instead
+    } else {
+      // Only accept URLs that look like Cashfree order payment URLs
+      if (paymentUrl.includes('cashfree.com') && 
+          (paymentUrl.includes('/pg/orders/') || paymentUrl.includes('/pg/links/'))) {
+        validPaymentUrl = paymentUrl;
+        console.log('✅ BookingPaymentDialog: Valid payment URL accepted:', validPaymentUrl);
+      } else {
+        console.warn('⚠️ BookingPaymentDialog: Unknown payment URL format, rejecting:', paymentUrl);
+        validPaymentUrl = null;
+      }
+    }
+  }
+
   const handlePaymentMessage = (event) => {
     // Listen for payment completion messages from Cashfree
     if (event.origin !== 'https://payments.cashfree.com' && 
@@ -75,78 +104,142 @@ export default function BookingPaymentDialog({
   }, []);
 
   // Initialize Cashfree checkout.js SDK when dialog opens and we have payment_session_id
+  // ALWAYS prefer checkout.js SDK over iframe for booking payments
   useEffect(() => {
-    if (isOpen && paymentSessionId && !validPaymentUrl && !checkoutInitialized && checkoutContainerRef.current) {
+    if (isOpen && paymentSessionId && !checkoutInitialized) {
+      let retryCount = 0;
+      const maxRetries = 50; // 5 seconds max (50 * 100ms)
+      let timeoutId = null;
+      let isMounted = true;
+
       const initializeCheckout = async () => {
         try {
-          // Load Cashfree checkout.js SDK
-          const script = document.createElement('script');
-          script.src = 'https://sdk.cashfree.com/js/v3/cashfree.js';
-          script.async = true;
+          console.log('🔄 Starting Cashfree checkout initialization...', {
+            hasPaymentSessionId: !!paymentSessionId,
+            hasContainer: !!checkoutContainerRef.current
+          });
+
+          // Check if script already exists
+          let script = document.querySelector('script[src="https://sdk.cashfree.com/js/v3/cashfree.js"]');
           
-          script.onload = () => {
-            if (typeof window !== 'undefined' && window.Cashfree && checkoutContainerRef.current) {
-              // Get Cashfree App ID from environment (client-side)
-              const cashfreeAppId = process.env.NEXT_PUBLIC_CASHFREE_APP_ID;
-              const cashfreeEnv = process.env.NEXT_PUBLIC_CASHFREE_ENVIRONMENT || 'PRODUCTION';
-              
-              if (!cashfreeAppId) {
-                console.error('Cashfree App ID not configured');
-                setPaymentStatus('failed');
+          if (!script) {
+            console.log('📦 Loading Cashfree SDK script...');
+            // Load Cashfree checkout.js SDK
+            script = document.createElement('script');
+            script.src = 'https://sdk.cashfree.com/js/v3/cashfree.js';
+            script.async = true;
+            
+            script.onerror = () => {
+              console.error('❌ Failed to load Cashfree SDK script');
+              if (isMounted) setPaymentStatus('failed');
+            };
+
+            document.body.appendChild(script);
+          } else {
+            console.log('✅ Cashfree SDK script already loaded');
+          }
+
+          // Wait for SDK to be available
+          const initCheckout = () => {
+            if (!isMounted) return; // Component unmounted, stop retrying
+            
+            retryCount++;
+            
+            // Check if container is available
+            if (!checkoutContainerRef.current) {
+              if (retryCount < maxRetries) {
+                if (retryCount % 10 === 0) {
+                  console.log(`⏳ Waiting for container... (${retryCount}/${maxRetries})`);
+                }
+                timeoutId = setTimeout(initCheckout, 100);
+                return;
+              } else {
+                console.error('❌ Checkout container not available after max retries');
+                if (isMounted) setPaymentStatus('failed');
                 return;
               }
+            }
 
-              try {
-                // Initialize Cashfree SDK
-                const cashfree = new window.Cashfree({
-                  mode: cashfreeEnv.toUpperCase() === 'PRODUCTION' ? 'production' : 'sandbox'
-                });
+            // Check if SDK is loaded
+            if (typeof window === 'undefined' || !window.Cashfree) {
+              if (retryCount < maxRetries) {
+                if (retryCount % 10 === 0) {
+                  console.log(`⏳ Waiting for Cashfree SDK... (${retryCount}/${maxRetries})`);
+                }
+                timeoutId = setTimeout(initCheckout, 100);
+                return;
+              } else {
+                console.error('❌ Cashfree SDK not loaded after max retries');
+                if (isMounted) setPaymentStatus('failed');
+                return;
+              }
+            }
 
-                // Render checkout
-                cashfree.checkout({
-                  paymentSessionId: paymentSessionId,
-                  returnUrl: `${window.location.origin}/dashboard/mentee/bookings/${bookingData?.bookingId}/payment?order_id=${bookingData?.orderId}`,
-                  onSuccess: () => {
-                    console.log('Payment successful via checkout.js');
+            console.log('✅ Both container and SDK are ready, initializing checkout...');
+
+            // Get Cashfree App ID from environment (client-side)
+            const cashfreeAppId = process.env.NEXT_PUBLIC_CASHFREE_APP_ID;
+            const cashfreeEnv = process.env.NEXT_PUBLIC_CASHFREE_ENVIRONMENT || 'PRODUCTION';
+            
+            if (!cashfreeAppId) {
+              console.error('❌ Cashfree App ID not configured!');
+              console.error('📝 Please add NEXT_PUBLIC_CASHFREE_APP_ID to your .env.local file');
+              console.error('📝 Then restart your development server');
+              console.error('📖 See CASHFREE_SETUP.md for instructions');
+              if (isMounted) setPaymentStatus('failed');
+              return;
+            }
+
+            if (!isMounted) return; // Component unmounted
+
+            try {
+              // Initialize Cashfree SDK
+              const cashfree = new window.Cashfree({
+                mode: cashfreeEnv.toUpperCase() === 'PRODUCTION' ? 'production' : 'sandbox'
+              });
+
+              // Render checkout
+              cashfree.checkout({
+                paymentSessionId: paymentSessionId,
+                returnUrl: `${window.location.origin}/dashboard/mentee/bookings/${bookingData?.bookingId}/payment?order_id=${bookingData?.orderId}`,
+                onSuccess: () => {
+                  console.log('Payment successful via checkout.js');
+                  if (isMounted) {
                     setPaymentStatus('success');
                     setShowThankYou(true);
                     setTimeout(() => {
                       onPaymentSuccess();
                       onClose();
                     }, 3000);
-                  },
-                  onFailure: (error) => {
-                    console.error('Payment failed via checkout.js:', error);
-                    setPaymentStatus('failed');
                   }
-                }).render(checkoutContainerRef.current);
-                
+                },
+                onFailure: (error) => {
+                  console.error('Payment failed via checkout.js:', error);
+                  if (isMounted) setPaymentStatus('failed');
+                }
+              }).render(checkoutContainerRef.current);
+              
+              if (isMounted) {
                 setCheckoutInitialized(true);
                 setIframeLoaded(true);
                 console.log('✅ Cashfree checkout.js initialized successfully');
-              } catch (checkoutError) {
-                console.error('Error initializing Cashfree checkout:', checkoutError);
-                setPaymentStatus('failed');
               }
-            } else {
-              console.error('Cashfree SDK not loaded or container not available');
-              setPaymentStatus('failed');
+            } catch (checkoutError) {
+              console.error('Error initializing Cashfree checkout:', checkoutError);
+              if (isMounted) setPaymentStatus('failed');
             }
           };
 
-          script.onerror = () => {
-            console.error('Failed to load Cashfree SDK');
-            setPaymentStatus('failed');
-          };
-
-          document.body.appendChild(script);
-
-          return () => {
-            // Cleanup script if component unmounts
-            if (document.body.contains(script)) {
-              document.body.removeChild(script);
-            }
-          };
+          // Start initialization - wait a bit for script to load if it was just added
+          if (script.onload) {
+            // Script was already loaded, initialize immediately
+            setTimeout(initCheckout, 200);
+          } else {
+            // Wait for script to load first
+            script.onload = () => {
+              setTimeout(initCheckout, 200);
+            };
+          }
         } catch (error) {
           console.error('Error loading Cashfree SDK:', error);
           setPaymentStatus('failed');
@@ -154,8 +247,16 @@ export default function BookingPaymentDialog({
       };
 
       initializeCheckout();
+
+      // Cleanup on unmount
+      return () => {
+        isMounted = false;
+        if (timeoutId) {
+          clearTimeout(timeoutId);
+        }
+      };
     }
-  }, [isOpen, paymentSessionId, validPaymentUrl, checkoutInitialized, bookingData]);
+  }, [isOpen, paymentSessionId, checkoutInitialized, bookingData, onPaymentSuccess, onClose]);
 
   // Iframe loading timeout (for validPaymentUrl)
   useEffect(() => {
@@ -218,21 +319,6 @@ export default function BookingPaymentDialog({
   if (displayAmount === 0 || !displayAmount) {
     console.warn('⚠️ BookingPaymentDialog: Amount is 0 or missing!', { bookingData, displayAmount });
   }
-  
-  // Ensure amount is always displayed correctly
-  const displayAmount = bookingData?.amount || 0;
-  const displayTitle = bookingData?.offering?.title || "Mentorship Session";
-
-  // Validate and sanitize payment URL - reject subscription forms
-  let validPaymentUrl = paymentUrl;
-  if (paymentUrl && paymentUrl.includes('mentorleprime')) {
-    console.error('❌ BookingPaymentDialog: Payment URL is subscription form! Rejecting and using payment_session_id instead.', paymentUrl);
-    validPaymentUrl = null; // Force use of checkout.js SDK instead
-  }
-  
-  // If payment URL is invalid but we have payment_session_id, prefer checkout.js
-  const shouldUseCheckoutJs = !validPaymentUrl && paymentSessionId;
-  const shouldUseIframe = validPaymentUrl && !paymentSessionId;
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -315,8 +401,18 @@ export default function BookingPaymentDialog({
                   </div>
                 </div>
                 
-                {/* Use iframe for validPaymentUrl, checkout.js container for paymentSessionId */}
-                {validPaymentUrl && shouldUseIframe ? (
+                {/* ALWAYS prefer checkout.js SDK for booking payments - more reliable */}
+                {paymentSessionId ? (
+                  <div 
+                    ref={checkoutContainerRef}
+                    className="w-full h-full min-h-[500px] sm:min-h-[600px]"
+                    style={{ 
+                      minHeight: 'calc(95vh - 180px)',
+                      marginTop: '40px' // Space for amount banner
+                    }}
+                    data-payment-session-id={paymentSessionId}
+                  />
+                ) : validPaymentUrl && !validPaymentUrl.includes('mentorleprime') ? (
                   <iframe
                     src={validPaymentUrl}
                     width="100%"
@@ -334,14 +430,17 @@ export default function BookingPaymentDialog({
                     }}
                   />
                 ) : (
-                  <div 
-                    ref={checkoutContainerRef}
-                    className="w-full h-full min-h-[500px] sm:min-h-[600px]"
-                    style={{ 
-                      minHeight: 'calc(95vh - 180px)',
-                      marginTop: '40px' // Space for amount banner
-                    }}
-                  />
+                  <div className="flex items-center justify-center h-full min-h-[500px] bg-red-50">
+                    <div className="text-center p-8">
+                      <p className="text-red-600 font-semibold mb-2">Payment Initialization Error</p>
+                      <p className="text-sm text-gray-600 mb-4">
+                        Unable to load payment gateway. Please try again.
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        If this persists, contact support with order ID: {bookingData?.orderId}
+                      </p>
+                    </div>
+                  </div>
                 )}
               </div>
 
