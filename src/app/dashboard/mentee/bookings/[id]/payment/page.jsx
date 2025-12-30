@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,7 +13,8 @@ import {
 } from "lucide-react";
 import BookingPaymentDialog from "@/components/mentorship/BookingPaymentDialog";
 
-export default function BookingPaymentPage() {
+// Inner component that uses useSearchParams - must be wrapped in Suspense
+function BookingPaymentContent() {
   const params = useParams();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -533,6 +534,21 @@ export default function BookingPaymentPage() {
         />
       )}
     </div>
+  );
+}
+
+// Main component with Suspense boundary
+export default function BookingPaymentPage() {
+  return (
+    <Suspense fallback={
+      <div className="container mx-auto px-4 py-8 max-w-4xl">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
+        </div>
+      </div>
+    }>
+      <BookingPaymentContent />
+    </Suspense>
   );
 }
 

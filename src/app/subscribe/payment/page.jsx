@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { useToast } from "@/hooks/use-toast";
@@ -8,7 +8,8 @@ import PaymentDialog from "@/app/dashboard/mentee/resources/components/PaymentDi
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Loader2 } from "lucide-react";
 
-export default function SubscribePaymentPage() {
+// Inner component that uses useSearchParams - must be wrapped in Suspense
+function SubscribePaymentContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast();
@@ -196,5 +197,21 @@ export default function SubscribePaymentPage() {
         )}
       </div>
     </div>
+  );
+}
+
+// Main component with Suspense boundary
+export default function SubscribePaymentPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-gray-600" />
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    }>
+      <SubscribePaymentContent />
+    </Suspense>
   );
 }
