@@ -259,22 +259,33 @@ export const handleMentorApproval = async (mentorId, approved) => {
 
   try {
     if (approved) {
-      // Approve the mentor
-      await supabase
+      // Approve the mentor - update status
+      const { error: mentorError } = await supabase
         .from("mentor_data")
         .update({
           status: MENTOR_STATUS.APPROVED,
-          role: ROLES.MENTOR,
         })
         .eq("user_id", mentorId);
+      
+      if (mentorError) throw mentorError;
+
+      // Update user role from pending_mentor to mentor
+      const { assignRoleToUser } = await import("@/lib/roleUtils");
+      const roleResult = await assignRoleToUser(mentorId, ROLES.MENTOR, MENTOR_STATUS.APPROVED);
+      
+      if (!roleResult.success) {
+        throw new Error(roleResult.error || "Failed to assign mentor role");
+      }
     } else {
       // Reject the mentor
-      await supabase
+      const { error } = await supabase
         .from("mentor_data")
         .update({
           status: MENTOR_STATUS.REJECTED,
         })
-        .eq("user_id", userId);
+        .eq("user_id", mentorId);
+      
+      if (error) throw error;
     }
 
     return true;

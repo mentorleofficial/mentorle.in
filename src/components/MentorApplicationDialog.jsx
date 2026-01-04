@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { ROLES, MENTOR_STATUS } from "@/lib/roles";
+import { assignRoleToUser } from "@/lib/roleUtils";
 import {
   Dialog,
   DialogContent,
@@ -28,23 +29,53 @@ export default function MentorApplicationDialog({
     try {
       setIsLoading(true);
       
-      // Update the mentor status to approved and role to mentor
+      if (!application || !application.user_id) {
+        throw new Error("Invalid application data");
+      }
+
+      const userId = application.user_id;
+      
+      // Step 1: Update mentor_data status to approved
       const { error: mentorError } = await supabase
         .from("mentor_data")
         .update({ 
-          status: MENTOR_STATUS.APPROVED,
-          role: ROLES.MENTOR
+          status: MENTOR_STATUS.APPROVED
         })
-        .eq("id", application.id);
+        .eq("user_id", userId);
       
-      if (mentorError) throw mentorError;
+      if (mentorError) {
+        console.error("Error updating mentor_data:", mentorError);
+        throw mentorError;
+      }
+      
+      // Step 2: Update user_roles to ensure user has mentor role (not pending_mentor)
+      // Check current role first
+      const { data: currentRoles } = await supabase
+        .from("user_roles")
+        .select("roles(name)")
+        .eq("user_id", userId);
+      
+      const currentRoleName = currentRoles?.[0]?.roles?.name;
+      
+      // Only update role if it's pending_mentor or if no role exists
+      if (!currentRoleName || currentRoleName === ROLES.PENDING_MENTOR) {
+        const roleResult = await assignRoleToUser(userId, ROLES.MENTOR, MENTOR_STATUS.APPROVED);
+        
+        if (!roleResult.success) {
+          console.error("Error assigning mentor role:", roleResult.error);
+          throw new Error(roleResult.error || "Failed to assign mentor role");
+        }
+      } else if (currentRoleName === ROLES.MENTOR) {
+        // Role is already mentor, just ensure status is updated (already done in Step 1)
+        console.log("User already has mentor role, status updated to approved");
+      }
       
       toast({
         title: "Application Approved",
-        description: "The mentor application has been approved."
+        description: "The mentor application has been approved and the user role has been updated."
       });
       
-      // Notify parent component
+      // Notify parent component to refresh the list
       onApplicationProcessed(application.id);
       onClose();
       
@@ -52,7 +83,7 @@ export default function MentorApplicationDialog({
       console.error("Error approving application:", error);
       toast({
         title: "Error",
-        description: "Failed to approve application.",
+        description: error.message || "Failed to approve application.",
         variant: "destructive"
       });
     } finally {
@@ -64,11 +95,17 @@ export default function MentorApplicationDialog({
     try {
       setIsLoading(true);
       
+      if (!application || !application.user_id) {
+        throw new Error("Invalid application data");
+      }
+
+      const userId = application.user_id;
+      
       // Update the mentor status to rejected
       const { error } = await supabase
         .from("mentor_data")
         .update({ status: MENTOR_STATUS.REJECTED })
-        .eq("id", application.id);
+        .eq("user_id", userId);
       
       if (error) throw error;
       
@@ -77,7 +114,7 @@ export default function MentorApplicationDialog({
         description: "The mentor application has been rejected."
       });
       
-      // Notify parent component
+      // Notify parent component to refresh the list
       onApplicationProcessed(application.id);
       onClose();
       
@@ -85,7 +122,7 @@ export default function MentorApplicationDialog({
       console.error("Error rejecting application:", error);
       toast({
         title: "Error",
-        description: "Failed to reject application.",
+        description: error.message || "Failed to reject application.",
         variant: "destructive"
       });
     } finally {
@@ -97,10 +134,16 @@ export default function MentorApplicationDialog({
     try {
       setIsLoading(true);
 
+      if (!application || !application.user_id) {
+        throw new Error("Invalid application data");
+      }
+
+      const userId = application.user_id;
+
       const { error } = await supabase
         .from("mentor_data")
         .update({ status: MENTOR_STATUS.CHANGES_REQUESTED })
-        .eq("id", application.id);
+        .eq("user_id", userId);
 
       if (error) throw error;
 
@@ -115,7 +158,7 @@ export default function MentorApplicationDialog({
       console.error("Error requesting changes:", error);
       toast({
         title: "Error",
-        description: "Failed to request changes for this application.",
+        description: error.message || "Failed to request changes for this application.",
         variant: "destructive"
       });
     } finally {

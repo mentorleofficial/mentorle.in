@@ -60,9 +60,27 @@ function MentorApplicationsContent() {
     setIsApplicationDialogOpen(true);
   };
 
-  const handleApplicationProcessed = (applicationId) => {
-    // Update local state by removing the processed application
-    setApplications(applications.filter(app => app.id !== applicationId));
+  const handleApplicationProcessed = async (applicationId) => {
+    // Refetch applications to get updated status
+    try {
+      const { data, error } = await supabase
+        .from("mentor_data")
+        .select(`*`)
+        .in("status", [
+          MENTOR_STATUS.PENDING,
+          MENTOR_STATUS.APPROVED,
+          MENTOR_STATUS.REJECTED,
+          MENTOR_STATUS.CHANGES_REQUESTED
+        ]);
+
+      if (error) throw error;
+
+      setApplications(data || []);
+    } catch (error) {
+      console.error("Error refreshing applications:", error);
+      // Fallback: remove from local state if refetch fails
+      setApplications(applications.filter(app => app.id !== applicationId));
+    }
   };
 
   const handleCloseDialog = () => {
