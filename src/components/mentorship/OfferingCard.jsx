@@ -17,6 +17,14 @@ const CATEGORY_LABELS = {
 };
 
 export default function OfferingCard({ offering, onBook }) {
+  const handleBookClick = () => {
+    if (onBook && typeof onBook === 'function') {
+      onBook(offering);
+    } else {
+      console.warn('onBook handler not provided to OfferingCard');
+    }
+  };
+
   return (
     <Card className="hover:shadow-lg transition-all duration-200 overflow-hidden">
       <CardContent className="p-0">
@@ -82,12 +90,21 @@ export default function OfferingCard({ offering, onBook }) {
                 {offering.price > 0 ? offering.price : "Free"}
               </span>
             </div>
-            <Button
-              onClick={() => onBook(offering)}
-              className="bg-black text-white hover:bg-gray-800"
-            >
-              Book Now
-            </Button>
+            {onBook && typeof onBook === 'function' ? (
+              <Button
+                onClick={handleBookClick}
+                className="bg-black text-white hover:bg-gray-800"
+              >
+                Book Now
+              </Button>
+            ) : (
+              <Button
+                disabled
+                className="bg-gray-400 text-white cursor-not-allowed"
+              >
+                Book Now
+              </Button>
+            )}
           </div>
         </div>
       </CardContent>

@@ -46,44 +46,103 @@ export default function BookingModal({ offering, mentorAvailability, onClose, on
       return;
     }
 
-    const dayOfWeek = selectedDate.getDay();
-    const daySlots = mentorAvailability.filter(slot => slot.day_of_week === dayOfWeek);
-    
-    const slots = [];
-    const now = new Date();
-    const minNotice = addHours(now, offering.min_notice_hours);
-
-    daySlots.forEach(slot => {
-      const [startHour, startMin] = slot.start_time.split(':').map(Number);
-      const [endHour, endMin] = slot.end_time.split(':').map(Number);
-      
-      // Generate slots based on duration
-      let currentHour = startHour;
-      let currentMin = startMin;
-      
-      while (currentHour * 60 + currentMin + offering.duration_minutes <= endHour * 60 + endMin) {
-        const slotTime = new Date(selectedDate);
-        slotTime.setHours(currentHour, currentMin, 0, 0);
+    const fetchAvailableSlots = async () => {
+      try {
+        const { supabase } = await import("@/lib/supabase");
+        const { data: { session } } = await supabase.auth.getSession();
         
-        // Only add if after minimum notice time
-        if (slotTime > minNotice) {
-          slots.push({
-            time: format(slotTime, "HH:mm"),
-            label: format(slotTime, "h:mm a"),
-            datetime: slotTime
+        const dayOfWeek = selectedDate.getDay();
+        const daySlots = mentorAvailability.filter(slot => slot.day_of_week === dayOfWeek);
+        
+        const slots = [];
+        const now = new Date();
+        const minNotice = addHours(now, offering.min_notice_hours);
+
+        // Generate all potential slots
+        daySlots.forEach(slot => {
+          const [startHour, startMin] = slot.start_time.split(':').map(Number);
+          const [endHour, endMin] = slot.end_time.split(':').map(Number);
+          
+          // Generate slots based on duration
+          let currentHour = startHour;
+          let currentMin = startMin;
+          
+          while (currentHour * 60 + currentMin + offering.duration_minutes <= endHour * 60 + endMin) {
+            const slotTime = new Date(selectedDate);
+            slotTime.setHours(currentHour, currentMin, 0, 0);
+            
+            // Only add if after minimum notice time
+            if (slotTime > minNotice) {
+              slots.push({
+                time: format(slotTime, "HH:mm"),
+                label: format(slotTime, "h:mm a"),
+                datetime: slotTime
+              });
+            }
+            
+            // Move to next slot
+            currentMin += offering.duration_minutes + offering.buffer_after_minutes;
+            while (currentMin >= 60) {
+              currentMin -= 60;
+              currentHour += 1;
+            }
+          }
+        });
+
+        // Fetch existing bookings for this mentor on the selected date
+        const dayStart = new Date(selectedDate);
+        dayStart.setHours(0, 0, 0, 0);
+        const dayEnd = new Date(selectedDate);
+        dayEnd.setHours(23, 59, 59, 999);
+
+        // Query bookings directly from Supabase to check availability
+        const { data: existingBookingsData, error: bookingsError } = await supabase
+          .from('mentorship_bookings')
+          .select('id, scheduled_at, duration_minutes, status')
+          .eq('mentor_id', offering.mentor_id)
+          .in('status', ['pending', 'confirmed'])
+          .gte('scheduled_at', dayStart.toISOString())
+          .lte('scheduled_at', dayEnd.toISOString());
+
+        const existingBookings = existingBookingsData || [];
+        
+        if (bookingsError) {
+          console.warn("Error fetching existing bookings:", bookingsError);
+        }
+
+        // Filter out slots that conflict with existing bookings
+        const availableSlots = slots.filter(slot => {
+          const slotStart = slot.datetime;
+          const slotEnd = new Date(slotStart.getTime() + (offering.duration_minutes * 60 * 1000));
+          const bufferStart = new Date(slotStart.getTime() - (offering.buffer_before_minutes * 60 * 1000));
+          const bufferEnd = new Date(slotEnd.getTime() + (offering.buffer_after_minutes * 60 * 1000));
+
+          // Check if this slot conflicts with any existing booking
+          const hasConflict = existingBookings.some(booking => {
+            const bookingStart = new Date(booking.scheduled_at);
+            const bookingEnd = new Date(bookingStart.getTime() + (booking.duration_minutes * 60 * 1000));
+
+            // Check if booking overlaps with slot buffer zone
+            return (
+              (bookingStart >= bufferStart && bookingStart < bufferEnd) ||
+              (bookingEnd > bufferStart && bookingEnd <= bufferEnd) ||
+              (bookingStart <= bufferStart && bookingEnd >= bufferEnd)
+            );
           });
-        }
-        
-        // Move to next slot
-        currentMin += offering.duration_minutes + offering.buffer_after_minutes;
-        while (currentMin >= 60) {
-          currentMin -= 60;
-          currentHour += 1;
-        }
-      }
-    });
 
-    setAvailableSlots(slots);
+          return !hasConflict;
+        });
+
+        setAvailableSlots(availableSlots);
+      } catch (error) {
+        console.error("Error fetching available slots:", error);
+        // On error, still show slots but they might have conflicts
+        // The API will reject them if they're not available
+        setAvailableSlots([]);
+      }
+    };
+
+    fetchAvailableSlots();
   }, [selectedDate, mentorAvailability, offering]);
 
   const handleBook = async () => {
@@ -196,8 +255,8 @@ export default function BookingModal({ offering, mentorAvailability, onClose, on
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl max-w-md w-full max-h-[90vh] overflow-hidden">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-2 sm:p-4">
+      <div className="bg-white rounded-xl max-w-md w-full max-h-[95vh] sm:max-h-[90vh] overflow-hidden">
         {/* Header */}
         <div className="p-6 border-b flex items-center justify-between">
           <div>

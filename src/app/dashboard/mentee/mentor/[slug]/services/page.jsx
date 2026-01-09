@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Star, Calendar, Clock, IndianRupee, MessageSquare, User, ArrowRight, Briefcase, Linkedin, ExternalLink } from "lucide-react";
 import { format } from "date-fns";
 import OfferingCard from "@/components/mentorship/OfferingCard";
+import BookingModal from "@/components/mentorship/BookingModal";
 
 // Import microservices
 import MentorService from "./api/mentorService";
@@ -45,9 +46,14 @@ function NotFoundState() {
 }
 
 // Mentor Offerings Component
-function MentorOfferings({ mentorId, mentorName }) {
+function MentorOfferings({ mentorId, mentorName, mentorSlug }) {
+  const { toast } = useToast();
+  const router = useRouter();
   const [offerings, setOfferings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedOffering, setSelectedOffering] = useState(null);
+  const [mentorAvailability, setMentorAvailability] = useState([]);
+  const [showBookingModal, setShowBookingModal] = useState(false);
 
   useEffect(() => {
     fetchOfferings();
@@ -71,6 +77,58 @@ function MentorOfferings({ mentorId, mentorName }) {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleBook = async (offering) => {
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (!session) {
+      toast({
+        title: "Login Required",
+        description: "Please log in to book a session",
+        variant: "destructive",
+      });
+      router.push(`/login?redirect=/dashboard/mentee/mentor/${mentorSlug}/services`);
+      return;
+    }
+
+    try {
+      // Fetch mentor's availability
+      const response = await fetch(`/api/availability?mentor_id=${offering.mentor_id}`);
+      if (response.ok) {
+        const { data } = await response.json();
+        setMentorAvailability(data || []);
+        setSelectedOffering(offering);
+        setShowBookingModal(true);
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to load mentor availability",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching availability:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load mentor availability",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleBookingSuccess = (result) => {
+    setShowBookingModal(false);
+    setSelectedOffering(null);
+    if (result.requiresPayment) {
+      // Payment will be handled by BookingModal redirect
+      return;
+    }
+    toast({
+      title: "Booked!",
+      description: "Your session has been booked successfully",
+    });
+    router.push("/dashboard/mentee/bookings");
   };
 
   if (loading) {
@@ -103,11 +161,28 @@ function MentorOfferings({ mentorId, mentorName }) {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {offerings.map((offering) => (
-              <OfferingCard key={offering.id} offering={offering} />
+              <OfferingCard 
+                key={offering.id} 
+                offering={offering} 
+                onBook={handleBook}
+              />
             ))}
           </div>
         )}
       </CardContent>
+      
+      {/* Booking Modal */}
+      {showBookingModal && selectedOffering && (
+        <BookingModal
+          offering={selectedOffering}
+          mentorAvailability={mentorAvailability}
+          onClose={() => {
+            setShowBookingModal(false);
+            setSelectedOffering(null);
+          }}
+          onSuccess={handleBookingSuccess}
+        />
+      )}
     </Card>
   );
 }
@@ -123,18 +198,41 @@ function MentorEvents({ mentorId }) {
 
   const fetchEvents = async () => {
     try {
-      const { data, error } = await supabase
-        .from("events")
+      // Try events_programs table first (newer table name)
+      let { data, error } = await supabase
+        .from("events_programs")
         .select("*")
         .eq("created_by", mentorId)
         .gte("start_date", new Date().toISOString())
         .order("start_date", { ascending: true })
         .limit(5);
 
-      if (error) throw error;
-      setEvents(data || []);
+      // If that fails, try events table (fallback)
+      if (error) {
+        const fallbackResult = await supabase
+          .from("events")
+          .select("*")
+          .eq("created_by", mentorId)
+          .gte("start_date", new Date().toISOString())
+          .order("start_date", { ascending: true })
+          .limit(5);
+        
+        if (!fallbackResult.error) {
+          data = fallbackResult.data;
+          error = null;
+        }
+      }
+
+      if (error) {
+        console.warn("Error fetching events:", error);
+        // Don't throw - just set empty array
+        setEvents([]);
+      } else {
+        setEvents(data || []);
+      }
     } catch (error) {
       console.error("Error fetching events:", error);
+      setEvents([]);
     } finally {
       setLoading(false);
     }
@@ -573,7 +671,7 @@ export default function MentorServicesPage() {
           {/* Services Content */}
           <div className="lg:col-span-2 space-y-6">
             {/* Offerings Section */}
-            <MentorOfferings mentorId={mentor.user_id} mentorName={mentor.name} />
+            <MentorOfferings mentorId={mentor.user_id} mentorName={mentor.name} mentorSlug={params.slug} />
             
             {/* Events Section */}
             <MentorEvents mentorId={mentor.user_id} />

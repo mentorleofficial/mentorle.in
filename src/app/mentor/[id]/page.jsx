@@ -6,6 +6,8 @@ import { supabase } from "@/lib/supabase";
 import Image from "next/image";
 import Link from "next/link";
 import MentorVideo from "@/app/dashboard/mentee/booking/components/MentorVideo";
+import BookingModal from "@/components/mentorship/BookingModal";
+import OfferingCard from "@/components/mentorship/OfferingCard";
 import { 
   Briefcase, 
   MapPin, 
@@ -19,16 +21,23 @@ import {
   Globe
 } from "lucide-react";
 import { slugToName } from "@/lib/slugUtils";
+import { useToast } from "@/hooks/use-toast";
 
 export default function PublicMentorProfile() {
   const router = useRouter();
   const params = useParams();
+  const { toast } = useToast();
   const [mentor, setMentor] = useState(null);
   const [loading, setLoading] = useState(true);
   const [imageUrl, setImageUrl] = useState("");
   const [imageLoading, setImageLoading] = useState(true);
   const [imageError, setImageError] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [offerings, setOfferings] = useState([]);
+  const [offeringsLoading, setOfferingsLoading] = useState(false);
+  const [selectedOffering, setSelectedOffering] = useState(null);
+  const [mentorAvailability, setMentorAvailability] = useState([]);
+  const [showBookingModal, setShowBookingModal] = useState(false);
 
   useEffect(() => {
     const checkAuthAndFetchMentor = async () => {
@@ -105,6 +114,8 @@ export default function PublicMentorProfile() {
           if (mentorData) {
             setMentor(mentorData);
             await fetchProfileImage(mentorData.profile_url);
+            // Fetch offerings for this mentor
+            await fetchOfferings(mentorData.user_id);
           }
         } catch (error) {
           console.error("Error fetching mentor:", error);
@@ -116,6 +127,80 @@ export default function PublicMentorProfile() {
 
     checkAuthAndFetchMentor();
   }, [params.id]);
+
+  const fetchOfferings = async (mentorUserId) => {
+    if (!mentorUserId) return;
+    
+    setOfferingsLoading(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const headers = { "Content-Type": "application/json" };
+      if (session?.access_token) {
+        headers["Authorization"] = `Bearer ${session.access_token}`;
+      }
+
+      const response = await fetch(`/api/offerings?mentor_id=${mentorUserId}&status=active`, { headers });
+      if (response.ok) {
+        const { data } = await response.json();
+        setOfferings(data || []);
+      }
+    } catch (error) {
+      console.error("Error fetching offerings:", error);
+    } finally {
+      setOfferingsLoading(false);
+    }
+  };
+
+  const handleBook = async (offering) => {
+    if (!isAuthenticated) {
+      toast({
+        title: "Login Required",
+        description: "Please log in to book a session",
+        variant: "destructive",
+      });
+      router.push(`/login?redirect=/mentor/${params.id}`);
+      return;
+    }
+
+    try {
+      // Fetch mentor's availability
+      const response = await fetch(`/api/availability?mentor_id=${offering.mentor_id}`);
+      if (response.ok) {
+        const { data } = await response.json();
+        setMentorAvailability(data || []);
+        setSelectedOffering(offering);
+        setShowBookingModal(true);
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to load mentor availability",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching availability:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load mentor availability",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleBookingSuccess = (result) => {
+    setShowBookingModal(false);
+    setSelectedOffering(null);
+    if (result.requiresPayment) {
+      // Payment will be handled by BookingModal redirect
+      return;
+    }
+    toast({
+      title: "Booked!",
+      description: "Your session has been booked successfully",
+    });
+    // Optionally redirect to bookings page
+    router.push("/dashboard/mentee/bookings");
+  };
 
   const fetchProfileImage = async (profileUrl) => {
     if (!profileUrl) {
@@ -304,14 +389,26 @@ export default function PublicMentorProfile() {
                 </div>
               )}
 
-              {/* Coming Soon Button */}
-              <div className="bg-gray-600 text-white px-8 py-4 rounded-xl font-semibold text-lg cursor-not-allowed opacity-75 text-center">
-                Booking Coming Soon
-              </div>
-
-              <p className="text-sm text-gray-400 mt-4">
-                We're working on bringing you the best mentorship experience. Stay tuned!
-              </p>
+              {/* Book Now Button - Show if offerings exist */}
+              {offerings.length > 0 ? (
+                <button
+                  onClick={() => handleBook(offerings[0])}
+                  className="bg-white text-black px-8 py-4 rounded-xl font-semibold text-lg hover:bg-gray-100 transition-colors w-full"
+                >
+                  Book Now
+                </button>
+              ) : (
+                <>
+                  <div className="bg-gray-600 text-white px-8 py-4 rounded-xl font-semibold text-lg cursor-not-allowed opacity-75 text-center">
+                    {offeringsLoading ? "Loading..." : "No Bookings Available"}
+                  </div>
+                  {!offeringsLoading && (
+                    <p className="text-sm text-gray-400 mt-4">
+                      This mentor hasn't set up any booking sessions yet.
+                    </p>
+                  )}
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -350,6 +447,22 @@ export default function PublicMentorProfile() {
                     >
                       {item}
                     </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Offerings Section */}
+            {offerings.length > 0 && (
+              <div className="bg-white rounded-2xl p-8 shadow-lg">
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">Available Sessions</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {offerings.map((offering) => (
+                    <OfferingCard 
+                      key={offering.id} 
+                      offering={offering} 
+                      onBook={handleBook}
+                    />
                   ))}
                 </div>
               </div>
@@ -408,19 +521,39 @@ export default function PublicMentorProfile() {
               </div>
             )}
 
-            {/* Coming Soon CTA */}
-            <div className="bg-gradient-to-br from-gray-600 to-gray-700 rounded-2xl p-6 text-white">
-              <h3 className="text-lg font-semibold mb-2">Booking Coming Soon!</h3>
-              <p className="text-gray-300 text-sm mb-4">
-                We're working hard to bring you amazing mentorship sessions
-              </p>
-              <div className="w-full bg-gray-500 text-white py-3 rounded-lg font-semibold text-center cursor-not-allowed opacity-75">
-                Coming Soon
+            {/* Quick Book CTA */}
+            {offerings.length > 0 && (
+              <div className="bg-gradient-to-br from-gray-600 to-gray-700 rounded-2xl p-6 text-white">
+                <h3 className="text-lg font-semibold mb-2">Book a Session</h3>
+                <p className="text-gray-300 text-sm mb-4">
+                  Choose from available mentorship sessions
+                </p>
+                {offerings[0] && (
+                  <button
+                    onClick={() => handleBook(offerings[0])}
+                    className="w-full bg-white text-black py-3 rounded-lg font-semibold text-center hover:bg-gray-100 transition-colors"
+                  >
+                    Book Now
+                  </button>
+                )}
               </div>
-            </div>
+            )}
           </div>
         </div>
       </div>
+
+      {/* Booking Modal */}
+      {showBookingModal && selectedOffering && (
+        <BookingModal
+          offering={selectedOffering}
+          mentorAvailability={mentorAvailability}
+          onClose={() => {
+            setShowBookingModal(false);
+            setSelectedOffering(null);
+          }}
+          onSuccess={handleBookingSuccess}
+        />
+      )}
     </div>
   );
 }

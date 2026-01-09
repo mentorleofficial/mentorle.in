@@ -322,20 +322,20 @@ export default function BookingPaymentDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[900px] w-[95vw] max-h-[95vh] p-0 overflow-hidden">
-        <DialogHeader className="px-4 sm:px-6 py-4 border-b bg-gradient-to-r from-gray-50 to-gray-100">
-          <DialogTitle className="flex items-center gap-3">
+      <DialogContent className="sm:max-w-[900px] w-[100vw] max-w-[100vw] h-[100vh] max-h-[100vh] sm:h-auto sm:max-h-[95vh] p-0 overflow-hidden m-0 sm:m-auto rounded-none sm:rounded-lg">
+        <DialogHeader className="px-4 sm:px-6 py-3 sm:py-4 border-b bg-gradient-to-r from-gray-50 to-gray-100">
+          <DialogTitle className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3">
             <div className="min-w-0 flex-1">
-              <h3 className="text-base sm:text-lg font-semibold text-gray-900">
+              <h3 className="text-sm sm:text-base md:text-lg font-semibold text-gray-900">
                 Payment for {displayTitle}
               </h3>
               <p className="text-xs sm:text-sm text-gray-600 font-medium">
                 ₹{displayAmount.toFixed(2)} • One-time Payment
               </p>
             </div>
-            <div className="flex-shrink-0 bg-black text-white px-4 py-2 rounded-lg">
+            <div className="flex-shrink-0 bg-black text-white px-3 sm:px-4 py-2 rounded-lg w-full sm:w-auto">
               <div className="text-xs text-gray-300">Total Amount</div>
-              <div className="text-lg font-bold">₹{displayAmount.toFixed(2)}</div>
+              <div className="text-base sm:text-lg font-bold">₹{displayAmount.toFixed(2)}</div>
             </div>
           </DialogTitle>
         </DialogHeader>
@@ -375,17 +375,17 @@ export default function BookingPaymentDialog({
               </div>
 
               {/* Payment Frame */}
-              <div className="flex-1 bg-white relative overflow-hidden">
+              <div className="flex-1 bg-white relative overflow-hidden" style={{ height: 'calc(100vh - 200px)', minHeight: '400px' }}>
                 {/* Loading state */}
                 {((validPaymentUrl && !iframeLoaded) || (paymentSessionId && !checkoutInitialized)) && (
                   <div className="absolute inset-0 bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center z-10">
                     <div className="text-center max-w-sm mx-auto px-4">
-                      <Loader2 className="w-10 h-10 animate-spin mx-auto mb-4 text-blue-500" />
-                      <p className="text-sm text-gray-700 font-medium mb-2">Loading secure payment gateway...</p>
+                      <Loader2 className="w-8 h-8 sm:w-10 sm:h-10 animate-spin mx-auto mb-4 text-blue-500" />
+                      <p className="text-xs sm:text-sm text-gray-700 font-medium mb-2">Loading secure payment gateway...</p>
                       <p className="text-xs text-gray-500">
                         Establishing secure connection with Cashfree
                       </p>
-                      <div className="mt-4 text-sm font-semibold text-gray-700">
+                      <div className="mt-4 text-xs sm:text-sm font-semibold text-gray-700">
                         Amount: ₹{displayAmount.toFixed(2)}
                       </div>
                     </div>
@@ -393,11 +393,11 @@ export default function BookingPaymentDialog({
                 )}
                 
                 {/* Amount reminder banner - always show */}
-                <div className="absolute top-0 left-0 right-0 bg-yellow-50 border-b border-yellow-200 px-4 py-2 z-20">
-                  <div className="flex items-center justify-center gap-2 text-sm">
+                <div className="absolute top-0 left-0 right-0 bg-yellow-50 border-b border-yellow-200 px-2 sm:px-4 py-1.5 sm:py-2 z-20">
+                  <div className="flex items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm">
                     <span className="font-medium text-yellow-900">Paying:</span>
-                    <span className="font-bold text-lg text-yellow-900">₹{displayAmount.toFixed(2)}</span>
-                    <span className="text-yellow-700">for {displayTitle}</span>
+                    <span className="font-bold text-base sm:text-lg text-yellow-900">₹{displayAmount.toFixed(2)}</span>
+                    <span className="text-yellow-700 hidden sm:inline">for {displayTitle}</span>
                   </div>
                 </div>
                 
@@ -405,10 +405,12 @@ export default function BookingPaymentDialog({
                 {paymentSessionId ? (
                   <div 
                     ref={checkoutContainerRef}
-                    className="w-full h-full min-h-[500px] sm:min-h-[600px]"
+                    className="w-full h-full"
                     style={{ 
-                      minHeight: 'calc(95vh - 180px)',
-                      marginTop: '40px' // Space for amount banner
+                      height: 'calc(100vh - 240px)',
+                      minHeight: '400px',
+                      marginTop: '36px',
+                      paddingBottom: '20px'
                     }}
                     data-payment-session-id={paymentSessionId}
                   />
@@ -419,21 +421,22 @@ export default function BookingPaymentDialog({
                     height="100%"
                     frameBorder="0"
                     sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"
-                    className="w-full h-full min-h-[500px] sm:min-h-[600px] transition-opacity duration-300"
+                    className="w-full h-full transition-opacity duration-300"
                     title={`Cashfree Payment Gateway - ₹${displayAmount.toFixed(2)}`}
                     onLoad={handleIframeLoad}
                     style={{ 
-                      minHeight: 'calc(95vh - 180px)',
+                      height: 'calc(100vh - 240px)',
+                      minHeight: '400px',
                       border: 'none',
                       opacity: iframeLoaded ? 1 : 0,
-                      marginTop: '40px' // Space for amount banner
+                      marginTop: '36px'
                     }}
                   />
                 ) : (
-                  <div className="flex items-center justify-center h-full min-h-[500px] bg-red-50">
-                    <div className="text-center p-8">
-                      <p className="text-red-600 font-semibold mb-2">Payment Initialization Error</p>
-                      <p className="text-sm text-gray-600 mb-4">
+                  <div className="flex items-center justify-center h-full min-h-[400px] bg-red-50">
+                    <div className="text-center p-4 sm:p-8">
+                      <p className="text-sm sm:text-base text-red-600 font-semibold mb-2">Payment Initialization Error</p>
+                      <p className="text-xs sm:text-sm text-gray-600 mb-4">
                         Unable to load payment gateway. Please try again.
                       </p>
                       <p className="text-xs text-gray-500">
@@ -446,12 +449,12 @@ export default function BookingPaymentDialog({
 
               {/* Error State */}
               {paymentStatus === 'failed' && (
-                <div className="px-4 sm:px-6 py-3 sm:py-4 bg-gradient-to-r from-red-50 to-pink-50 border-t">
-                  <div className="flex items-center gap-3">
+                <div className="px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4 bg-gradient-to-r from-red-50 to-pink-50 border-t">
+                  <div className="flex items-center gap-2 sm:gap-3">
                     <div className="w-2 h-2 bg-red-500 rounded-full flex-shrink-0"></div>
                     <div>
-                      <p className="text-sm sm:text-base font-medium text-red-900">⚠️ Payment Failed</p>
-                      <p className="text-xs sm:text-sm text-red-800">
+                      <p className="text-xs sm:text-sm md:text-base font-medium text-red-900">⚠️ Payment Failed</p>
+                      <p className="text-xs text-red-800">
                         Please try again or contact support if the issue persists.
                       </p>
                     </div>
