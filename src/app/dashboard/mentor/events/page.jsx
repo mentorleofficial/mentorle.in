@@ -441,7 +441,7 @@ function MentorEventsContent() {
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="mb-8">
+        <div className="mb-8 mt-6 sm:mt-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 flex items-center gap-2">
@@ -452,7 +452,7 @@ function MentorEventsContent() {
                 Create and manage your workshops, bootcamps, and sessions
               </p>
             </div>
-            <Button onClick={openCreateDialog} className="flex items-center gap-2">
+            <Button onClick={openCreateDialog} className="flex items-center gap-2 mt-4 sm:mt-0">
               <Plus className="h-5 w-5" />
               Create Event
             </Button>

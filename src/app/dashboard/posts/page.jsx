@@ -126,12 +126,12 @@ export default function PostsPage() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 mt-6 sm:mt-8">
         <div>
           <h1 className="text-3xl font-bold mb-2">Posts Management</h1>
           <p className="text-gray-600">Manage your blog posts and articles</p>
         </div>
-        <Button onClick={() => router.push("/dashboard/posts/new")}>
+        <Button onClick={() => router.push("/dashboard/posts/new")} className="mt-4 sm:mt-0">
           <Plus className="w-4 h-4 mr-2" />
           New Post
         </Button>
