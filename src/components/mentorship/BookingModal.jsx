@@ -51,43 +51,43 @@ export default function BookingModal({ offering, mentorAvailability, onClose, on
         const { supabase } = await import("@/lib/supabase");
         const { data: { session } } = await supabase.auth.getSession();
         
-        const dayOfWeek = selectedDate.getDay();
-        const daySlots = mentorAvailability.filter(slot => slot.day_of_week === dayOfWeek);
-        
-        const slots = [];
-        const now = new Date();
-        const minNotice = addHours(now, offering.min_notice_hours);
+    const dayOfWeek = selectedDate.getDay();
+    const daySlots = mentorAvailability.filter(slot => slot.day_of_week === dayOfWeek);
+    
+    const slots = [];
+    const now = new Date();
+    const minNotice = addHours(now, offering.min_notice_hours);
 
         // Generate all potential slots
-        daySlots.forEach(slot => {
-          const [startHour, startMin] = slot.start_time.split(':').map(Number);
-          const [endHour, endMin] = slot.end_time.split(':').map(Number);
-          
-          // Generate slots based on duration
-          let currentHour = startHour;
-          let currentMin = startMin;
-          
-          while (currentHour * 60 + currentMin + offering.duration_minutes <= endHour * 60 + endMin) {
-            const slotTime = new Date(selectedDate);
-            slotTime.setHours(currentHour, currentMin, 0, 0);
-            
-            // Only add if after minimum notice time
-            if (slotTime > minNotice) {
-              slots.push({
-                time: format(slotTime, "HH:mm"),
-                label: format(slotTime, "h:mm a"),
-                datetime: slotTime
-              });
-            }
-            
-            // Move to next slot
-            currentMin += offering.duration_minutes + offering.buffer_after_minutes;
-            while (currentMin >= 60) {
-              currentMin -= 60;
-              currentHour += 1;
-            }
-          }
-        });
+    daySlots.forEach(slot => {
+      const [startHour, startMin] = slot.start_time.split(':').map(Number);
+      const [endHour, endMin] = slot.end_time.split(':').map(Number);
+      
+      // Generate slots based on duration
+      let currentHour = startHour;
+      let currentMin = startMin;
+      
+      while (currentHour * 60 + currentMin + offering.duration_minutes <= endHour * 60 + endMin) {
+        const slotTime = new Date(selectedDate);
+        slotTime.setHours(currentHour, currentMin, 0, 0);
+        
+        // Only add if after minimum notice time
+        if (slotTime > minNotice) {
+          slots.push({
+            time: format(slotTime, "HH:mm"),
+            label: format(slotTime, "h:mm a"),
+            datetime: slotTime
+          });
+        }
+        
+        // Move to next slot
+        currentMin += offering.duration_minutes + offering.buffer_after_minutes;
+        while (currentMin >= 60) {
+          currentMin -= 60;
+          currentHour += 1;
+        }
+      }
+    });
 
         // Fetch existing bookings for this mentor on the selected date
         const dayStart = new Date(selectedDate);

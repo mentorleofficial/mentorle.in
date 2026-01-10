@@ -167,12 +167,12 @@ function OfferingsContent() {
   return (
     <div className="container mx-auto px-4 py-8 max-w-6xl">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 mt-6 sm:mt-8">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">My Offerings</h1>
           <p className="text-gray-600 mt-1">Manage your mentorship sessions and services</p>
         </div>
-        <Link href="/dashboard/offerings/new">
+        <Link href="/dashboard/offerings/new" className="mt-4 sm:mt-0">
           <Button className="bg-black text-white hover:bg-gray-800">
             <Plus className="w-4 h-4 mr-2" />
             Create Offering
