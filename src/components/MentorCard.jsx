@@ -1,13 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import useMentorStore from "@/store/store";
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo } from "react";
 import { supabase } from "@/lib/supabase";
 import { Briefcase, MapPin, Lightbulb, ExternalLink, Linkedin, Share2, Check, Star, Heart, IndianRupee } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { nameToSlug } from "@/lib/slugUtils";
 
-const MentorCard = ({ Industry, Name, mentorData, isFavorite: propIsFavorite, onFavoriteChange }) => {
+const MentorCard = memo(({ Industry, Name, mentorData, isFavorite: propIsFavorite, onFavoriteChange }) => {
   const setMentorData = useMentorStore((state) => state.setMentorData);
   const { toast } = useToast();
   const [imageUrl, setImageUrl] = useState("");
@@ -432,6 +432,8 @@ const MentorCard = ({ Industry, Name, mentorData, isFavorite: propIsFavorite, on
       </div>
     </div>
   );
-};
+});
+
+MentorCard.displayName = 'MentorCard';
 
 export default MentorCard;

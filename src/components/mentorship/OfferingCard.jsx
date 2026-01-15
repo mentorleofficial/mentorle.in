@@ -32,10 +32,13 @@ export default function OfferingCard({ offering, onBook }) {
         <div className="p-4 bg-gray-50 border-b">
           <div className="flex items-center gap-3">
             {offering.mentor?.profile_url ? (
-              <img
+              <Image
                 src={offering.mentor.profile_url}
                 alt={offering.mentor.name}
+                width={48}
+                height={48}
                 className="w-12 h-12 rounded-full object-cover"
+                unoptimized={offering.mentor.profile_url.startsWith('http')}
               />
             ) : (
               <div className="w-12 h-12 rounded-full bg-black flex items-center justify-center text-white font-bold">
@@ -110,5 +113,9 @@ export default function OfferingCard({ offering, onBook }) {
       </CardContent>
     </Card>
   );
-}
+});
+
+OfferingCard.displayName = 'OfferingCard';
+
+export default OfferingCard;
 

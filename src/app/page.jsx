@@ -4,18 +4,30 @@ import Image from "next/image";
 
 import { useState } from "react";
 
+import dynamic from "next/dynamic";
 import Button from "@/components/Button";
-import MentorSlider from "@/components/MentorSlider";
-import InstructorsSection from "@/components/InstructorsSection";
-import OnlineCommunity from "@/components/online_community";
 
-// import Community from "@/sections/Community";
-import TestimonialSlider from "@/sections/testimonials";
-import TestimonialsSection from "@/components/TestimonialNew";
-import FAQ from "@/sections/FAQ";
+// Lazy load heavy components
+const MentorSlider = dynamic(() => import("@/components/MentorSlider"), {
+  loading: () => <div className="h-64 animate-pulse bg-gray-200 rounded" />,
+});
+const InstructorsSection = dynamic(() => import("@/components/InstructorsSection"), {
+  loading: () => <div className="h-64 animate-pulse bg-gray-200 rounded" />,
+});
+const OnlineCommunity = dynamic(() => import("@/components/online_community"), {
+  loading: () => <div className="h-64 animate-pulse bg-gray-200 rounded" />,
+});
+const TestimonialsSection = dynamic(() => import("@/components/TestimonialNew"), {
+  loading: () => <div className="h-64 animate-pulse bg-gray-200 rounded" />,
+});
+const FAQ = dynamic(() => import("@/sections/FAQ"), {
+  loading: () => <div className="h-64 animate-pulse bg-gray-200 rounded" />,
+});
+const FGLIPage = dynamic(() => import("@/components/FgliPage"), {
+  loading: () => <div className="h-64 animate-pulse bg-gray-200 rounded" />,
+});
 
 import { label1, label2 } from "./constant";
-import FGLIPage from "@/components/FgliPage";
 import { Car } from "lucide-react";
 // import CompanyMarquee from "@/components/CompanyMarquee";
 import { px } from "framer-motion";

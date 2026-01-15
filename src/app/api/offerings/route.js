@@ -95,7 +95,12 @@ export async function GET(request) {
       };
     }));
 
-    return NextResponse.json({ data: enrichedData });
+    const response = NextResponse.json({ data: enrichedData });
+    
+    // Add caching headers for better performance
+    response.headers.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=300');
+    
+    return response;
   } catch (error) {
     console.error('Error in offerings GET:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

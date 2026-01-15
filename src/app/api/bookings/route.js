@@ -171,6 +171,15 @@ export async function GET(request) {
   }
 }
 
+// Add caching helper function
+function addCacheHeaders(response, maxAge = 30, isPublic = false) {
+  const cacheControl = isPublic 
+    ? `public, s-maxage=${maxAge}, stale-while-revalidate=${maxAge * 2}`
+    : `private, max-age=${maxAge}, stale-while-revalidate=${maxAge * 2}`;
+  response.headers.set('Cache-Control', cacheControl);
+  return response;
+}
+
 // POST - Create new booking
 export async function POST(request) {
   try {

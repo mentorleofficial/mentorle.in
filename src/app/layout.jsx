@@ -11,7 +11,11 @@ import GlobalFeedbackButton from "@/components/GlobalFeedbackButton";
 // Font files can be colocated inside of `pages`
 const myFont = localFont({ src: "./Kollektif.ttf" });
 
-const raleway = Raleway({ subsets: ["latin"] });
+const raleway = Raleway({ 
+  subsets: ["latin"],
+  display: 'swap',
+  preload: true
+});
 
 export const metadata = {
   title: "Mentorle",

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo } from "react";
 import { Button } from "@/components/ui/button";
 import { Bell, User, LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -197,22 +197,17 @@ function DashboardHeader() {
         >
           <div className="h-8 w-8 md:h-8 md:w-8 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden relative">
             {profileUrl ? (
-              <>
-                <img
-                  src={profileUrl}
-                  alt="profile"
-                  className="w-full h-full object-cover rounded-full"
-                  onLoad={() => console.log('Image loaded successfully:', profileUrl)}
-                  onError={(e) => {
-                    console.error('Header image load error:', profileUrl);
-                    e.target.style.display = 'none';
-                    e.target.nextSibling.style.display = 'flex';
-                  }}
-                />
-                <div className="h-6 w-6 md:h-8 md:w-8 bg-gray-300 rounded-full flex items-center justify-center hidden">
-                  <User className="h-3 w-3 md:h-4 md:w-4 text-gray-600" />
-                </div>
-              </>
+              <Image
+                src={profileUrl}
+                alt="profile"
+                width={32}
+                height={32}
+                className="w-full h-full object-cover rounded-full"
+                unoptimized={profileUrl.startsWith('http')}
+                onError={() => {
+                  console.error('Header image load error:', profileUrl);
+                }}
+              />
             ) : (
               <div className="h-6 w-6 md:h-8 md:w-8 bg-gray-300 rounded-full flex items-center justify-center">
                 <User className="h-3 w-3 md:h-4 md:w-4 text-gray-600" />
