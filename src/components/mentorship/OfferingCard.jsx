@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Clock, IndianRupee, Star, User, Calendar } from "lucide-react";
+import Image from "next/image";
 
 const CATEGORY_LABELS = {
   resume_review: "Resume Review",
@@ -113,9 +114,5 @@ export default function OfferingCard({ offering, onBook }) {
       </CardContent>
     </Card>
   );
-});
-
-OfferingCard.displayName = 'OfferingCard';
-
-export default OfferingCard;
+}
 

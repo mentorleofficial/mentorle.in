@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/supabaseServer';
 import { getUserRole } from '@/lib/auth';
 import { ROLES } from '@/lib/roles';
+import { v4 as uuidv4 } from 'uuid';
 
 // GET - Fetch bookings (mentor or mentee view)
 export async function GET(request) {
@@ -325,6 +326,13 @@ export async function POST(request) {
       return NextResponse.json({ error: 'No more slots available for this day' }, { status: 400 });
     }
 
+    // Generate Jitsi meeting link automatically (no manual input needed)
+    const safeMentorIdPart = (offering.mentor_id || '').toString().replace(/[^a-zA-Z0-9]/g, '').slice(0, 8);
+    const safeOfferingIdPart = (offering_id || '').toString().replace(/[^a-zA-Z0-9]/g, '').slice(0, 8);
+    const randomPart = uuidv4().replace(/-/g, '').slice(0, 8);
+    const meetingRoomName = `mentorle-${safeMentorIdPart || 'mentor'}-${safeOfferingIdPart || 'offer'}-${randomPart}`;
+    const meetingLink = `https://meet.jit.si/${meetingRoomName}`;
+
     // Create booking
     const bookingData = {
       offering_id,
@@ -334,6 +342,7 @@ export async function POST(request) {
       duration_minutes: offering.duration_minutes,
       timezone: timezone || 'UTC',
       meeting_notes: meeting_notes?.trim() || null,
+      meeting_link: meetingLink,
       amount: offering.price,
       currency: offering.currency,
       payment_status: offering.price > 0 ? 'pending' : 'paid',
