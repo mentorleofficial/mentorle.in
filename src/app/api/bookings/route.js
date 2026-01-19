@@ -3,6 +3,8 @@ import { createServerSupabaseClient } from '@/lib/supabaseServer';
 import { getUserRole } from '@/lib/auth';
 import { ROLES } from '@/lib/roles';
 import { v4 as uuidv4 } from 'uuid';
+import { sendEmail, getUserDetails } from '@/lib/emailService';
+import { getBookingCreatedEmailTemplate } from '@/lib/emailTemplates';
 
 // GET - Fetch bookings (mentor or mentee view)
 export async function GET(request) {
@@ -364,7 +366,45 @@ export async function POST(request) {
       }, { status: 500 });
     }
 
-    // TODO: Send notification to mentor
+    // Send email notification to mentor about new booking
+    try {
+      // Get mentor details
+      const mentorDetails = await getUserDetails(supabase, offering.mentor_id, 'mentor');
+      
+      // Get mentee details
+      const menteeDetails = await getUserDetails(supabase, userId, 'mentee');
+      
+      if (mentorDetails && menteeDetails) {
+        const emailTemplate = getBookingCreatedEmailTemplate({
+          mentorName: mentorDetails.name,
+          menteeName: menteeDetails.name,
+          offeringTitle: offering.title,
+          scheduledAt: scheduledDate.toISOString(),
+          durationMinutes: offering.duration_minutes,
+          meetingLink: meetingLink,
+          meetingNotes: meeting_notes,
+          timezone: timezone || 'UTC'
+        });
+
+        // Send email to mentor (don't block booking creation if email fails)
+        sendEmail({
+          to: mentorDetails.email,
+          subject: emailTemplate.subject,
+          html: emailTemplate.html
+        }).catch(err => {
+          console.error('Failed to send booking notification email to mentor:', err);
+          // Don't throw - booking is already created
+        });
+      } else {
+        console.warn('Could not fetch user details for email notification', {
+          mentorDetails: !!mentorDetails,
+          menteeDetails: !!menteeDetails
+        });
+      }
+    } catch (emailError) {
+      console.error('Error sending booking notification email:', emailError);
+      // Don't fail the booking creation if email fails
+    }
 
     return NextResponse.json({ data }, { status: 201 });
   } catch (error) {

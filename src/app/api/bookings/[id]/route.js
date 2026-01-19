@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/supabaseServer';
 import { getUserRole } from '@/lib/auth';
 import { ROLES } from '@/lib/roles';
+import { sendEmail, getUserDetails } from '@/lib/emailService';
+import { getBookingConfirmedEmailTemplate } from '@/lib/emailTemplates';
 
 // GET - Fetch single booking
 export async function GET(request, { params }) {
@@ -300,7 +302,10 @@ export async function PATCH(request, { params }) {
       .from('mentorship_bookings')
       .update(updateData)
       .eq('id', id)
-      .select()
+      .select(`
+        *,
+        offering:offering_id (*)
+      `)
       .single();
 
     if (error) {
@@ -308,7 +313,50 @@ export async function PATCH(request, { params }) {
       return NextResponse.json({ error: 'Failed to update booking' }, { status: 500 });
     }
 
-    // TODO: Send notification for status changes
+    // Send email notification when booking is confirmed
+    if (body.status === 'confirmed' && booking.status !== 'confirmed') {
+      try {
+        // Get mentor details
+        const mentorDetails = await getUserDetails(supabase, data.mentor_id, 'mentor');
+        
+        // Get mentee details
+        const menteeDetails = await getUserDetails(supabase, data.mentee_id, 'mentee');
+        
+        // Get offering details
+        const offering = data.offering || {};
+        
+        if (mentorDetails && menteeDetails) {
+          const emailTemplate = getBookingConfirmedEmailTemplate({
+            menteeName: menteeDetails.name,
+            mentorName: mentorDetails.name,
+            offeringTitle: offering.title || 'Mentorship Session',
+            scheduledAt: data.scheduled_at,
+            durationMinutes: data.duration_minutes,
+            meetingLink: data.meeting_link || '',
+            meetingNotes: data.meeting_notes,
+            timezone: data.timezone || 'UTC'
+          });
+
+          // Send email to mentee (don't block confirmation if email fails)
+          sendEmail({
+            to: menteeDetails.email,
+            subject: emailTemplate.subject,
+            html: emailTemplate.html
+          }).catch(err => {
+            console.error('Failed to send confirmation email to mentee:', err);
+            // Don't throw - booking is already confirmed
+          });
+        } else {
+          console.warn('Could not fetch user details for confirmation email', {
+            mentorDetails: !!mentorDetails,
+            menteeDetails: !!menteeDetails
+          });
+        }
+      } catch (emailError) {
+        console.error('Error sending confirmation email:', emailError);
+        // Don't fail the booking confirmation if email fails
+      }
+    }
 
     return NextResponse.json({ data });
   } catch (error) {
