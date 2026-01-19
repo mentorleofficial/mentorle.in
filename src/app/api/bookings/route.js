@@ -286,6 +286,23 @@ export async function POST(request) {
       }, { status: 400 });
     }
 
+    // Prevent bookings for today and tomorrow to give mentors time to accept
+    const today = new Date(now);
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const dayAfterTomorrow = new Date(tomorrow);
+    dayAfterTomorrow.setDate(dayAfterTomorrow.getDate() + 1);
+    
+    const scheduledDateOnly = new Date(scheduledDate);
+    scheduledDateOnly.setHours(0, 0, 0, 0);
+    
+    if (scheduledDateOnly.getTime() === today.getTime() || scheduledDateOnly.getTime() === tomorrow.getTime()) {
+      return NextResponse.json({ 
+        error: 'Bookings cannot be made for today or tomorrow. Please select a date at least 2 days in advance to give mentors time to review and accept your booking.' 
+      }, { status: 400 });
+    }
+
     const maxBookingDate = new Date(now.getTime() + (offering.advance_booking_days * 24 * 60 * 60 * 1000));
     if (scheduledDate > maxBookingDate) {
       return NextResponse.json({ 

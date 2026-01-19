@@ -20,12 +20,15 @@ export default function BookingModal({ offering, mentorAvailability, onClose, on
   const [availableSlots, setAvailableSlots] = useState([]);
 
   // Generate available dates based on advance booking days
+  // Exclude today and tomorrow to give mentors time to accept bookings
   useEffect(() => {
     const dates = [];
     const today = startOfDay(new Date());
     const minNotice = addHours(new Date(), offering.min_notice_hours);
     
-    for (let i = 0; i <= offering.advance_booking_days; i++) {
+    // Start from day after tomorrow (i=2) to exclude today (i=0) and tomorrow (i=1)
+    const minDaysAhead = 2;
+    for (let i = minDaysAhead; i <= offering.advance_booking_days; i++) {
       const date = addDays(today, i);
       if (date >= minNotice) {
         const dayOfWeek = date.getDay();
