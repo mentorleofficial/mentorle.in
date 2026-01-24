@@ -9,6 +9,7 @@ import { format } from "date-fns";
 import CommentSection from "@/components/blogs/CommentSection";
 import LikeButton from "@/components/blogs/LikeButton";
 import TagList from "@/components/blogs/TagList";
+import RichTextRenderer from "@/components/blogs/RichTextRenderer";
 import FeedbackSection from "@/components/feedback/FeedbackSection";
 import { supabase } from "@/lib/supabase";
 
@@ -86,9 +87,14 @@ export default function BlogPostPage() {
 
   if (loading) {
     return (
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
-        <div className="text-center py-12">
-          <div className="animate-pulse text-gray-500">Loading post...</div>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/40">
+        <div className="container mx-auto px-4 py-16 max-w-4xl">
+          <div className="text-center py-20">
+            <div className="inline-flex items-center gap-3 px-6 py-3 bg-white rounded-2xl shadow-lg border border-slate-200">
+              <div className="w-6 h-6 border-3 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
+              <span className="text-slate-600 font-medium">Loading article...</span>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -96,15 +102,21 @@ export default function BlogPostPage() {
 
   if (!post) {
     return (
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
-        <div className="text-center py-12">
-          <h1 className="text-2xl font-bold mb-4">Post Not Found</h1>
-          <Link href="/blogs">
-            <Button variant="outline">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Blogs
-            </Button>
-          </Link>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/40">
+        <div className="container mx-auto px-4 py-16 max-w-4xl">
+          <div className="text-center py-20">
+            <div className="w-24 h-24 bg-gradient-to-br from-purple-100 to-blue-100 rounded-full mx-auto mb-6 flex items-center justify-center">
+              <span className="text-4xl">📝</span>
+            </div>
+            <h1 className="text-3xl font-bold text-slate-800 mb-4">Article Not Found</h1>
+            <p className="text-slate-600 mb-8">The article you're looking for doesn't exist or has been removed.</p>
+            <Link href="/blogs">
+              <Button className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:from-purple-700 hover:to-indigo-700 rounded-xl px-6 py-2.5 shadow-lg">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Articles
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
     );
@@ -115,84 +127,135 @@ export default function BlogPostPage() {
     : null;
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 max-w-4xl w-full">
-      <Link href="/blogs">
-        <Button variant="ghost" className="mb-6">
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to Blogs
-        </Button>
-      </Link>
-
-      <article className="w-full">
-        <header className="mb-8 w-full">
-          {post.cover_url && (
-            <div className="relative w-full h-64 sm:h-80 md:h-96 lg:h-[500px] mb-6 rounded-lg overflow-hidden bg-gray-100">
-              <img
-                src={post.cover_url}
-                alt={post.title}
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  console.error('Blog cover image failed to load:', post.cover_url);
-                  e.target.style.display = 'none';
-                }}
-              />
-            </div>
-          )}
-
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 break-words">{post.title}</h1>
-
-          {post.summary && (
-            <p className="text-lg sm:text-xl text-gray-600 mb-6 break-words">{post.summary}</p>
-          )}
-
-          <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 mb-4">
-            {post.author?.email && (
-              <div className="flex items-center gap-2">
-                <User className="w-4 h-4" />
-                <span>{post.author.email.split("@")[0]}</span>
-              </div>
-            )}
-            {publishedDate && (
-              <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4" />
-                <span>{publishedDate}</span>
-              </div>
-            )}
-            {post.reading_time_minutes && (
-              <div className="flex items-center gap-2">
-                <Clock className="w-4 h-4" />
-                <span>{post.reading_time_minutes} min read</span>
-              </div>
-            )}
-          </div>
-
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <TagList tags={post.tags} />
-            {currentUser && (
-              <LikeButton
-                postId={post.id}
-                initialLiked={liked}
-                initialCount={likeCount}
-                onLikeChange={(newLiked, newCount) => {
-                  setLiked(newLiked);
-                  setLikeCount(newCount);
-                }}
-              />
-            )}
-          </div>
-        </header>
-
-        <div className="prose prose-lg max-w-none mb-12 w-full">
-          <div className="whitespace-pre-wrap break-words overflow-wrap-anywhere text-base sm:text-lg leading-relaxed max-w-full">
-            {post.content}
-          </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/40">
+      {/* Header with Back Button */}
+      <div className="bg-white border-b border-slate-200 sticky top-0 z-10 backdrop-blur-sm bg-white/80">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 max-w-5xl">
+          <Link href="/blogs">
+            <Button variant="ghost" className="text-slate-700 hover:text-purple-600 hover:bg-purple-50 rounded-xl transition-all">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to Articles
+            </Button>
+          </Link>
         </div>
+      </div>
 
-        <footer className="border-t pt-8 space-y-8 w-full">
-          <FeedbackSection feedbackType="article" referenceId={post.id} />
-          <CommentSection postId={post.id} />
-        </footer>
-      </article>
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 max-w-6xl w-full">
+        <article className="w-full">
+          {/* Modern Hero Header - Image + Content Side by Side */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-start mb-8">
+            {/* Left Column - Featured Image */}
+            {post.cover_url && (
+              <div className="relative h-64 sm:h-80 md:h-96 lg:h-[500px] rounded-3xl overflow-hidden shadow-2xl">
+                <img
+                  src={post.cover_url}
+                  alt={post.title}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    console.error('Blog cover image failed to load:', post.cover_url);
+                    e.target.style.display = 'none';
+                  }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
+                
+                {/* Category Badge Overlay */}
+                <div className="absolute top-4 left-4">
+                  <span className="inline-block bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-1.5 rounded-full text-sm font-semibold shadow-lg">
+                    News!
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {/* Right Column - Content */}
+            <div className="flex flex-col justify-start">
+              {/* Reading Time Badge */}
+              <div className="flex items-center gap-2 mb-6">
+                {post.reading_time_minutes && (
+                  <span className="inline-block bg-slate-100 text-slate-700 px-3 py-1.5 rounded-full text-sm font-medium">
+                    {post.reading_time_minutes} mins read
+                  </span>
+                )}
+              </div>
+
+              {/* Title */}
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6 break-words text-slate-900 leading-tight">
+                {post.title}
+              </h1>
+
+              {/* Summary */}
+              {post.summary && (
+                <p className="text-base sm:text-lg text-slate-600 mb-8 break-words leading-relaxed line-clamp-4">
+                  {post.summary}
+                </p>
+              )}
+
+              {/* Meta Information */}
+              <div className="flex flex-wrap items-center gap-3 text-sm mb-6">
+                {post.author?.email && (
+                  <div className="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-full text-slate-600">
+                    <User className="w-4 h-4 text-slate-500" />
+                    <span className="font-medium">{post.author.email.split("@")[0]}</span>
+                  </div>
+                )}
+                {publishedDate && (
+                  <div className="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-full text-slate-600">
+                    <Calendar className="w-4 h-4 text-slate-500" />
+                    <span>{publishedDate}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Tags and Like Button */}
+              <div className="flex flex-col sm:flex-row sm:items-center gap-4 pt-6 border-t border-slate-200">
+                <TagList tags={post.tags} />
+                {currentUser && (
+                  <LikeButton
+                    postId={post.id}
+                    initialLiked={liked}
+                    initialCount={likeCount}
+                    onLikeChange={(newLiked, newCount) => {
+                      setLiked(newLiked);
+                      setLikeCount(newCount);
+                    }}
+                  />
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Article Content - Rich Text */}
+          <div className="bg-white rounded-3xl p-8 md:p-12 shadow-lg border border-slate-200 mb-8">
+            {post.content_json ? (
+              // Render rich text JSON
+              <div className="max-w-none">
+                <RichTextRenderer content={post.content_json} />
+              </div>
+            ) : (
+              // Fallback to plain text with formatting
+              <div className="whitespace-pre-wrap break-words text-slate-700 text-base sm:text-lg leading-relaxed space-y-4">
+                {post.content}
+              </div>
+            )}
+          </div>
+
+          {/* Footer Sections */}
+          <footer className="space-y-6 w-full">
+            {/* Feedback Section */}
+            <div className="bg-white rounded-3xl p-8 shadow-lg border border-slate-200">
+              <FeedbackSection feedbackType="article" referenceId={post.id} />
+            </div>
+
+            {/* Comments Section */}
+            <div className="bg-white rounded-3xl p-8 shadow-lg border border-slate-200">
+              <CommentSection postId={post.id} />
+            </div>
+          </footer>
+        </article>
+      </div>
+
+      {/* Decorative Footer Gradient */}
+      <div className="h-32 bg-gradient-to-t from-slate-100/50 to-transparent"></div>
     </div>
   );
 }

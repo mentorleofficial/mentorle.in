@@ -11,6 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { createSlug } from "@/lib/slugify";
 import { useAutosave } from "@/hooks/useAutosave";
+import { markdownToEditorJS, editorJSToMarkdown } from "@/lib/markdownToEditorJS";
 import { format } from "date-fns";
 import RichTextEditor from "./RichTextEditor";
 import ImageUpload from "./ImageUpload";
@@ -21,11 +22,24 @@ export default function PostEditor({ post = null, onSave }) {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [currentPostId, setCurrentPostId] = useState(post?.id || null);
+  
+  // Convert content_json to markdown for editing
+  const getEditableContent = (postData) => {
+    if (postData?.content_json && typeof postData.content_json === 'object') {
+      try {
+        return editorJSToMarkdown(postData.content_json);
+      } catch (error) {
+        console.error('Error converting content_json:', error);
+      }
+    }
+    return postData?.content || "";
+  };
+
   const [formData, setFormData] = useState({
     title: post?.title || "",
     slug: post?.slug || "",
     summary: post?.summary || "",
-    content: post?.content || "",
+    content: getEditableContent(post),
     tags: post?.tags || [],
     status: post?.status || "draft",
     featured: post?.featured || false,
@@ -33,14 +47,14 @@ export default function PostEditor({ post = null, onSave }) {
     scheduled_at: post?.status === 'scheduled' ? post?.published_at : "",
   });
 
-  // Update form data when post prop changes (for edit page)
+  // Update form data when post prop changes
   useEffect(() => {
     if (post) {
       setFormData({
         title: post.title || "",
         slug: post.slug || "",
         summary: post.summary || "",
-        content: post.content || "",
+        content: getEditableContent(post),
         tags: post.tags || [],
         status: post.status || "draft",
         featured: post.featured || false,
@@ -63,10 +77,14 @@ export default function PostEditor({ post = null, onSave }) {
       throw new Error("Session expired");
     }
 
+    // Convert markdown content to EditorJS format
+    const contentJson = markdownToEditorJS(data.content);
+
     const payload = {
       title: data.title,
       summary: data.summary || null,
       content: data.content,
+      content_json: contentJson,
       tags: data.tags.length > 0 ? data.tags : null,
       status: data.status,
       featured: data.featured,
@@ -89,18 +107,9 @@ export default function PostEditor({ post = null, onSave }) {
     });
 
     if (!response.ok) {
-      let errorMessage = "Failed to save";
-      try {
-        const text = await response.text();
-        if (text) {
-          const data = JSON.parse(text);
-          errorMessage = data.error || errorMessage;
-        }
-      } catch (parseError) {
-        // If parsing fails, use default error message
-        errorMessage = `Failed to save (${response.status})`;
-      }
-      throw new Error(errorMessage);
+      const text = await response.text();
+      const errorData = text ? JSON.parse(text) : {};
+      throw new Error(errorData.error || `Failed to save (${response.status})`);
     }
   };
 
@@ -184,11 +193,15 @@ export default function PostEditor({ post = null, onSave }) {
         return;
       }
 
+      // Convert markdown content to EditorJS format
+      const contentJson = markdownToEditorJS(formData.content);
+
       // Prepare payload with scheduling support
       const payload = {
         title: formData.title,
         summary: formData.summary || null,
         content: formData.content || "",
+        content_json: contentJson,
         tags: formData.tags.length > 0 ? formData.tags : null,
         status: formData.status,
         featured: formData.featured,
@@ -213,34 +226,10 @@ export default function PostEditor({ post = null, onSave }) {
         body: JSON.stringify(payload),
       });
 
-      // Check if response has content before parsing
-      const contentType = response.headers.get("content-type");
-      let data = {};
-      
-      if (contentType && contentType.includes("application/json")) {
-        try {
-          const text = await response.text();
-          data = text ? JSON.parse(text) : {};
-        } catch (parseError) {
-          console.error('Error parsing response:', parseError);
-          data = { error: "Failed to parse server response" };
-        }
-      } else {
-        const text = await response.text();
-        data = { error: text || "Server error occurred" };
-      }
+      const data = await response.json();
 
       if (!response.ok) {
-        const errorMessage = data.error || data.details || `Failed to save post (Status: ${response.status})`;
-        console.error('Post save error:', {
-          status: response.status,
-          statusText: response.statusText,
-          error: errorMessage,
-          data: data,
-          userRole: data.userRole,
-          requiredRoles: data.requiredRoles
-        });
-        throw new Error(errorMessage);
+        throw new Error(data.error || data.details || `Failed to save post (${response.status})`);
       }
 
       const successMessage = formData.status === 'scheduled' 

@@ -5,6 +5,10 @@ import { getUserRole } from '@/lib/auth';
 import { ROLES } from '@/lib/roles';
 import { createServerSupabaseClient } from '@/lib/supabaseServer';
 
+// In-memory cache for posts (microservice pattern)
+const postsCache = new Map();
+const CACHE_TTL = 60 * 1000; // 1 minute cache
+
 // GET - Fetch all published posts (public) or all posts for mentor/admin
 export async function GET(request) {
   try {
@@ -12,8 +16,11 @@ export async function GET(request) {
     const { searchParams } = new URL(request.url);
     const status = searchParams.get('status') || 'published';
     const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '10');
+    const limit = parseInt(searchParams.get('limit') || '12');
     const offset = (page - 1) * limit;
+    
+    // Create cache key
+    const cacheKey = `${status}-${page}-${limit}`;
 
     // Get current user for role check
     let userId = null;
@@ -38,8 +45,23 @@ export async function GET(request) {
     if (userId) {
       userRole = await getUserRole(userId, supabase);
     }
+    
+    // Check cache for public requests (non-authenticated users)
+    const isPublicRequest = !userRole || (userRole !== ROLES.ADMIN && userRole !== ROLES.MENTOR);
+    if (isPublicRequest && status === 'published') {
+      const cached = postsCache.get(cacheKey);
+      if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+        return NextResponse.json(cached.data, {
+          headers: {
+            'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+            'CDN-Cache-Control': 'public, s-maxage=60',
+            'Vercel-CDN-Cache-Control': 'public, s-maxage=60'
+          }
+        });
+      }
+    }
 
-    // Build query
+    // Build optimized query - only fetch necessary fields for listing
     let query = supabase
       .from('posts')
       .select(`
@@ -47,7 +69,6 @@ export async function GET(request) {
         title,
         slug,
         summary,
-        content,
         tags,
         status,
         featured,
@@ -56,9 +77,8 @@ export async function GET(request) {
         view_count,
         published_at,
         created_at,
-        updated_at,
         author_id
-      `)
+      `, { count: 'exact' })
       .order('published_at', { ascending: false, nullsFirst: false })
       .order('created_at', { ascending: false });
 
@@ -121,13 +141,35 @@ export async function GET(request) {
       })
     );
 
-    return NextResponse.json({
+    const responseData = {
       data: postsWithAuthors,
       pagination: {
         page,
         limit,
         total: count || 0,
         totalPages: Math.ceil((count || 0) / limit)
+      }
+    };
+    
+    // Cache public requests
+    if (isPublicRequest && status === 'published') {
+      postsCache.set(cacheKey, {
+        data: responseData,
+        timestamp: Date.now()
+      });
+      
+      // Clean old cache entries (simple LRU)
+      if (postsCache.size > 50) {
+        const firstKey = postsCache.keys().next().value;
+        postsCache.delete(firstKey);
+      }
+    }
+    
+    return NextResponse.json(responseData, {
+      headers: {
+        'Cache-Control': isPublicRequest ? 'public, s-maxage=60, stale-while-revalidate=300' : 'no-cache',
+        'CDN-Cache-Control': isPublicRequest ? 'public, s-maxage=60' : 'no-cache',
+        'Vercel-CDN-Cache-Control': isPublicRequest ? 'public, s-maxage=60' : 'no-cache'
       }
     });
   } catch (error) {
