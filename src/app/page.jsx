@@ -6,6 +6,7 @@ import { useState } from "react";
 
 import dynamic from "next/dynamic";
 import Button from "@/components/Button";
+import AchievementPopup from "@/components/AchievementPopup";
 
 // Lazy load heavy components
 const MentorSlider = dynamic(() => import("@/components/MentorSlider"), {
@@ -39,6 +40,7 @@ export default function Home() {
   return (
     <>
       <main>
+        <AchievementPopup />
         <section className="mt-20 lg:mt-18 px-4 sm:px-6 md:px-10 lg:px-24 flex flex-col lg:flex-row justify-around items-center mb-12 sm:mb-20 gap-8 lg:gap-0">
           <div className="w-full lg:w-[45%]">
             <h1 className="text-black text-2xl font-extrabold sm:text-3xl lg:text-5xl text-center lg:text-left break-words">
