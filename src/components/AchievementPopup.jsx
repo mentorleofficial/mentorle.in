@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { X } from "lucide-react";
 import {
     Dialog,
@@ -35,8 +36,14 @@ export default function AchievementPopup() {
                     {/* Left Section - Badge/Image */}
                     <div className="hidden md:flex md:w-2/5 bg-gray-50 border-r border-gray-200 items-center justify-center p-8">
                         <div className="text-center">
-                            <div className="inline-flex items-center justify-center w-24 h-24 bg-white border-4 border-gray-300 rounded-lg mb-4">
-                                <span className="text-4xl font-bold text-gray-800">18</span>
+                            <div className="mb-4">
+                                <Image
+                                    src="/f6s.png"
+                                    alt="F6S Logo"
+                                    width={120}
+                                    height={120}
+                                    className="mx-auto"
+                                />
                             </div>
                             <p className="text-sm font-semibold text-gray-700">Top Ranking</p>
                             <p className="text-xs text-gray-500 mt-1">in India</p>
