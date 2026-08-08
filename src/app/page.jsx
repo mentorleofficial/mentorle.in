@@ -78,7 +78,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="my-12 sm:my-16 px-4 md:px-10 lg:px-24 bg-gray-400 rounded-full p-10">
+        {/* <section className="my-12 sm:my-16 px-4 md:px-10 lg:px-24 bg-gray-400 rounded-full p-10">
           <h2 className="text-xl sm:text-2xl lg:text-4xl font-semibold text-center break-words">
             Trusted by
           </h2>
@@ -94,7 +94,7 @@ export default function Home() {
               />
             ))}
           </div>
-        </section>
+        </section> */}
 
         <MentorSlider />
         <InstructorsSection />
