@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import MentorVideo from "@/components/MentorVideo";
+// import MentorVideo from "@/components/MentorVideo";
 import {
   Briefcase,
   MapPin,
@@ -187,7 +187,7 @@ export default function PublicMentorProfile() {
               </div>
             )}
 
-            {mentor.youtube && <MentorVideo youtubeUrl={mentor.youtube} />}
+            {/* {mentor.youtube && <MentorVideo youtubeUrl={mentor.youtube} />} */}
 
             {expertise_area.length > 0 && (
               <div className="bg-white rounded-2xl p-8 shadow-lg">
