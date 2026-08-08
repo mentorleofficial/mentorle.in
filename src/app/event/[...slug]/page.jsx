@@ -173,7 +173,7 @@ export default function EventDetailPage() {
 
     // Check if user is authenticated
     if (!user) {
-      router.push('/signup');
+      router.push('https://platform.mentorle.in');
       return;
     }
 

@@ -1,5 +1,11 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { persist, createJSONStorage } from "zustand/middleware";
+
+const noopStorage = {
+  getItem: () => null,
+  setItem: () => {},
+  removeItem: () => {},
+};
 
 const useMentorStore = create(
   persist(
@@ -8,10 +14,12 @@ const useMentorStore = create(
       setMentorData: (data) => set({ mentorData: data }),
     }),
     {
-      name: "mentor-storage", // Name for localStorage key
-      getStorage: () => localStorage, // Store data in localStorage
+      name: "mentor-storage",
+      storage: createJSONStorage(() =>
+        typeof window !== "undefined" ? localStorage : noopStorage
+      ),
     }
   )
 );
- 
+
 export default useMentorStore;

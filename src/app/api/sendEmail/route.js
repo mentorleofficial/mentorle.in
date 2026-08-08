@@ -131,7 +131,7 @@ export async function POST(req) {
             
             <!-- Action Button -->
             <div style="text-align: center; margin: 32px 0;">
-              <a href="https://mentorle.in/dashboard" 
+              <a href="https://platform.mentorle.in" 
                  style="display: inline-block; 
                         background-color: #000; 
                         color: white; 

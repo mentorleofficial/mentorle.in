@@ -111,7 +111,7 @@ export default function EventCard({ event, user }) {
     }
     
     if (!user) {
-      window.location.href = "/login";
+      window.location.href = "https://platform.mentorle.in";
       return;
     }
     

@@ -10,7 +10,6 @@ import CommentSection from "@/components/blogs/CommentSection";
 import LikeButton from "@/components/blogs/LikeButton";
 import TagList from "@/components/blogs/TagList";
 import RichTextRenderer from "@/components/blogs/RichTextRenderer";
-import FeedbackSection from "@/components/feedback/FeedbackSection";
 import { supabase } from "@/lib/supabase";
 
 export default function BlogPostPage() {
@@ -241,11 +240,6 @@ export default function BlogPostPage() {
 
           {/* Footer Sections */}
           <footer className="space-y-6 w-full">
-            {/* Feedback Section */}
-            <div className="bg-white rounded-3xl p-8 shadow-lg border border-slate-200">
-              <FeedbackSection feedbackType="article" referenceId={post.id} />
-            </div>
-
             {/* Comments Section */}
             <div className="bg-white rounded-3xl p-8 shadow-lg border border-slate-200">
               <CommentSection postId={post.id} />

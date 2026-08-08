@@ -16,6 +16,55 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  async redirects() {
+    return [
+      {
+        source: "/login",
+        destination: "https://platform.mentorle.in",
+        permanent: true,
+      },
+      {
+        source: "/signup",
+        destination: "https://platform.mentorle.in",
+        permanent: true,
+      },
+      {
+        source: "/forgot-password",
+        destination: "https://platform.mentorle.in",
+        permanent: true,
+      },
+      {
+        source: "/reset-password",
+        destination: "https://platform.mentorle.in",
+        permanent: true,
+      },
+      {
+        source: "/become-mentor",
+        destination: "https://platform.mentorle.in/become-a-mentor",
+        permanent: true,
+      },
+      {
+        source: "/apply-mentor",
+        destination: "https://platform.mentorle.in/become-a-mentor",
+        permanent: true,
+      },
+      {
+        source: "/dashboard",
+        destination: "https://platform.mentorle.in",
+        permanent: true,
+      },
+      {
+        source: "/dashboard/:path*",
+        destination: "https://platform.mentorle.in",
+        permanent: true,
+      },
+      {
+        source: "/subscribe/:path*",
+        destination: "https://platform.mentorle.in",
+        permanent: true,
+      },
+    ];
+  },
   images: {
     remotePatterns: [
       {
@@ -29,6 +78,10 @@ const nextConfig = {
       {
         protocol: "https",
         hostname: "zzocepwobcnmflkewzss.supabase.co",
+      },
+      {
+        protocol: "https",
+        hostname: "xykindgwltvgcrcuwmik.supabase.co",
       },
       {
         protocol: "https",

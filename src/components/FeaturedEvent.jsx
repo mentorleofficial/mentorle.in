@@ -291,7 +291,7 @@ export default function FeaturedEvent({ showOnlyUpcoming = false }) {
           <h3 className="text-xl font-bold text-black mb-2">No Events Available</h3>
           <p className="text-gray-800 mb-6">Check back later for upcoming events and programs.</p>
           <button
-            onClick={() => router.push('/dashboard/mentee/events')}
+            onClick={() => router.push('/event')}
             className="px-6 py-3 bg-black text-white rounded-lg hover:bg-white hover:text-black transition-colors font-medium shadow-sm border border-black"
           >
             Explore Events
@@ -318,7 +318,7 @@ export default function FeaturedEvent({ showOnlyUpcoming = false }) {
         </div>
         
         <button
-          onClick={() => router.push('/dashboard/mentee/events')}
+          onClick={() => router.push('/event')}
           className="flex items-center gap-2 px-4 py-2 bg-black text-white hover:bg-white hover:text-black rounded-lg transition-all duration-200 text-sm font-medium shadow-sm hover:shadow-md transform hover:-translate-y-0.5 border border-black"
         >
           View All
@@ -336,7 +336,7 @@ export default function FeaturedEvent({ showOnlyUpcoming = false }) {
             <div
               key={event.id}
               className="bg-white rounded-xl p-5 border border-black hover:shadow-lg transition-all duration-300 cursor-pointer group hover:-translate-y-1 hover:bg-black hover:text-white"
-              onClick={() => router.push(`/dashboard/mentee/events`)}
+              onClick={() => router.push('/event')}
             >
               {/* Event Header */}
               <div className="flex items-start justify-between mb-4">
@@ -433,7 +433,7 @@ export default function FeaturedEvent({ showOnlyUpcoming = false }) {
       {events.length > 6 && (
         <div className="mt-8 pt-6 border-t border-black text-center">
           <button
-            onClick={() => router.push('/dashboard/mentee/events')}
+            onClick={() => router.push('/event')}
             className="text-black hover:text-white hover:bg-black font-semibold text-sm flex items-center justify-center gap-2 mx-auto hover:underline transition-all duration-200 px-4 py-2 rounded-lg border border-black"
           >
             View {events.length - 6} more events

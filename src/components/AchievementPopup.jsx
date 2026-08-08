@@ -6,7 +6,9 @@ import { X } from "lucide-react";
 import {
     Dialog,
     DialogContent,
-    DialogClose
+    DialogClose,
+    DialogTitle,
+    DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
@@ -57,12 +59,12 @@ export default function AchievementPopup() {
                         <div className="space-y-4">
                             <div>
                                 <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Recognition</p>
-                                <h2 className="text-2xl font-bold text-gray-900 mt-1">
+                                <DialogTitle className="text-2xl font-bold text-gray-900 mt-1">
                                     Mentorle
-                                </h2>
-                                <p className="text-sm text-gray-700 mt-2">
+                                </DialogTitle>
+                                <DialogDescription className="text-sm text-gray-700 mt-2">
                                     Recognized as one of India's 18 largest mentoring companies by F6S
-                                </p>
+                                </DialogDescription>
                             </div>
 
                             <div className="space-y-3 pt-4">

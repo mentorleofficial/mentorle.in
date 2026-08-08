@@ -10,7 +10,7 @@ const EmptyState = ({ filterType, router }) => {
           title: "No Upcoming Events",
           description: "There are no upcoming events scheduled at the moment. Check back later for new opportunities!",
           actionText: "Browse All Events",
-          action: () => router.push("/dashboard/mentee/events")
+          action: () => router.push("/event")
         };
       case "ongoing":
         return {
@@ -25,7 +25,7 @@ const EmptyState = ({ filterType, router }) => {
           title: "No Completed Events",
           description: "You haven't attended any completed events yet. Start your learning journey by joining upcoming events!",
           actionText: "Find Events",
-          action: () => router.push("/dashboard/mentee/events")
+          action: () => router.push("/event")
         };
       default:
         return {
@@ -56,7 +56,7 @@ const EmptyState = ({ filterType, router }) => {
         </Button>
         <Button 
           variant="outline" 
-          onClick={() => router.push("/dashboard/mentee/findmentor")}
+          onClick={() => router.push("/mentor")}
           className="flex items-center gap-2"
         >
           <Search className="h-4 w-4" />

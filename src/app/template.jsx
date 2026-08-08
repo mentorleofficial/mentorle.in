@@ -4,7 +4,6 @@ import * as React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import {
   NavigationMenu,
@@ -14,8 +13,8 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
-import { Menu, X, ChevronDown, Sparkles } from "lucide-react";
-import { supabase } from "@/lib/supabase";
+import { Menu, X, ChevronDown } from "lucide-react";
+import { PLATFORM_URL, PLATFORM_BECOME_MENTOR_URL } from "@/lib/platform";
 
 // Consolidated navigation data
 const navigationData = {
@@ -29,7 +28,7 @@ const navigationData = {
   becomeMentor: [
     {
       title: "Become a Mentor",
-      href: "/become-mentor",
+      href: PLATFORM_BECOME_MENTOR_URL,
       description: "Share your expertise and guide others.",
     },
   ],
@@ -123,15 +122,15 @@ const footerLinks = [
 // Mobile menu data
 // Note: Community removed since Events is already a direct link, avoiding redundancy
 const mobileMenuItems = [
-  { title: "Resources", items: navigationData.resources },
-  { title: "For University", items: navigationData.university },
+  // { title: "Resources", items: navigationData.resources },
+  // { title: "For University", items: navigationData.university },
   { title: "About Us", items: navigationData.about },
 ];
 
 // Direct mobile menu links (no dropdown needed)
 const mobileDirectLinks = [
   { title: "Find Mentor", href: "/mentor" },
-  { title: "Become Mentor", href: "/become-mentor" },
+  { title: "Become Mentor", href: PLATFORM_BECOME_MENTOR_URL },
   { title: "Events", href: "/event"}
 ];
 
@@ -216,43 +215,7 @@ const MobileDropdown = ({ title, items }) => {
 
 export default function Template({ children }) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [userName, setUserName] = useState("");
-  const [userRole, setUserRole] = useState("");
   const [scrollY, setScrollY] = useState(0);
-  const pathname = usePathname();
-  const router = useRouter();
-
-  // CRITICAL: Check for recovery token and redirect to reset-password if needed
-  useEffect(() => {
-    const hashParams = new URLSearchParams(window.location.hash.substring(1));
-    const hasRecoveryToken = hashParams.get('type') === 'recovery' || hashParams.has('access_token');
-    
-    // If we have a recovery token but we're not on reset-password, redirect there
-    if (hasRecoveryToken && pathname !== '/reset-password') {
-      sessionStorage.setItem('isPasswordResetFlow', 'true');
-      // Preserve the hash when redirecting
-      const hash = window.location.hash;
-      router.push('/reset-password' + hash);
-      return;
-    }
-
-    // If we're on dashboard but have the password reset flag, redirect to reset-password
-    if (pathname.startsWith('/dashboard') && 
-        sessionStorage.getItem('isPasswordResetFlow') === 'true') {
-      if (hasRecoveryToken) {
-        router.push('/reset-password' + window.location.hash);
-      } else {
-        router.push('/reset-password');
-      }
-      return;
-    }
-  }, [pathname, router]);
-
-  useEffect(() => {
-    const token = typeof window !== 'undefined' ? localStorage.getItem("auth_token") : null;
-    setIsAuthenticated(!!token);
-  }, []);
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
@@ -260,70 +223,7 @@ export default function Template({ children }) {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Fetch user name and role from any of the three tables
-  useEffect(() => {
-    const fetchUserNameAndRole = async () => {
-      // CRITICAL: Don't do anything if we're on reset-password page
-      // This prevents any redirects during password reset flow
-      if (pathname === '/reset-password' || 
-          (typeof window !== 'undefined' && sessionStorage.getItem('isPasswordResetFlow') === 'true')) {
-        return;
-      }
-      
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-      let userName = "";
-      let role = "";
-      // Try mentee_data
-      let { data: mentee } = await supabase
-        .from("mentee_data")
-        .select("name")
-        .eq("email", user.email)
-        .single();
-      if (mentee && mentee.name) {
-        userName = mentee.name;
-        role = "mentee";
-      } else {
-        // Try mentor_data
-        let { data: mentor } = await supabase
-          .from("mentor_data")
-          .select("name")
-          .eq("email", user.email)
-          .single();
-        if (mentor && mentor.name) {
-          userName = mentor.name;
-          role = "mentor";
-        } else {
-          // Try admin_data
-          let { data: admin } = await supabase
-            .from("admin_data")
-            .select("name")
-            .eq("email", user.email)
-            .single();
-          if (admin && admin.name) {
-            userName = admin.name;
-            role = "admin";
-          }
-        }
-      }
-      setUserName(userName);
-      setUserRole(role);
-    };
-    fetchUserNameAndRole();
-  }, [isAuthenticated]);
-
-  const shouldShowNavAndFooter = !isAuthenticated && !pathname.startsWith("/dashboard");
-
-  // Handler for authenticated user dashboard navigation
-  const handleDashboardNavigation = () => {
-    if (userRole === "mentee") {
-      router.push("/dashboard/mentee");
-    } else if (userRole === "mentor") {
-      router.push("/dashboard/mentor");
-    } else if (userRole === "admin") {
-      router.push("/dashboard/admin");
-    }
-  };
+  const shouldShowNavAndFooter = true;
 
   return (
     <>
@@ -384,7 +284,7 @@ export default function Template({ children }) {
                 <NavigationMenuItem>
                   <NavigationMenuLink asChild>
                     <Link
-                      href="/become-mentor"
+                      href={PLATFORM_BECOME_MENTOR_URL}
                       className="text-md font-medium hover:text-gray-900 transition-all duration-300 px-4 py-2 rounded-lg hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100 hover:shadow-md relative overflow-hidden group"
                     >
                       <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-500"></div>
@@ -408,8 +308,8 @@ export default function Template({ children }) {
                 {/* Dropdown Navigation Items */}
                 {[
                   // { label: "Events", data: navigationData.community },
-                  { label: "Resources", data: navigationData.resources },
-                  { label: "For University", data: navigationData.university },
+                  // { label: "Resources", data: navigationData.resources },
+                  // { label: "For University", data: navigationData.university },
                   { label: "About Us", data: navigationData.about }
                 ].map((item, index) => (
                   <NavigationMenuItem key={item.label}>
@@ -423,25 +323,13 @@ export default function Template({ children }) {
 
                 <NavigationMenuItem>
                   <NavigationMenuLink asChild>
-                    {userName ? (
-                      <button
-                        onClick={handleDashboardNavigation}
-                        className="hidden lg:flex px-6 py-3 text-white bg-black font-medium rounded-xl border-2 border-black transition-all duration-500 ease-out transform hover:bg-white hover:text-black hover:scale-105 hover:shadow-2xl ml-4 relative overflow-hidden group cursor-pointer"
-                      >
-                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-800/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
-                        {/* <Sparkles className="w-4 h-4 mr-2 relative z-10 group-hover:animate-spin" /> */}
-                        <span className="relative z-10">Hi! {userName}</span>
-                      </button>
-                    ) : (
-                      <Link
-                        href="/login"
-                        className="hidden lg:flex px-6 py-3 text-white bg-black font-medium rounded-xl border-2 border-black transition-all duration-500 ease-out transform hover:bg-white hover:text-black hover:scale-105 hover:shadow-2xl ml-4 relative overflow-hidden group"
-                      >
-                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-800/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
-                        {/* <Sparkles className="w-4 h-4 mr-2 relative z-10 group-hover:animate-spin" /> */}
-                        <span className="relative z-10">Login</span>
-                      </Link>
-                    )}
+                    <Link
+                      href={PLATFORM_URL}
+                      className="hidden lg:flex px-6 py-3 text-white bg-black font-medium rounded-xl border-2 border-black transition-all duration-500 ease-out transform hover:bg-white hover:text-black hover:scale-105 hover:shadow-2xl ml-4 relative overflow-hidden group"
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-800/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+                      <span className="relative z-10">Login</span>
+                    </Link>
                   </NavigationMenuLink>
                 </NavigationMenuItem>
               </NavigationMenuList>
@@ -474,29 +362,15 @@ export default function Template({ children }) {
                 ))}
                 
                 <div className="flex justify-center pt-4 border-t border-gray-200 mt-6">
-                  {userName ? (
-                    <button
-                      onClick={handleDashboardNavigation}
-                      className="px-6 py-3 text-black font-medium rounded-xl border-2 border-black transition-all duration-500 ease-out transform hover:bg-black hover:text-white hover:scale-105 hover:shadow-xl relative overflow-hidden group cursor-pointer"
-                    >
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-800/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
-                      <span className="relative z-10 flex items-center gap-2">
-                        {/* <Sparkles className="w-4 h-4 group-hover:animate-pulse" /> */}
-                        Hi! {userName}
-                      </span>
-                    </button>
-                  ) : (
-                    <Link
-                      href="/login"
-                      className="px-6 py-3 text-black font-medium rounded-xl border-2 border-black transition-all duration-500 ease-out transform hover:bg-black hover:text-white hover:scale-105 hover:shadow-xl relative overflow-hidden group"
-                    >
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-800/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
-                      <span className="relative z-10 flex items-center gap-2">
-                        {/* <Sparkles className="w-4 h-4 group-hover:animate-pulse" /> */}
-                        Login
-                      </span>
-                    </Link>
-                  )}
+                  <Link
+                    href={PLATFORM_URL}
+                    className="px-6 py-3 text-black font-medium rounded-xl border-2 border-black transition-all duration-500 ease-out transform hover:bg-black hover:text-white hover:scale-105 hover:shadow-xl relative overflow-hidden group"
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-800/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+                    <span className="relative z-10 flex items-center gap-2">
+                      Login
+                    </span>
+                  </Link>
                 </div>
               </div>
             </div>

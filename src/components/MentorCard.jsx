@@ -239,8 +239,8 @@ const MentorCard = memo(({ Industry, Name, mentorData, isFavorite: propIsFavorit
       return;
     }
 
-    // Create slug from mentor name
-    const mentorSlug = nameToSlug(mentorName);
+    const mentorSlug =
+      mentorData?.slug || nameToSlug(mentorName) || mentorData?.user_id;
     const shareUrl = `${window.location.origin}/mentor/${mentorSlug}`;
     
     try {
@@ -274,9 +274,17 @@ const MentorCard = memo(({ Industry, Name, mentorData, isFavorite: propIsFavorit
     }
   };
 
-  const expertise = Array.isArray(mentorData?.expertise_area) 
-    ? mentorData.expertise_area 
-    : mentorData?.expertise_area ? [mentorData.expertise_area] : [];
+  const expertise = Array.isArray(mentorData?.expertise_area)
+    ? mentorData.expertise_area
+    : Array.isArray(mentorData?.expertise)
+      ? mentorData.expertise
+      : mentorData?.expertise_area
+        ? [mentorData.expertise_area]
+        : [];
+
+  const profileHref = `/mentor/${
+    mentorData?.slug || nameToSlug(getMentorName()) || mentorData?.user_id
+  }`;
 
   return (
     <div className="flex justify-center p-2">
@@ -302,7 +310,7 @@ const MentorCard = memo(({ Industry, Name, mentorData, isFavorite: propIsFavorit
           )}
           
           {/* Glare Effect Overlay */}
-          <div className="aspect-[3/4] relative overflow-hidden">
+          {/* <div className="aspect-[3/4] relative overflow-hidden">
             <Image
               src="https://zzocepwobcnmflkewzss.supabase.co/storage/v1/object/sign/media/glare.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzRmNjU4MC01MGE2LTQ1MzMtOTgxMC0yNjM2NWQ0NGI4Y2MiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJtZWRpYS9nbGFyZS5wbmciLCJpYXQiOjE3NTI5MzUzMzQsImV4cCI6MTc4NDQ3MTMzNH0.3AWaXC_2qRMM01tL5mreReiPH_Sa4RVyOw4NyArL2XI"
               alt="Glare effect"
@@ -310,7 +318,7 @@ const MentorCard = memo(({ Industry, Name, mentorData, isFavorite: propIsFavorit
               sizes="(max-width: 768px) 100vw, 20vw"
               priority={false}
             />
-          </div>
+          </div> */}
           
           {/* Badge */}
           {mentorData?.badge && (
@@ -409,12 +417,14 @@ const MentorCard = memo(({ Industry, Name, mentorData, isFavorite: propIsFavorit
           {/* Experience and View Profile Button in one row */}
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center">
-              <div className="text-lg font-bold mr-1">{mentorData?.experience_years || 5}</div>
+              <div className="text-lg font-bold mr-1">
+                {mentorData?.experience_years ?? mentorData?.years_experience ?? "—"}
+              </div>
               <div className="text-xs text-gray-300">Years Exp.</div>
             </div>
             
             <Link 
-              href={`/dashboard/mentee/mentor/${nameToSlug(getMentorName())}/services`} 
+              href={profileHref} 
               className="flex-grow" 
               onClick={handleClick}
             >

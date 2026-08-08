@@ -1,34 +1,18 @@
 import { NextResponse } from 'next/server';
-import { getUserRole } from '@/lib/auth';
-import { ROLES } from '@/lib/roles';
 import { createServerSupabaseClient } from '@/lib/supabaseServer';
 
-// GET - Fetch a single post by slug
+// GET - Fetch a single published post by slug
 export async function GET(request, { params }) {
   try {
     const supabase = await createServerSupabaseClient();
-    const { slug } = params;
+    const { slug } = await params;
 
-    const { data: { session } } = await supabase.auth.getSession();
-    const userId = session?.user?.id;
-    let userRole = null;
-
-    if (userId) {
-      userRole = await getUserRole(userId, supabase);
-    }
-
-    let query = supabase
+    const { data, error } = await supabase
       .from('posts')
       .select('*')
       .eq('slug', slug)
+      .eq('status', 'published')
       .single();
-
-    // If not admin/mentor, only show published posts
-    if (!userRole || (userRole !== ROLES.ADMIN && userRole !== ROLES.MENTOR)) {
-      query = query.eq('status', 'published');
-    }
-
-    const { data, error } = await query;
 
     if (error) {
       if (error.code === 'PGRST116') {
@@ -79,4 +63,3 @@ export async function GET(request, { params }) {
     );
   }
 }
-
