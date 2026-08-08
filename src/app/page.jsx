@@ -35,7 +35,7 @@ const PricingSection = dynamic(() => import("@/components/PricingSection"), {
 import { label1, label2 } from "./constant";
 
 const TRUSTED_UNIVERSITIES = [
-  { name: "CGC University", src: "/cgc.webp" },
+  { name: "CGC University", src: "/CGC.webp" },
   { name: "GNDU", src: "/GNDU.png" },
   { name: "CT University", src: "/CT.png" },
   { name: "IKGPTU", src: "/IKGPTU.png" },
