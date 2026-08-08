@@ -52,28 +52,32 @@ export default function Home() {
     <>
       <main>
         <AchievementPopup />
-        <section className="mt-20 lg:mt-18 px-4 sm:px-6 md:px-10 lg:px-24 flex flex-col lg:flex-row justify-around items-center mb-12 sm:mb-20 gap-8 lg:gap-0">
-          <div className="w-full lg:w-[45%]">
-            <h1 className="text-black text-2xl font-extrabold sm:text-3xl lg:text-5xl text-center lg:text-left break-words">
-            Learn from experts who build, not just talk.
+        <section className="mt-16 sm:mt-20 lg:mt-24 px-4 sm:px-8 md:px-12 lg:px-20 xl:px-28 flex flex-col lg:flex-row justify-between items-center mb-14 sm:mb-20 gap-10 lg:gap-12 xl:gap-16 min-h-[60vh] lg:min-h-[68vh]">
+          <div className="w-full lg:w-[48%] xl:w-[46%] max-w-2xl lg:max-w-none">
+            <h1 className="text-black text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-extrabold leading-[1.1] tracking-tight text-center lg:text-left break-words">
+              Learn from experts who build, not just talk.
             </h1>
-            <p className="text-base font-normal sm:text-lg lg:text-xl text-black mt-4 mb-5 text-center lg:text-left break-words">
+            <p className="text-lg sm:text-xl lg:text-2xl text-black/80 mt-5 sm:mt-6 mb-7 sm:mb-8 leading-relaxed text-center lg:text-left break-words max-w-xl mx-auto lg:mx-0">
               Get mentored by people who have already done it at the world&apos;s best companies.
             </p>
             <a
               href={PLATFORM_URL}
-              className="flex justify-center lg:block"
+              className="flex justify-center lg:justify-start"
             >
-              <Button text="Start exploring Mentorle" />
+              <Button
+                text="Start exploring Mentorle"
+                className="!text-base sm:!text-lg !px-8 !py-3.5 sm:!py-4"
+              />
             </a>
           </div>
-          <div className="hidden lg:block w-full lg:w-auto">
+          <div className="hidden lg:flex w-full lg:w-[52%] xl:w-[50%] justify-end items-center">
             <Image
               src="https://zzocepwobcnmflkewzss.supabase.co/storage/v1/object/sign/media/hero_no.1.png?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJtZWRpYS9oZXJvX25vLjEucG5nIiwiaWF0IjoxNzQzNjI4MTI5LCJleHAiOjIwNTg5ODgxMjl9.UzjWC9D1sNE7FBZ0IEy70kkt_lXvRBMz8K7h-okIZY8"
-              alt="Hero Image"
-              width={700}
-              height={700}
-              className="w-full max-w-[550px] -mt-16"
+              alt="Mentorle mentors"
+              width={800}
+              height={800}
+              priority
+              className="w-full max-w-[620px] xl:max-w-[680px] h-auto -mt-8"
             />
           </div>
         </section>
@@ -140,9 +144,9 @@ export default function Home() {
         </section>
 
         <FGLIPage />
+        <PricingSection />
         <TestimonialsSection />
 
-        <PricingSection />
 
         <section className=" flex flex-col lg:flex-row gap-5 lg:gap-20 justify-center mt-20 mb-20 px-8 md:px-24 text-black ">
           <FAQ />
