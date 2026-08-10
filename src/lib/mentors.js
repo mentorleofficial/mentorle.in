@@ -11,7 +11,7 @@ import { createServerSupabaseClient } from "@/lib/supabaseServer";
 import { nameToSlug } from "@/lib/slugUtils";
 
 const PROFILE_SELECT =
-  "id, user_id, slug, is_active, headline, current_role, current_organization, expertise, years_experience, bio, linkedin_url, portfolio_url, experiences, professional_status, created_at";
+  "id, user_id, slug, is_active, headline, current_role, current_organization, expertise, years_experience, bio, linkedin_url, portfolio_url, experiences, professional_status, company_url, designation, created_at";
 
 function asArray(value) {
   if (Array.isArray(value)) return value.filter(Boolean);
@@ -32,6 +32,40 @@ function nonEmpty(value) {
   if (typeof value !== "string") return value ?? null;
   const trimmed = value.trim();
   return trimmed ? trimmed : null;
+}
+
+/**
+ * Derive a public company logo URL from a company website URL.
+ * Uses Clearbit Logo API with Google Favicon as a soft fallback option for callers.
+ */
+export function getCompanyLogoUrl(companyUrl) {
+  if (!companyUrl || typeof companyUrl !== "string") return null;
+
+  try {
+    const normalized = companyUrl.trim().startsWith("http")
+      ? companyUrl.trim()
+      : `https://${companyUrl.trim()}`;
+    const hostname = new URL(normalized).hostname.replace(/^www\./i, "");
+    if (!hostname) return null;
+    return `https://logo.clearbit.com/${hostname}`;
+  } catch {
+    return null;
+  }
+}
+
+export function getCompanyLogoFallbackUrl(companyUrl) {
+  if (!companyUrl || typeof companyUrl !== "string") return null;
+
+  try {
+    const normalized = companyUrl.trim().startsWith("http")
+      ? companyUrl.trim()
+      : `https://${companyUrl.trim()}`;
+    const hostname = new URL(normalized).hostname.replace(/^www\./i, "");
+    if (!hostname) return null;
+    return `https://www.google.com/s2/favicons?domain=${hostname}&sz=128`;
+  } catch {
+    return null;
+  }
 }
 
 /**
@@ -114,10 +148,16 @@ export function normalizeMentor({
   const bio = nonEmpty(profileRow?.bio) || nonEmpty(dataRow?.bio) || "";
 
   const currentRole =
+    nonEmpty(profileRow?.designation) ||
     nonEmpty(profileRow?.current_role) ||
     nonEmpty(dataRow?.current_role) ||
     nonEmpty(profileRow?.headline) ||
     null;
+
+  const designation =
+    nonEmpty(profileRow?.designation) || currentRole;
+
+  const companyUrl = nonEmpty(profileRow?.company_url);
 
   const slug =
     nonEmpty(profileRow?.slug) ||
@@ -135,6 +175,10 @@ export function normalizeMentor({
     email: dataRow?.email || userRow?.email || null,
     bio,
     current_role: currentRole,
+    designation,
+    company_url: companyUrl,
+    companyLogoUrl: getCompanyLogoUrl(companyUrl),
+    companyLogoFallbackUrl: getCompanyLogoFallbackUrl(companyUrl),
     headline: nonEmpty(profileRow?.headline),
     current_organization: nonEmpty(profileRow?.current_organization),
     Industry: nonEmpty(dataRow?.Industry),
