@@ -1,6 +1,7 @@
 'use client'
 
 import Button from "@/components/Button";
+import { Phone } from "lucide-react";
 
 export default function Contact() {
     return (
@@ -14,11 +15,15 @@ export default function Contact() {
             </div> */}
             <div className="flex gap-5 items-center mb-3">
                 <img src="https://zzocepwobcnmflkewzss.supabase.co/storage/v1/object/sign/media/mail.svg?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJtZWRpYS9tYWlsLnN2ZyIsImlhdCI6MTc0MzYxMDI4MCwiZXhwIjoyMDU4OTcwMjgwfQ.WshaJUeUK7icLu4pLQGwMn8JstzWRYTFWa_gaXK3H88" alt="Mail" className="w-[25px]"/>
-                <p>support@mentorle.in</p>
+                <a href="mailto:support@mentorle.in" className="hover:underline">support@mentorle.in</a>
             </div>
-            <div className="flex gap-5 items-center mb-5">
-                <img src="https://zzocepwobcnmflkewzss.supabase.co/storage/v1/object/sign/media/location.svg?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJtZWRpYS9sb2NhdGlvbi5zdmciLCJpYXQiOjE3NDM2MTAzMDgsImV4cCI6MjA1ODk3MDMwOH0.GWQZVjZorcp-7Y__wGVGIGGvbhYM5P_cko-QxkqrOEg" alt="Location" className="w-[25px]" />
-                <p>Punjab, India</p>
+            <div className="flex gap-5 items-center mb-3">
+                <Phone className="w-[25px] h-[25px] text-black flex-shrink-0" />
+                <a href="tel:+919888409232" className="hover:underline">+91 9888409232</a>
+            </div>
+            <div className="flex gap-5 items-start mb-5">
+                <img src="https://zzocepwobcnmflkewzss.supabase.co/storage/v1/object/sign/media/location.svg?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJtZWRpYS9sb2NhdGlvbi5zdmciLCJpYXQiOjE3NDM2MTAzMDgsImV4cCI6MjA1ODk3MDMwOH0.GWQZVjZorcp-7Y__wGVGIGGvbhYM5P_cko-QxkqrOEg" alt="Location" className="w-[25px] mt-1 flex-shrink-0" />
+                <p>MOH. Sukhiabad, Near Baba Balak Nath Mandir, Hoshiarpur, Punjab — 146001</p>
             </div>
             <a href="mailto:support@mentorle.in?subject=General%20Complaint&body=Dear%20Mentorle%20Team,%0A%0AI%20would%20like%20to%20raise%20a%20general%20complaint%20regarding%20the%20following%20issue(s):%0A%0A[Please%20describe%20your%20complaint%20here.]%0Asupport@mentorle.in">
               <Button text="Contact Us" />

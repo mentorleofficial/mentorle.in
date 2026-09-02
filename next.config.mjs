@@ -63,6 +63,16 @@ const nextConfig = {
         destination: "https://platform.mentorle.in",
         permanent: true,
       },
+      {
+        source: "/private-policy",
+        destination: "/privacy-policy",
+        permanent: true,
+      },
+      {
+        source: "/term-and-conditions",
+        destination: "/terms-of-service",
+        permanent: true,
+      },
     ];
   },
   images: {

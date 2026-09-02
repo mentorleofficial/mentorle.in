@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/navigation-menu";
 import { Menu, X, ChevronDown } from "lucide-react";
 import { PLATFORM_URL, PLATFORM_BECOME_MENTOR_URL } from "@/lib/platform";
+import SiteFooter from "@/components/SiteFooter";
 
 // Consolidated navigation data
 const navigationData = {
@@ -109,14 +110,6 @@ const socialLinks = [
     src: "https://zzocepwobcnmflkewzss.supabase.co/storage/v1/object/sign/media/whatsapp.svg?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJtZWRpYS93aGF0c2FwcC5zdmciLCJpYXQiOjE3NDM2MTE1MzcsImV4cCI6MjA1ODk3MTUzN30.qDP5_T-QNesX-kVMd8I7Rf29wzK5XjLK1n01dUs-DFc",
     alt: "whatsapp",
   },
-];
-
-// Footer links data
-const footerLinks = [
-  { href: "/private-policy", label: "Privacy Policy" },
-  { href: "https://t.me/+sjxQXmum2GA0YWQ9", label: "FAQs" },
-  { href: "https://t.me/+sjxQXmum2GA0YWQ9", label: "Contact Us" },
-  { href: "/term-and-conditions", label: "Terms & Conditions" },
 ];
 
 // Mobile menu data
@@ -380,133 +373,7 @@ export default function Template({ children }) {
 
       {children}
 
-      {shouldShowNavAndFooter && (
-        <>
-          <Image
-            src="https://zzocepwobcnmflkewzss.supabase.co/storage/v1/object/sign/media/footer.png?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJtZWRpYS9mb290ZXIucG5nIiwiaWF0IjoxNzQzNjExOTg1LCJleHAiOjIwNTg5NzE5ODV9.as2D7XlTNWc36yJCDkhk2UKDznRfG1kMWXf37H1BbBE"
-            width={1000}
-            height={300}
-            alt="footerimage"
-            className="w-full h-auto relative -bottom-2"
-          />
-
-          <footer className="bg-black relative -bottom-1">
-            <div className="relative flex items-center justify-center flex-col xl:-top-5 py-8 px-4 space-y-6">
-              <Image
-                src="/logo.png"
-                alt="Logo"
-                width={300}
-                height={300}
-                className="w-[150px] sm:w-[200px] lg:w-[250px] xl:w-[300px]"
-              />
-              <div className="h-[2px] bg-[#ffffff3a] w-[40%] mx-auto mt-5" />
-              <div className="flex justify-center items-center gap-10 mt-5">
-                <Link
-                  href="https://discord.com/invite/Cm2zFMGEYq"
-                  className="transition-transform duration-200 hover:scale-110"
-                >
-                  <img
-                    src="https://zzocepwobcnmflkewzss.supabase.co/storage/v1/object/sign/media/discord.svg?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJtZWRpYS9kaXNjb3JkLnN2ZyIsImlhdCI6MTc0MzYxMTQ3OSwiZXhwIjoyMDU4OTcxNDc5fQ.wsMJtvIHxMdlfzdUgZ3InqM3rqNkyJetm9HE2cW_STw"
-                    alt="discord"
-                    width={30}
-                    height={30}
-                    className="w-[20px] sm:w-[30px]"
-                  />
-                </Link>
-                <Link
-                  href="https://www.instagram.com/mentorle_official/"
-                  className="transition-transform duration-200 hover:scale-110"
-                >
-                  <img
-                    src="https://zzocepwobcnmflkewzss.supabase.co/storage/v1/object/sign/media/instagram.svg?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJtZWRpYS9pbnN0YWdyYW0uc3ZnIiwiaWF0IjoxNzQzNjExNjI0LCJleHAiOjIwNTg5NzE2MjR9.rL7AyxjX1C7kvyilU1SBEaug7Rl0sSaV2aOhqBws5Kc"
-                    alt="instagram"
-                    width={30}
-                    height={30}
-                    className="w-[20px] sm:w-[30px]"
-                  />
-                </Link>
-                <Link
-                  href="https://www.linkedin.com/company/mentorlee/"
-                  className="transition-transform duration-200 hover:scale-110"
-                >
-                  <img
-                    src="https://zzocepwobcnmflkewzss.supabase.co/storage/v1/object/sign/media/linkedin.svg?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJtZWRpYS9saW5rZWRpbi5zdmciLCJpYXQiOjE3NDM2MTE1MDksImV4cCI6MjA1ODk3MTUwOX0.fD7lkPJMoXKtDEKldkqkInlsHQJrMAW4gumVJpVOPPo"
-                    alt="linkedin"
-                    width={30}
-                    height={30}
-                    className="w-[20px] sm:w-[30px]"
-                  />
-                </Link>
-                <Link
-                  href="https://chat.whatsapp.com/DaP0RTmYUkKGLZvaZuDnWH"
-                  className="transition-transform duration-200 hover:scale-110"
-                >
-                  <img
-                    src="https://zzocepwobcnmflkewzss.supabase.co/storage/v1/object/sign/media/whatsapp.svg?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJtZWRpYS93aGF0c2FwcC5zdmciLCJpYXQiOjE3NDM2MTE1MzcsImV4cCI6MjA1ODk3MTUzN30.qDP5_T-QNesX-kVMd8I7Rf29wzK5XjLK1n01dUs-DFc"
-                    alt="whatsapp"
-                    width={30}
-                    height={30}
-                    className="w-[20px] sm:w-[30px]"
-                  />
-                </Link>
-              </div>
-              <div className="flex flex-col space-y-6 w-full mt-6 px-4 sm:px-6 lg:px-8 xl:px-12">
-  {/* Links Section */}
-              <div className="flex flex-wrap justify-center gap-4 sm:gap-6 lg:gap-8">
-                <Link
-                  href="/private-policy"
-                  className="transition-colors duration-200 hover:text-[#2D59E3]"
-                >
-                  <div className="text-white text-center underline cursor-pointer hover:font-semibold text-sm sm:text-base">
-                    Privacy Policy
-                  </div>
-                </Link>
-                <a
-                  href="https://t.me/+sjxQXmum2GA0YWQ9"
-                  className="transition-colors duration-200 hover:text-[#2D59E3]"
-                >
-                  <div className="text-white text-center underline cursor-pointer hover:font-semibold text-sm sm:text-base">
-                    FAQs
-                  </div>
-                </a>
-                <a
-                  href="https://t.me/+sjxQXmum2GA0YWQ9"
-                  className="transition-colors duration-200 hover:text-[#2D59E3]"
-                >
-                  <div className="text-white text-center underline cursor-pointer hover:font-semibold text-sm sm:text-base">
-                    Contact Us
-                  </div>
-                </a>
-                <Link
-                  href="/term-and-conditions"
-                  className="transition-colors duration-200 hover:text-[#2D59E3]"
-                >
-                  <div className="text-white text-center underline cursor-pointer hover:font-semibold text-sm sm:text-base">
-                    Terms & Conditions
-                  </div>
-                </Link>
-              </div>
-
-              {/* Divider */}
-              <div className="h-px bg-white/20 w-full max-w-4xl mx-auto"></div>
-
-              {/* Copyright and Company Info Section */}
-              <div className="flex flex-col lg:flex-row justify-between items-center gap-4 lg:gap-6 text-center lg:text-left">
-                {/* Copyright */}
-                <div className="text-white opacity-85 text-sm sm:text-base order-2 lg:order-1">
-                  © {new Date().getFullYear()} AltioraEdtech Learning (OPC) Pvt. Ltd. All rights reserved.
-                </div>
-                
-                {/* CIN */}
-                <div className="text-white opacity-85 text-sm sm:text-base order-1 lg:order-2">
-                  <p>CIN: U85500PB2025OPC064679</p>
-                </div>
-              </div>
-            </div>
-            </div>
-          </footer>
-        </>
-      )}
+      {shouldShowNavAndFooter && <SiteFooter />}
     </>
   );
 }
