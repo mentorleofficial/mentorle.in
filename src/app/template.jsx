@@ -3,6 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import {
@@ -216,7 +217,9 @@ export default function Template({ children }) {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const shouldShowNavAndFooter = true;
+  const pathname = usePathname();
+  // The maintenance page is a standalone screen with no way out to the rest of the site
+  const shouldShowNavAndFooter = pathname !== "/maintenance";
 
   return (
     <>

@@ -343,3 +343,10 @@ nav {
 .eventCard {
   border: 3px solid #000000;
 }
+
+/* Maintenance page: scale everything with the viewport on large screens (16px at 1920px, 32px at 3840px) */
+@media (min-width: 1920px) {
+  html:has(main[data-page="maintenance"]) {
+    font-size: 0.8333vw;
+  }
+}
