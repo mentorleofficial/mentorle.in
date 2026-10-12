@@ -12,7 +12,7 @@ Where the Figma designs differ from the written specifications. The site is bein
 
 **Status key:** `Open` = needs a decision · `Resolved` = decided (note the outcome) · `Built as design` = shipped following Figma, still needs sign-off.
 
-_Last updated: 2026-10-12 — Homepage and Find a Mentor built._
+_Last updated: 2026-10-12 — Homepage, Find a Mentor and Mentorle Plus built._
 
 ---
 
@@ -51,13 +51,25 @@ Copy or assets the design doesn't provide. Placeholders are in use until real on
 
 ---
 
-## 2. Mentorle Plus (pricing) page — _not built yet; noted from Figma_
+## 2. Mentorle Plus (pricing) page (`/pricing`) — built 2026-10-12
+
+The plan cards now **match the spec**: Free ₹0, Pro Pass ₹2,500/yr (anchored at ₹10,000, ~₹208/month), All-Access ₹5,999/yr or 6 × ₹999, tokens on day 0/90/180/270, 365-day expiry and the 7-day refund rule (PP §1–3, BP §5, §8, §9 Fix 6). What's still open:
 
 | # | Item | What the spec says | What Figma shows | Status |
 |---|---|---|---|---|
-| P1 | Free plan card | — | "Standard 1:1 retail pricing" is listed **twice** (both crossed out). Likely a copy error. | Open |
-| P2 | Benefits strip | See H1–H3. | Repeats "2 Free Sessions", "Exclusive Referrals", "UpGrad passes / fashion & lifestyle". | Open |
-| P3 | Resource Vault vs perk stack | The perk stack belongs to the ₹5,999 pass (BP §5), but the Resource Vault is listed under ₹2,500 (PP §1) — open conflict C3. | Pro gets "Full Resource Vault & LaTeX templates"; All-Access gets the "₹13,900+ partner perk stack". Matches the earlier wireframe's interim choice. | Open |
+| P1 | Free plan card | — | "Standard 1:1 retail pricing" is listed **twice** (both crossed out). Likely a copy error. | Built as design |
+| P2 | Benefits section contradicts the plan cards | Pro gives discounts, not free sessions; All-Access gives **4 tokens a year** (BP §8). Perks are career tools (BP §5). | The "What you actually get" section on the same page still promises "2 free 1-on-1 sessions **every month**" and "UpGrad passes / fashion & lifestyle vouchers" (see H1–H3). A visitor sees both claims together. | Open |
+| P3 | Resource Vault vs perk stack | The perk stack belongs to the ₹5,999 pass (BP §5), but the Resource Vault is listed under ₹2,500 (PP §1) — open conflict C3. | Pro gets "Full Resource Vault & LaTeX templates"; All-Access gets the "₹13,900+ partner perk stack". | Built as design |
+| P4 | Free plan button says "Current Plan" | — | Shown to everyone, including signed-out visitors who have no plan. | Open |
+| P5 | Missing Pro Pass details | Referral rewards: ₹200 wallet cash and a 20% boost when a referred peer buys Pro (PP §3); weekly Saturday demo masterclass (PP §4). | Only "Re-boost to 15–20% through referrals" is shown. | Open |
+| P6 | All-Access EMI fallback | If cardless EMI is declined: parent debit-card EMI or a 2-part split, ₹2,999 + ₹3,000 (BP §9 Fix 2). | Only "or 6 EMIs of ₹999/month". | Open |
+
+**Content and design gaps**
+
+| # | Item | What's missing | What's built for now |
+|---|---|---|---|
+| PD1 | Plan buttons | No checkout or accounts exist yet. | "Current Plan" → `/signup`, "Get Pro Pass" → `/signup?plan=pro`, "Get All-Access" → `/signup?plan=all-access`. |
+| PD2 | Benefit card text | The Figma cards are identical to the homepage's Plus cards. | Reuses the homepage `PlusBenefits` component, so editing one updates both. |
 
 ## 3. Find a Mentor page (`/mentors`) — built 2026-10-12
 

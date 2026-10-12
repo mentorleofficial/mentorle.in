@@ -99,9 +99,11 @@ Pairs on photos are always `ghost` + `light`, 8px apart (`gap-2`), centred.
 | `ArrowControls` | `components/ui/ArrowControls.tsx` | Orange prev/next pair. `size="sm"` (41px) in small frames, `md` (69×66) for carousels. The left arrow is drawn faded by design. |
 | `ProgressiveBlur` | `components/ui/ProgressiveBlur.tsx` | Frosted bottom fade for text over photos (events cards). See the gotcha in §8. |
 | `ScrollRevealText` | `components/ui/ScrollRevealText.tsx` | Large paragraph whose words turn from grey to ink on scroll. |
-| `CountUp` | `components/motion/CountUp.tsx` | Animated numbers (0 → target) with suffix/decimals. |
+| `CountUp` | `components/motion/CountUp.tsx` | Animated numbers (0 → target) with `prefix` (e.g. `₹`), `suffix`, `decimals`, and `as` (`dd` default, `p`, `span`). Screen readers get the final value through visually hidden text. |
 | `MentorCard` | `components/mentors/MentorCard.tsx` | Photo + rounded experience badge + name/role. Takes a `Mentor` from `src/data/mentors.ts` and an optional `href` (default `/mentors`). Used on Home and Find a Mentor; reuse for Speaker Hub. |
-| `PageHero` | `components/ui/PageHero.tsx` | Hero for inner pages: full-bleed photo, 48px title, optional 14px subtitle (`text-white/85`, max width 28rem), `ghost` + `light` CTA pair. 720px tall on desktop (`md:h-[45rem]`), text block starts 112px down. `overlayOpacity` defaults to 0 (the Find a Mentor image ships pre-darkened). |
+| `PageHero` | `components/ui/PageHero.tsx` | Hero for inner pages: full-bleed photo, 48px title, optional 14px subtitle (`text-white/85`, max width 28rem), `ghost` + `light` CTA pair. 720px tall on desktop (`md:h-[45rem]`), text block starts 112px down. `overlayOpacity` defaults to 0 (the hero images ship pre-darkened). Per-design knobs: `subtitleSize` (`sm` 14px on Find a Mentor, `base` 16px on Mentorle Plus) and `contentOffset` (text block top, default `md:pt-[7rem]`; Mentorle Plus uses `md:pt-[5.375rem]`). Title max width 50rem. |
+| `PlusBenefits` | `components/home/PlusBenefits.tsx` | Three Plus benefit cards (264px tall at desktop) under a `SectionHeader`. Props: `eyebrow`, `title`, `description`, `action` (pass `null` for no CTA, which also widens the header→cards gap to 76px). Section padding 130 top / 163 bottom. Used on Home and Mentorle Plus. |
+| `PlanCard` / `PricingPlans` | `components/pricing/` | Pricing cards; see the pricing pattern below. |
 | `MentorDirectory` | `components/mentors/MentorDirectory.tsx` | Filter tabs + search + mentor grid + empty state. See the filter-bar pattern below. |
 | `MaskIcon` | `components/ui/MaskIcon.tsx` | Paints a single-colour SVG with `currentColor` via CSS mask, so one icon file works on light and dark backgrounds. |
 | `useCarouselLoop` | `components/home/useCarouselLoop.ts` | Clones slides so carousels can loop seamlessly (see §6). |
@@ -114,7 +116,19 @@ Pairs on photos are always `ghost` + `light`, 8px apart (`gap-2`), centred.
 - Below `lg` the tabs scroll horizontally (`no-scrollbar`, bleeding to the screen edges) and the search box takes a full-width row underneath.
 - Filtering announces the result count in a visually hidden `aria-live` region. New results fade and rise in (0.6s, 0.06s stagger). The empty state is a muted line plus a "Clear filters" link.
 
-**Pages** follow `hero → content section(s) on bg-surface/bg-dots → footer`. The Find a Mentor page is `PageHero` + one `bg-surface` section (`py-…-[8.125rem]`) + footer.
+**Pricing card pattern** (Mentorle Plus):
+- **Grid:** the standard 3 × 433px grid. Below `lg` the cards stack in one centred column (max 34rem).
+- **Featured plan:** a 42px `bg-brand` banner ("Most Popular", 15px, 24px left padding) sits on top, and the card gets a `border-brand` border with no top border. Non-featured cards get `lg:pt-[2.625rem]` so all cards start level, and all three stretch to equal height.
+- **Card content** (24px padding):
+  - title `text-2xl`, tagline `text-base`;
+  - price at 84px at 1440 (`xl:text-[clamp(4.5rem,5.85vw,5.25rem)]`, `lg` 52px, mobile 60px), weight 500, `ink` for the featured plan and `muted` for the others, followed by the period in `text-base`;
+  - a note line (always reserves 24px so features align across cards);
+  - features `text-base`, 10px apart, with a check / star (bold row) / cross (muted row) icon;
+  - a full-width button pinned to the bottom (`dark` or `brand`).
+- **Terms line:** centred `text-base` 48px below the cards, with the key phrase in `font-semibold`.
+- **Section:** `bg-dots`, 136px top padding (the banner sits 136px below the hero) and 130px bottom.
+
+**Pages** follow `hero → content section(s) on bg-surface/bg-dots → footer`. Find a Mentor is `PageHero` + one `bg-surface` section + footer. Mentorle Plus is `PageHero` + `PricingPlans` (`bg-dots`) + `PlusBenefits` (`bg-surface`) + footer.
 
 Content lives in typed data files: `src/data/site.ts` (nav, footer, company/legal info, external URLs), `src/data/mentors.ts` (the `Mentor` model, shaped like the future API record, plus domain filters; the homepage's featured mentors come from here too) and `src/data/<page>.ts` (page copy, image paths and sizes). Components never hard-code copy. Placeholder copy gets a one-line comment in the data file and an entry in `docs/SPEC-VS-DESIGN.md`.
 

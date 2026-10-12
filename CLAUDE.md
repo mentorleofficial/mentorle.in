@@ -38,7 +38,7 @@ src/app/                  routes (layout.tsx, page.tsx per route), globals.css (
 src/components/layout/    SiteHeader, SiteFooter (shared by every page)
 src/components/ui/        reusable primitives: ButtonLink, SectionHeader, ArrowControls, ProgressiveBlur, ScrollRevealText
 src/components/motion/    ScrollAnimations (data-attribute animation runner), SmoothScroll (Lenis), CountUp
-src/components/<page>/    page-specific sections (components/home/, components/mentors/)
+src/components/<page>/    page-specific sections (components/home/, components/mentors/, components/pricing/)
 src/data/site.ts          nav, footer columns, social links, company/legal info, external URLs
 src/data/<page>.ts        all copy, image paths and image sizes for that page
 public/<page>/            assets for that page (e.g. public/homepage/)
@@ -76,4 +76,4 @@ scripts/convert-to-webp.mjs  PNG/JPG → WebP converter (npm run images)
 
 ## Routes (planned)
 
-Built: `/`, `/mentors` (Find a Mentor). Linked but not built yet (they 404 for now): `/mentors/<slug>` (mentor profiles), `/pricing`, `/community`, `/about`, `/events`, `/speaker-hub`, `/universities`, `/enterprise`, `/community-guidelines`, `/privacy`, `/terms`, `/login`, `/signup`. Keep these paths when building the pages, since nav and footer links already point at them (`src/data/site.ts`).
+Built: `/`, `/mentors` (Find a Mentor), `/pricing` (Mentorle Plus). Linked but not built yet (they 404 for now): `/mentors/<slug>` (mentor profiles), `/community`, `/about`, `/events`, `/speaker-hub`, `/universities`, `/enterprise`, `/community-guidelines`, `/privacy`, `/terms`, `/login`, `/signup`. Keep these paths when building the pages, since nav and footer links already point at them (`src/data/site.ts`).

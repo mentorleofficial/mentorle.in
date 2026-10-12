@@ -11,9 +11,11 @@ type PageHeroProps = {
   primaryCta?: Cta;
   secondaryCta?: Cta;
   overlayOpacity?: number;
+  subtitleSize?: "sm" | "base";
+  contentOffset?: string;
 };
 
-export function PageHero({ title, subtitle, background, primaryCta, secondaryCta, overlayOpacity = 0 }: PageHeroProps) {
+export function PageHero({ title, subtitle, background, primaryCta, secondaryCta, overlayOpacity = 0, subtitleSize = "sm", contentOffset = "md:pt-[7rem]" }: PageHeroProps) {
   return (
     <section
       aria-labelledby="page-hero-title"
@@ -31,21 +33,26 @@ export function PageHero({ title, subtitle, background, primaryCta, secondaryCta
         <div className="absolute inset-0 -z-10" style={{ backgroundColor: `rgb(0 0 0 / ${overlayOpacity})` }} aria-hidden />
       )}
 
-      <div className="container-page pt-16 text-center text-white md:pt-[7rem]">
+      <div className={`container-page pt-16 text-center text-white ${contentOffset}`}>
         <h1
           id="page-hero-title"
           data-hero="1"
-          className="mx-auto max-w-[40rem] text-[2.125rem] leading-[1.18] font-medium tracking-[-0.01em] md:text-5xl"
+          className="mx-auto max-w-[50rem] text-[2.125rem] leading-[1.18] font-medium tracking-[-0.01em] md:text-5xl"
         >
           {title}
         </h1>
         {subtitle && (
-          <p data-hero="2" className="mx-auto mt-4 max-w-[28rem] text-sm leading-[1.55] text-white/85 md:mt-5">
+          <p
+            data-hero="2"
+            className={`mx-auto mt-4 leading-[1.55] text-white/85 md:mt-5 ${
+              subtitleSize === "base" ? "max-w-[32rem] text-base" : "max-w-[28rem] text-sm"
+            }`}
+          >
             {subtitle}
           </p>
         )}
         {(primaryCta || secondaryCta) && (
-          <div data-hero="3" className="mt-8 flex flex-wrap items-center justify-center gap-2">
+          <div data-hero="3" className={`flex flex-wrap items-center justify-center gap-2 ${subtitleSize === "base" ? "mt-6" : "mt-8"}`}>
             {primaryCta && (
               <ButtonLink href={primaryCta.href} variant="ghost">
                 {primaryCta.label}

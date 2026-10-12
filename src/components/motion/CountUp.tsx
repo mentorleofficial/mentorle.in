@@ -10,16 +10,18 @@ gsap.registerPlugin(ScrollTrigger, useGSAP);
 type CountUpProps = {
   target: number;
   decimals?: number;
+  prefix?: string;
   suffix?: string;
+  as?: "dd" | "span" | "p";
   className?: string;
 };
 
 const format = (value: number, decimals: number) =>
   value.toLocaleString("en-US", { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
 
-export function CountUp({ target, decimals = 0, suffix = "", className }: CountUpProps) {
+export function CountUp({ target, decimals = 0, prefix = "", suffix = "", as: Tag = "dd", className }: CountUpProps) {
   const ref = useRef<HTMLElement>(null);
-  const finalText = `${format(target, decimals)}${suffix}`;
+  const finalText = `${prefix}${format(target, decimals)}${suffix}`;
 
   useGSAP(
     () => {
@@ -28,14 +30,14 @@ export function CountUp({ target, decimals = 0, suffix = "", className }: CountU
       const mm = gsap.matchMedia();
       mm.add("(prefers-reduced-motion: no-preference)", () => {
         const counter = { value: 0 };
-        element.textContent = `${format(0, decimals)}${suffix}`;
+        element.textContent = `${prefix}${format(0, decimals)}${suffix}`;
         gsap.to(counter, {
           value: target,
           duration: 2.2,
           ease: "power2.out",
           scrollTrigger: { trigger: element, start: "top 90%", once: true },
           onUpdate: () => {
-            element.textContent = `${format(counter.value, decimals)}${suffix}`;
+            element.textContent = `${prefix}${format(counter.value, decimals)}${suffix}`;
           },
         });
         return () => {
@@ -44,14 +46,15 @@ export function CountUp({ target, decimals = 0, suffix = "", className }: CountU
       });
       return () => mm.revert();
     },
-    { dependencies: [target, decimals, suffix] },
+    { dependencies: [target, decimals, prefix, suffix] },
   );
 
   return (
-    <dd className={className} aria-label={finalText}>
+    <Tag className={className}>
+      <span className="sr-only">{finalText}</span>
       <span ref={ref} aria-hidden>
         {finalText}
       </span>
-    </dd>
+    </Tag>
   );
 }
