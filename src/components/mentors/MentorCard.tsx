@@ -1,13 +1,18 @@
 import Image from "next/image";
 import Link from "next/link";
-import type { FeaturedMentor } from "@/data/home";
+import type { Mentor } from "@/data/mentors";
 
-export function MentorCard({ mentor }: { mentor: FeaturedMentor }) {
+type MentorCardProps = {
+  mentor: Mentor;
+  href?: string;
+};
+
+export function MentorCard({ mentor, href = "/mentors" }: MentorCardProps) {
   return (
-    <article className="group flex flex-col gap-2">
+    <article className="group relative flex h-full flex-col gap-2">
       <div className="relative aspect-[433/377] overflow-hidden">
         <Image
-          src={mentor.src}
+          src={mentor.photo.src}
           alt={mentor.name}
           fill
           sizes="(min-width: 768px) 27rem, 100vw"
@@ -22,15 +27,13 @@ export function MentorCard({ mentor }: { mentor: FeaturedMentor }) {
           </span>
         </span>
       </div>
-      <div className="bg-white p-4">
+      <div className="flex-1 bg-white p-4">
         <h3 className="text-xl font-medium text-ink lg:text-2xl">
-          <Link href="/mentors" className="after:absolute after:inset-0 hover:underline hover:underline-offset-4">
+          <Link href={href} className="after:absolute after:inset-0 hover:underline hover:underline-offset-4">
             {mentor.name}
           </Link>
         </h3>
-        <p className="mt-1.5 text-sm text-ink/85 lg:text-base">
-          {mentor.role}
-        </p>
+        <p className="mt-1.5 text-sm text-ink/85 lg:text-base">{mentor.role}</p>
       </div>
     </article>
   );

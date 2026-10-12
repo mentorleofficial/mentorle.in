@@ -7,7 +7,7 @@ export type ImageAsset = {
 export const hero = {
   title: "Fast-track your growth with Industry Insiders",
   background: {
-    src: "/homepage/hero-background.jpg",
+    src: "/homepage/hero-background.webp",
     width: 1280,
     height: 720,
     alt: "A mentor and a mentee reviewing a résumé together at a café table",
@@ -16,9 +16,9 @@ export const hero = {
   secondaryCta: { label: "Explore Mentorle Plus", href: "/pricing" },
   spotlight: [
     {
-      src: "/homepage/hero-section-image.jpg",
-      width: 3072,
-      height: 2007,
+      src: "/homepage/hero-section-image.webp",
+      width: 2880,
+      height: 1882,
       alt: "A mentor walking a group of mentees through a plan on a whiteboard",
     },
   ],
@@ -60,27 +60,27 @@ export type GatheringEvent = ImageAsset & {
 // Only the centre card's text exists in Figma; the other two cards use placeholder copy.
 export const gatherings: GatheringEvent[] = [
   {
-    src: "/homepage/live-gatherings/image-1.png",
-    width: 525,
-    height: 748,
+    src: "/homepage/live-gatherings/image-1.webp",
+    width: 700,
+    height: 998,
     tag: "Leadership Dinner",
     title: "Leadership Roundtable",
     description: "An intimate dinner where senior operators share what they wish they had known earlier.",
     alt: "Guests talking at a leadership dinner",
   },
   {
-    src: "/homepage/live-gatherings/image-2.png",
-    width: 1377,
-    height: 798,
+    src: "/homepage/live-gatherings/image-2.webp",
+    width: 1836,
+    height: 1064,
     tag: "University Summit",
     title: "Founders & Leaders Mixer",
     description: "An evening of networking and meaningful conversations with industry leaders.",
     alt: "Founders and leaders networking at a mixer",
   },
   {
-    src: "/homepage/live-gatherings/image-3.png",
-    width: 900,
-    height: 1350,
+    src: "/homepage/live-gatherings/image-3.webp",
+    width: 1200,
+    height: 1800,
     tag: "Tech Sprint",
     title: "Builders Tech Sprint",
     description: "A hands-on sprint where students build alongside engineers from product companies.",
@@ -88,42 +88,6 @@ export const gatherings: GatheringEvent[] = [
   },
 ];
 
-export type FeaturedMentor = ImageAsset & {
-  name: string;
-  role: string;
-  experience: string;
-  focus: string;
-};
-
-export const featuredMentors: FeaturedMentor[] = [
-  {
-    name: "Arjun Malhotra",
-    role: "Head of Product · Ex-Microsoft",
-    experience: "12+ yrs",
-    focus: "Growth Strategy",
-    src: "/homepage/community/arjun-malhotra.png",
-    width: 649,
-    height: 567,
-  },
-  {
-    name: "Meera Kapoor",
-    role: "Founder · Ex-McKinsey",
-    experience: "10+ yrs",
-    focus: "Startup Strategy",
-    src: "/homepage/community/meera-kapoor.png",
-    width: 649,
-    height: 567,
-  },
-  {
-    name: "Rohan Mehta",
-    role: "Design Director · Ex-Adobe",
-    experience: "08+ yrs",
-    focus: "Growth Strategy",
-    src: "/homepage/community/rohan-mehta.png",
-    width: 649,
-    height: 567,
-  },
-];
 
 export type Quote = {
   quote: string;
@@ -155,7 +119,7 @@ export const mentorQuotes: Quote[] = [
 
 export const mentorBanner = {
   title: "Your Experience Could Change Someone’s Next Move.",
-  image: { src: "/homepage/Your-experience-could-changes.png", width: 2160, height: 930 },
+  image: { src: "/homepage/Your-experience-could-changes.webp", width: 2880, height: 1240 },
   secondaryCta: { label: "Explore Mentorle Plus", href: "/pricing" },
 };
 
@@ -217,11 +181,11 @@ export const lifeAtMentorle = {
     title: "Leadership Summit ’26",
     description:
       "When our top mentors addressed students, they highlighted the power of building a resilient career. We championed hands-on learning, transitioning from rote memorization to real-world adaptability in the AI age.",
-    image: { src: "/homepage/mentor-stories/leadership-summit-26.png", width: 649, height: 504 },
+    image: { src: "/homepage/mentor-stories/leadership-summit-26.webp", width: 866, height: 672 },
     alt: "Students in the audience at the Mentorle Leadership Summit",
   },
   workshop: {
-    image: { src: "/homepage/mentor-stories/beyond-the-algorithm.png", width: 649, height: 540 },
+    image: { src: "/homepage/mentor-stories/beyond-the-algorithm.webp", width: 866, height: 720 },
     alt: "Students collaborating around a table during a Mentorle workshop",
   },
   beyondTheAlgorithm: {
@@ -233,7 +197,7 @@ export const lifeAtMentorle = {
     title: "Connections That Matter",
     description:
       "Great opportunities often begin with the right conversation. Connect with ambitious individuals, startup founders, and industry leaders who share ideas, exchange experiences, and create meaningful opportunities for long-term growth.",
-    image: { src: "/homepage/mentor-stories/connections-that-matter.png", width: 649, height: 504 },
+    image: { src: "/homepage/mentor-stories/connections-that-matter.webp", width: 866, height: 672 },
     alt: "Professionals in conversation around a café table",
   },
 };
@@ -271,17 +235,17 @@ export const successStories: SuccessStory[] = [
       "The 1-on-1 guidance I received here was unparalleled. My mentor helped me completely revamp my portfolio, which directly led to my offer at Microsoft.",
     name: "Aditi Sharma",
     title: "Product Designer @ Microsoft",
-    src: "/homepage/success-stories/aditi-sharma.png",
-    width: 448,
-    height: 529,
+    src: "/homepage/success-stories/aditi-sharma.webp",
+    width: 598,
+    height: 706,
   },
   {
     quote:
       "Being a Mentorle Plus member is a cheat code. Not only did I get 2 free sessions with a YC founder, but the exclusive study resources saved me months of prep time.",
     name: "Rahul Verma",
     title: "Founder @ FinTech Startup",
-    src: "/homepage/success-stories/rahul-verma.png",
-    width: 448,
-    height: 529,
+    src: "/homepage/success-stories/rahul-verma.webp",
+    width: 598,
+    height: 706,
   },
 ];

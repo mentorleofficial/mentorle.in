@@ -18,6 +18,9 @@ export const metadata: Metadata = {
   },
   description:
     "Mentorle connects you with experienced professionals and industry experts for practical guidance, honest insights, and meaningful conversations.",
+  icons: {
+    icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
+  },
 };
 
 // Hides animated elements before hydration so GSAP can reveal them without a flash; skipped for reduced motion.

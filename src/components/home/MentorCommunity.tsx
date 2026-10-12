@@ -1,7 +1,7 @@
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { SectionHeader } from "@/components/ui/SectionHeader";
-import { MentorCard } from "@/components/home/MentorCard";
-import { featuredMentors } from "@/data/home";
+import { MentorCard } from "@/components/mentors/MentorCard";
+import { featuredMentors } from "@/data/mentors";
 
 export function MentorCommunity() {
   return (
@@ -20,9 +20,7 @@ export function MentorCommunity() {
         />
         <div data-animate="stagger" className="mt-12 grid gap-5 md:mt-16 md:grid-cols-3">
           {featuredMentors.map((mentor) => (
-            <div key={mentor.name} className="relative">
-              <MentorCard mentor={mentor} />
-            </div>
+            <MentorCard key={mentor.slug} mentor={mentor} />
           ))}
         </div>
       </div>

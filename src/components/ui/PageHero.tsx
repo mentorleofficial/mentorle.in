@@ -1,0 +1,64 @@
+import Image from "next/image";
+import { ButtonLink } from "@/components/ui/ButtonLink";
+import type { ImageAsset } from "@/data/home";
+
+type Cta = { label: string; href: string };
+
+type PageHeroProps = {
+  title: string;
+  subtitle?: string;
+  background: ImageAsset & { alt: string };
+  primaryCta?: Cta;
+  secondaryCta?: Cta;
+  overlayOpacity?: number;
+};
+
+export function PageHero({ title, subtitle, background, primaryCta, secondaryCta, overlayOpacity = 0 }: PageHeroProps) {
+  return (
+    <section
+      aria-labelledby="page-hero-title"
+      className="relative isolate flex h-svh max-h-[53.75rem] min-h-[37.5rem] items-center overflow-hidden bg-ink md:h-[45rem] md:max-h-none"
+    >
+      <Image
+        src={background.src}
+        alt={background.alt}
+        fill
+        preload
+        sizes="100vw"
+        className="-z-10 object-cover"
+      />
+      {overlayOpacity > 0 && (
+        <div className="absolute inset-0 -z-10" style={{ backgroundColor: `rgb(0 0 0 / ${overlayOpacity})` }} aria-hidden />
+      )}
+
+      <div className="container-page pt-16 text-center text-white md:pt-[7rem]">
+        <h1
+          id="page-hero-title"
+          data-hero="1"
+          className="mx-auto max-w-[40rem] text-[2.125rem] leading-[1.18] font-medium tracking-[-0.01em] md:text-5xl"
+        >
+          {title}
+        </h1>
+        {subtitle && (
+          <p data-hero="2" className="mx-auto mt-4 max-w-[28rem] text-sm leading-[1.55] text-white/85 md:mt-5">
+            {subtitle}
+          </p>
+        )}
+        {(primaryCta || secondaryCta) && (
+          <div data-hero="3" className="mt-8 flex flex-wrap items-center justify-center gap-2">
+            {primaryCta && (
+              <ButtonLink href={primaryCta.href} variant="ghost">
+                {primaryCta.label}
+              </ButtonLink>
+            )}
+            {secondaryCta && (
+              <ButtonLink href={secondaryCta.href} variant="light">
+                {secondaryCta.label}
+              </ButtonLink>
+            )}
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}

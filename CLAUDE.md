@@ -26,6 +26,7 @@ npm run dev     # dev server
 npm run lint    # ESLint — must pass
 npm run build   # production build — must pass
 npm start       # serve the production build
+npm run images  # convert PNG/JPG in public/ to WebP and update references (see the optimize-assets skill)
 ```
 
 There's no test suite yet. Verify UI changes by building, running the app and checking screenshots at multiple widths (see the checklist below).
@@ -37,12 +38,14 @@ src/app/                  routes (layout.tsx, page.tsx per route), globals.css (
 src/components/layout/    SiteHeader, SiteFooter (shared by every page)
 src/components/ui/        reusable primitives: ButtonLink, SectionHeader, ArrowControls, ProgressiveBlur, ScrollRevealText
 src/components/motion/    ScrollAnimations (data-attribute animation runner), SmoothScroll (Lenis), CountUp
-src/components/<page>/    page-specific sections (e.g. components/home/)
+src/components/<page>/    page-specific sections (components/home/, components/mentors/)
 src/data/site.ts          nav, footer columns, social links, company/legal info, external URLs
 src/data/<page>.ts        all copy, image paths and image sizes for that page
 public/<page>/            assets for that page (e.g. public/homepage/)
 docs/DESIGN-SYSTEM.md     colours, type scale, spacing, components, motion, responsive rules, gotchas
 docs/SPEC-VS-DESIGN.md    running list of differences between the spec documents and the Figma
+scripts/convert-to-webp.mjs  PNG/JPG → WebP converter (npm run images)
+.claude/skills/           project skills (optimize-assets)
 context-files/            (gitignored, local only) spec PDFs, IMPLEMENTATION-CONTEXT.md, Figma PNG exports
 ```
 
@@ -56,14 +59,15 @@ context-files/            (gitignored, local only) spec PDFs, IMPLEMENTATION-CON
 6. **Animations through the motion system** (`data-hero`, `data-animate`, `data-parallax`, `CountUp`), not ad-hoc libraries. Respect reduced motion.
 7. **Don't add visual hacks the design doesn't have** (extra gradients, vignettes, shading, decorative icons) without asking. The user has rejected these before.
 8. The footer's **Grievance Officer block is legally required** (DPDP Act). Never remove it.
-9. Only commit when the user asks.
+9. **All raster images in `public/` are WebP.** Whenever the user adds or updates PNG/JPG assets, run the `optimize-assets` skill (`npm run images`) before using them. Originals are kept in `context-files/originals/`.
+10. Only commit when the user asks.
 
 ## Building a new page — workflow
 
 1. **Find the design** in `context-files/figma/<page>/`. Only Home, Find a Mentor, Mentorle Plus and Speaker Hub exist so far; other pages are still being designed, so ask before building one with no design.
 2. **Slice the export to read it at full size.** The PNGs are 2880px wide (a 1440 frame at 2×), too tall to view whole. With PyMuPDF (`import pymupdf`), open the PNG, then `page.get_pixmap(clip=Rect(...))` in ~720-design-px tall bands. 1 design px = 2 image px. Sample exact colours with `pixmap.pixel(x, y)`.
 3. **Measure, then map to the design system.** Most values will already exist in DESIGN-SYSTEM. Measure any new text by comparing its rendered width/height against the export.
-4. **Move assets** for the page into `public/<page>/` (keep `context-files/` as the untouched source). Check images for baked-in text.
+4. **Move assets** for the page into `public/<page>/` (keep `context-files/` as the untouched source). Check images for baked-in text, then **convert them to WebP** with `npm run images -- public/<page>` (the `optimize-assets` skill).
 5. **Write `src/data/<page>.ts`**, then sections in `src/components/<page>/`, composed in `src/app/<route>/page.tsx`. Sections are server components; only interactive parts are `"use client"`.
 6. **Add motion** with data attributes (headers already animate via `SectionHeader`).
 7. **Verify:** `npm run lint` and `npm run build` pass. Run the production build and screenshot at **375, 768, 1024, 1440, 1728, 1920** wide: no horizontal scroll, nothing hidden after scrolling, no console errors. Compare the 1440 render section by section against the Figma.
@@ -71,4 +75,4 @@ context-files/            (gitignored, local only) spec PDFs, IMPLEMENTATION-CON
 
 ## Routes (planned)
 
-Built: `/`. Linked but not built yet (they 404 for now): `/mentors`, `/pricing`, `/community`, `/about`, `/events`, `/speaker-hub`, `/universities`, `/enterprise`, `/community-guidelines`, `/privacy`, `/terms`, `/login`, `/signup`. Keep these paths when building the pages, since nav and footer links already point at them (`src/data/site.ts`).
+Built: `/`, `/mentors` (Find a Mentor). Linked but not built yet (they 404 for now): `/mentors/<slug>` (mentor profiles), `/pricing`, `/community`, `/about`, `/events`, `/speaker-hub`, `/universities`, `/enterprise`, `/community-guidelines`, `/privacy`, `/terms`, `/login`, `/signup`. Keep these paths when building the pages, since nav and footer links already point at them (`src/data/site.ts`).
