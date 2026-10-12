@@ -46,28 +46,29 @@ docs/DESIGN-SYSTEM.md     colours, type scale, spacing, components, motion, resp
 docs/SPEC-VS-DESIGN.md    running list of differences between the spec documents and the Figma
 scripts/convert-to-webp.mjs  PNG/JPG → WebP converter (npm run images)
 .claude/skills/           project skills (optimize-assets)
-context-files/            (gitignored, local only) spec PDFs, IMPLEMENTATION-CONTEXT.md, Figma PNG exports
 ```
+
+**Design and spec source material lives outside the repo** in `../mentorle-context/mentorle.in/` (i.e. `C:\Programming\BeezTech\Mentorle-V2\mentorle-context\mentorle.in\`), so no git operation can delete it: the spec PDFs, `IMPLEMENTATION-CONTEXT.md`, Figma PNG exports in `figma/<page>/`, and original images replaced by WebP in `originals/`. Read it from there; never copy it into the repo.
 
 ## Standing rules
 
 1. **Read `docs/DESIGN-SYSTEM.md` before building or changing any UI.** Reuse its tokens, type scale, spacing and components. Every page must look like it belongs with the homepage. If a new page introduces a genuinely new pattern, add it to the design system doc in the same change.
-2. **Figma wins over the spec documents.** When the design and the specs (`context-files/*.pdf`, `IMPLEMENTATION-CONTEXT.md`) disagree, build what the design shows, then **add a row to `docs/SPEC-VS-DESIGN.md`**. The user takes that file to their senior for decisions.
+2. **Figma wins over the spec documents.** When the design and the specs (`../mentorle-context/mentorle.in/*.pdf`, `IMPLEMENTATION-CONTEXT.md`) disagree, build what the design shows, then **add a row to `docs/SPEC-VS-DESIGN.md`**. The user takes that file to their senior for decisions.
 3. **Match the design precisely.** Measure from the Figma export (see the workflow below); don't eyeball sizes. Card/image sizes, font sizes, letter-spacing and colours have all been verified against the design. Keep it that way.
 4. **`rem` units only** for sizes (px ÷ 16), so the layout scales on large screens. See DESIGN-SYSTEM §1.
 5. **Copy goes in `src/data/*.ts`**, never hard-coded in components. Mark placeholder copy with a comment and log it in `SPEC-VS-DESIGN.md`.
 6. **Animations through the motion system** (`data-hero`, `data-animate`, `data-parallax`, `CountUp`), not ad-hoc libraries. Respect reduced motion.
 7. **Don't add visual hacks the design doesn't have** (extra gradients, vignettes, shading, decorative icons) without asking. The user has rejected these before.
 8. The footer's **Grievance Officer block is legally required** (DPDP Act). Never remove it.
-9. **All raster images in `public/` are WebP.** Whenever the user adds or updates PNG/JPG assets, run the `optimize-assets` skill (`npm run images`) before using them. Originals are kept in `context-files/originals/`.
+9. **All raster images in `public/` are WebP.** Whenever the user adds or updates PNG/JPG assets, run the `optimize-assets` skill (`npm run images`) before using them. Originals are kept in `../mentorle-context/mentorle.in/originals/`.
 10. Only commit when the user asks.
 
 ## Building a new page — workflow
 
-1. **Find the design** in `context-files/figma/<page>/`. Only Home, Find a Mentor, Mentorle Plus and Speaker Hub exist so far; other pages are still being designed, so ask before building one with no design.
+1. **Find the design** in `../mentorle-context/mentorle.in/figma/<page>/`. Only Home, Find a Mentor, Mentorle Plus and Speaker Hub exist so far; other pages are still being designed, so ask before building one with no design.
 2. **Slice the export to read it at full size.** The PNGs are 2880px wide (a 1440 frame at 2×), too tall to view whole. With PyMuPDF (`import pymupdf`), open the PNG, then `page.get_pixmap(clip=Rect(...))` in ~720-design-px tall bands. 1 design px = 2 image px. Sample exact colours with `pixmap.pixel(x, y)`.
 3. **Measure, then map to the design system.** Most values will already exist in DESIGN-SYSTEM. Measure any new text by comparing its rendered width/height against the export.
-4. **Move assets** for the page into `public/<page>/` (keep `context-files/` as the untouched source). Check images for baked-in text, then **convert them to WebP** with `npm run images -- public/<page>` (the `optimize-assets` skill).
+4. **Move assets** for the page into `public/<page>/` (keep `../mentorle-context/mentorle.in/` as the untouched source). Check images for baked-in text, then **convert them to WebP** with `npm run images -- public/<page>` (the `optimize-assets` skill).
 5. **Write `src/data/<page>.ts`**, then sections in `src/components/<page>/`, composed in `src/app/<route>/page.tsx`. Sections are server components; only interactive parts are `"use client"`.
 6. **Add motion** with data attributes (headers already animate via `SectionHeader`).
 7. **Verify:** `npm run lint` and `npm run build` pass. Run the production build and screenshot at **375, 768, 1024, 1440, 1728, 1920** wide: no horizontal scroll, nothing hidden after scrolling, no console errors. Compare the 1440 render section by section against the Figma.

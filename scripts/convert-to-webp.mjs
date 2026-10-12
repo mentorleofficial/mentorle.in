@@ -4,7 +4,7 @@ import sharp from "sharp";
 
 const ROOT = process.cwd();
 const PUBLIC_DIR = path.join(ROOT, "public");
-const BACKUP_DIR = path.join(ROOT, "context-files", "originals");
+const BACKUP_DIR = path.join(ROOT, "..", "mentorle-context", "mentorle.in", "originals");
 const SOURCE_DIRS = [path.join(ROOT, "src")];
 const RASTER = /\.(png|jpe?g)$/i;
 const MAX_WIDTH = 2880;

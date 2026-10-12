@@ -1,6 +1,6 @@
 # Mentorle design system
 
-The single source of truth for how pages on mentorle.in look, move and scale. Every value here was **measured from the Figma export** (`context-files/figma/homepage/homepage.png`, a 1440px frame exported at 2×) and is already implemented in code. When building a new page, reuse these values and components before inventing new ones. If a new Figma page needs something that isn't here, add it to this file in the same change.
+The single source of truth for how pages on mentorle.in look, move and scale. Every value here was **measured from the Figma export** (`../mentorle-context/mentorle.in/figma/homepage/homepage.png`, a 1440px frame exported at 2×) and is already implemented in code. When building a new page, reuse these values and components before inventing new ones. If a new Figma page needs something that isn't here, add it to this file in the same change.
 
 - Code tokens live in `src/app/globals.css` (`@theme`). This doc explains how to use them.
 - Font: **Manrope** everywhere. It's loaded once in `src/app/layout.tsx` via `next/font/google` and exposed as Tailwind's `font-sans`. Never add another font.

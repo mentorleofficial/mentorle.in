@@ -18,7 +18,7 @@ Every raster image served from `public/` must be WebP. Run this whenever the use
    ```
    The script (`scripts/convert-to-webp.mjs`, using sharp):
    - writes `<name>.webp` next to the original: quality 82, max 2880px wide (2× the 1440 design), alpha preserved;
-   - moves the original to `context-files/originals/<same path>`, a local, gitignored backup, so nothing is lost;
+   - moves the original to `../mentorle-context/mentorle.in/originals/<same path>` (outside the repo, so git can't delete it), so nothing is lost;
    - rewrites `/path/name.png|jpg` → `/path/name.webp` in `src/`;
    - prints before/after sizes and the final pixel dimensions.
 4. **Fix dimensions.** Update the `width`/`height` in `src/data/*.ts` to the pixel sizes the script printed, especially for any image that was downscaled.
@@ -29,4 +29,4 @@ Every raster image served from `public/` must be WebP. Run this whenever the use
 
 - **SVGs** (icons, logos, `favicon.svg`): they're already vector.
 - **Video** (`.mp4`): out of scope. Mention it if a large video is added.
-- **Anything outside `public/`** (`context-files/` is the untouched design source).
+- **Anything outside `public/`** (`../mentorle-context/mentorle.in/` is the untouched design source).
