@@ -22,7 +22,7 @@ export default function PricingPage() {
         primaryCta={hero.primaryCta}
         secondaryCta={hero.secondaryCta}
         subtitleSize="base"
-        contentOffset="md:pt-[5.375rem]"
+        contentOffset="md:pt-[3.75rem]"
       />
       <PricingPlans />
       <PlusBenefits eyebrow={benefits.eyebrow} title={benefits.title} description={benefits.description} action={null} />

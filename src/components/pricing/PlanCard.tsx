@@ -1,4 +1,3 @@
-import { CountUp } from "@/components/motion/CountUp";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import type { Plan, PlanFeature } from "@/data/pricing";
 
@@ -46,14 +45,13 @@ export function PlanCard({ plan }: { plan: Plan }) {
         <p className="mt-1 text-base text-ink">{plan.tagline}</p>
 
         <div className="mt-6 flex flex-wrap items-baseline gap-x-2">
-          <CountUp
-            as="p"
-            target={plan.price}
-            prefix="₹"
+          <p
             className={`text-[3.75rem] leading-none font-medium tracking-[-0.02em] tabular-nums lg:text-[3.25rem] xl:text-[clamp(4.5rem,5.85vw,5.25rem)] ${
               plan.featured ? "text-ink" : "text-muted"
             }`}
-          />
+          >
+            ₹{plan.price.toLocaleString("en-IN")}
+          </p>
           <span className="text-base text-ink">{plan.period}</span>
         </div>
         <p className="mt-3 min-h-6 text-base text-ink">{plan.note}</p>

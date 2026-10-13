@@ -1,13 +1,17 @@
 import Image from "next/image";
+import type { ReactNode } from "react";
 import Link from "next/link";
+import { prefetchFor } from "@/lib/routes";
 import type { Mentor } from "@/data/mentors";
 
 type MentorCardProps = {
   mentor: Mentor;
   href?: string;
+  action?: ReactNode;
+  bordered?: boolean;
 };
 
-export function MentorCard({ mentor, href = "/mentors" }: MentorCardProps) {
+export function MentorCard({ mentor, href = "/mentors", action, bordered = false }: MentorCardProps) {
   return (
     <article className="group relative flex h-full flex-col gap-2">
       <div className="relative aspect-[433/377] overflow-hidden">
@@ -27,13 +31,14 @@ export function MentorCard({ mentor, href = "/mentors" }: MentorCardProps) {
           </span>
         </span>
       </div>
-      <div className="flex-1 bg-white p-4">
+      <div className={`flex-1 bg-white p-4 ${bordered ? "border border-line" : ""}`}>
         <h3 className="text-xl font-medium text-ink lg:text-2xl">
-          <Link href={href} className="after:absolute after:inset-0 hover:underline hover:underline-offset-4">
+          <Link href={href} prefetch={prefetchFor(href)} className="after:absolute after:inset-0 hover:underline hover:underline-offset-4">
             {mentor.name}
           </Link>
         </h3>
         <p className="mt-1.5 text-sm text-ink/85 lg:text-base">{mentor.role}</p>
+        {action && <div className="relative z-10 mt-[1.125rem]">{action}</div>}
       </div>
     </article>
   );

@@ -4,24 +4,34 @@ export type ImageAsset = {
   height: number;
 };
 
+export type HeroSlide = ImageAsset & {
+  alt: string;
+  // Tailwind object-position classes; per image so faces stay in frame at every width.
+  position: string;
+};
+
 export const hero = {
   title: "Fast-track your growth with Industry Insiders",
-  background: {
-    src: "/homepage/hero-background.webp",
-    width: 1280,
-    height: 720,
-    alt: "A mentor and a mentee reviewing a résumé together at a café table",
-  },
   primaryCta: { label: "Find a Mentor", href: "/mentors" },
   secondaryCta: { label: "Explore Mentorle Plus", href: "/pricing" },
-  spotlight: [
+  autoplayMs: 3000,
+  // Rotates as the hero background; the small card previews the next slide. Add more slides here.
+  slides: [
+    {
+      src: "/homepage/hero-background.webp",
+      width: 1280,
+      height: 720,
+      alt: "A mentor and a mentee reviewing a résumé together at a café table",
+      position: "object-[62%_30%] md:object-top",
+    },
     {
       src: "/homepage/hero-section-image.webp",
       width: 2880,
       height: 1882,
       alt: "A mentor walking a group of mentees through a plan on a whiteboard",
+      position: "object-[65%_40%] md:object-top",
     },
-  ],
+  ] satisfies HeroSlide[],
 };
 
 export const partners: (ImageAsset & { name: string })[] = [
@@ -41,8 +51,8 @@ export const about = {
   eyebrow: "Who we’re",
   highlight: "Punjab’s #1",
   title: "Mentorship & Events Network",
-  lead: "Mentorle connects",
-  body: "you with experienced professionals and industry experts for practical guidance, honest insights, and meaningful conversations that help you make better decisions and grow faster.",
+  lead: "Degrees teach you the theory.",
+  body: "But the industry demands the practical. The game has unwritten rules, and we’re handing you the playbook.",
   stats: [
     { target: 25, decimals: 0, suffix: "K+", label: "Ambitious Mentees" },
     { target: 1200, decimals: 0, suffix: "+", label: "Vetted Experts" },

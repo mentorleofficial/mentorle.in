@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { prefetchFor } from "@/lib/routes";
 import { useState } from "react";
 import { buttonClasses } from "@/components/ui/ButtonLink";
 import { accountNav, primaryNav } from "@/data/site";
@@ -16,10 +17,10 @@ export function SiteHeader() {
         {/* Animate the bar itself: fading an ancestor would disable its backdrop blur until the fade completes. */}
         <div data-hero="0" className="relative flex h-16 items-center justify-between border border-white/5 bg-black/20 px-4 backdrop-blur-[6px] md:h-[5.4375rem] md:px-[1.875rem]">
           <div className="hidden items-center gap-[0.625rem] lg:flex">
-            <Link href={accountNav.newHere.href} className={buttonClasses("light")}>
+            <Link href={accountNav.newHere.href} prefetch={prefetchFor(accountNav.newHere.href)} className={buttonClasses("light")}>
               {accountNav.newHere.label}
             </Link>
-            <Link href={accountNav.login.href} className={buttonClasses("ghost", "bg-transparent")}>
+            <Link href={accountNav.login.href} prefetch={prefetchFor(accountNav.login.href)} className={buttonClasses("ghost", "bg-transparent")}>
               {accountNav.login.label}
             </Link>
           </div>
@@ -30,7 +31,7 @@ export function SiteHeader() {
             className="lg:absolute lg:left-1/2 lg:-translate-x-1/2"
             onClick={close}
           >
-            <Image src="/homepage/logo.svg" alt="Mentorle" width={187} height={48} preload className="h-9 w-auto md:h-12" />
+            <Image src="/homepage/logo.svg" alt="Mentorle" width={187} height={48} loading="eager" className="h-9 w-auto md:h-12" />
           </Link>
 
           <nav aria-label="Primary" className="hidden lg:block">
@@ -39,6 +40,7 @@ export function SiteHeader() {
                 <li key={item.href}>
                   <Link
                     href={item.href}
+                    prefetch={prefetchFor(item.href)}
                     className="relative text-[0.9375rem] text-white/90 transition-colors after:absolute after:inset-x-0 after:-bottom-1 after:h-px after:origin-left after:scale-x-0 after:bg-white after:transition-transform after:duration-300 hover:text-white hover:after:scale-x-100"
                   >
                     {item.label}
@@ -77,6 +79,7 @@ export function SiteHeader() {
                     <li key={item.href}>
                       <Link
                         href={item.href}
+                        prefetch={prefetchFor(item.href)}
                         onClick={close}
                         className="block border-b border-white/10 py-3 text-base text-white/90 hover:text-white"
                       >
@@ -87,10 +90,10 @@ export function SiteHeader() {
                 </ul>
               </nav>
               <div className="mt-4 grid grid-cols-2 gap-[0.625rem] sm:max-w-sm">
-                <Link href={accountNav.newHere.href} onClick={close} className={buttonClasses("light")}>
+                <Link href={accountNav.newHere.href} prefetch={prefetchFor(accountNav.newHere.href)} onClick={close} className={buttonClasses("light")}>
                   {accountNav.newHere.label}
                 </Link>
-                <Link href={accountNav.login.href} onClick={close} className={buttonClasses("ghost")}>
+                <Link href={accountNav.login.href} prefetch={prefetchFor(accountNav.login.href)} onClick={close} className={buttonClasses("ghost")}>
                   {accountNav.login.label}
                 </Link>
               </div>

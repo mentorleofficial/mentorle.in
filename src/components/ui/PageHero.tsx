@@ -44,8 +44,8 @@ export function PageHero({ title, subtitle, background, primaryCta, secondaryCta
         {subtitle && (
           <p
             data-hero="2"
-            className={`mx-auto mt-4 leading-[1.55] text-white/85 md:mt-5 ${
-              subtitleSize === "base" ? "max-w-[32rem] text-base" : "max-w-[28rem] text-sm"
+            className={`mx-auto mt-4 text-white/85 md:mt-5 ${
+              subtitleSize === "base" ? "max-w-[30rem] text-base leading-snug" : "max-w-[28rem] text-sm leading-[1.55]"
             }`}
           >
             {subtitle}

@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { prefetchFor } from "@/lib/routes";
 import type { NavLink } from "@/data/site";
 import { company, footerColumns, legalLinks, socialLinks } from "@/data/site";
 
@@ -14,7 +15,7 @@ function FooterLink({ link }: { link: NavLink }) {
     );
   }
   return (
-    <Link href={link.href} className={linkClasses}>
+    <Link href={link.href} prefetch={prefetchFor(link.href)} className={linkClasses}>
       {link.label}
     </Link>
   );
@@ -27,7 +28,7 @@ export function SiteFooter() {
         <div className="grid gap-12 py-14 md:py-20 xl:grid-cols-[37.3125rem_1fr] xl:gap-0 xl:py-0">
           <div data-animate="fade-up" className="xl:pt-[8.1875rem] xl:pb-[3.3125rem] xl:pr-10">
             <Link href="/" aria-label="Mentorle home" className="inline-block">
-              <Image src="/homepage/logo.svg" alt="Mentorle" width={187} height={48} className="h-14 w-auto md:h-[5.75rem]" />
+              <Image src="/homepage/logo.svg" alt="Mentorle" width={187} height={48} loading="eager" className="h-14 w-auto md:h-[5.75rem]" />
             </Link>
             <p className="mt-8 max-w-[24.375rem] text-base leading-snug text-white/90">{company.tagline}</p>
             <ul className="mt-8 flex items-center gap-5 md:mt-12">
@@ -98,7 +99,7 @@ export function SiteFooter() {
             {legalLinks.map((link, index) => (
               <li key={link.href} className="flex items-center gap-3">
                 {index > 0 && <span aria-hidden className="h-3.5 w-px bg-white/50" />}
-                <Link href={link.href} className="hover:underline">
+                <Link href={link.href} prefetch={prefetchFor(link.href)} className="hover:underline">
                   {link.label}
                 </Link>
               </li>

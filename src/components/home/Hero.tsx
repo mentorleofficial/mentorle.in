@@ -1,6 +1,5 @@
-import Image from "next/image";
 import { ButtonLink } from "@/components/ui/ButtonLink";
-import { HeroSpotlight } from "@/components/home/HeroSpotlight";
+import { HeroSlideshow } from "@/components/home/HeroSlideshow";
 import { hero } from "@/data/home";
 
 export function Hero() {
@@ -9,18 +8,7 @@ export function Hero() {
       aria-labelledby="hero-title"
       className="relative isolate flex h-svh max-h-[53.75rem] min-h-[37.5rem] items-center overflow-hidden bg-ink md:max-h-[50rem] md:min-h-[45rem]"
     >
-      {/* Anchored to the top: the 16:9 frame has both heads at its top edge, so this keeps as much of them visible as the crop allows. */}
-      <div className="absolute inset-0 -z-10">
-        <Image
-          src={hero.background.src}
-          alt={hero.background.alt}
-          fill
-          preload
-          sizes="100vw"
-          className="object-cover object-[62%_30%] md:object-top"
-        />
-      </div>
-      <div className="absolute inset-0 -z-10 bg-black/35" aria-hidden />
+      <HeroSlideshow slides={hero.slides} autoplayMs={hero.autoplayMs} />
 
       <div className="container-page pt-16 text-center text-white md:pt-24">
         <h1
@@ -39,8 +27,6 @@ export function Hero() {
           </ButtonLink>
         </div>
       </div>
-
-      <HeroSpotlight slides={hero.spotlight} />
     </section>
   );
 }

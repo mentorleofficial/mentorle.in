@@ -38,7 +38,7 @@ src/app/                  routes (layout.tsx, page.tsx per route), globals.css (
 src/components/layout/    SiteHeader, SiteFooter (shared by every page)
 src/components/ui/        reusable primitives: ButtonLink, SectionHeader, ArrowControls, ProgressiveBlur, ScrollRevealText
 src/components/motion/    ScrollAnimations (data-attribute animation runner), SmoothScroll (Lenis), CountUp
-src/components/<page>/    page-specific sections (components/home/, components/mentors/, components/pricing/)
+src/components/<page>/    page-specific sections (components/home/, components/mentors/, components/pricing/, components/speakers/)
 src/data/site.ts          nav, footer columns, social links, company/legal info, external URLs
 src/data/<page>.ts        all copy, image paths and image sizes for that page
 public/<page>/            assets for that page (e.g. public/homepage/)
@@ -71,9 +71,10 @@ scripts/convert-to-webp.mjs  PNG/JPG → WebP converter (npm run images)
 4. **Move assets** for the page into `public/<page>/` (keep `../mentorle-context/mentorle.in/` as the untouched source). Check images for baked-in text, then **convert them to WebP** with `npm run images -- public/<page>` (the `optimize-assets` skill).
 5. **Write `src/data/<page>.ts`**, then sections in `src/components/<page>/`, composed in `src/app/<route>/page.tsx`. Sections are server components; only interactive parts are `"use client"`.
 6. **Add motion** with data attributes (headers already animate via `SectionHeader`).
-7. **Verify:** `npm run lint` and `npm run build` pass. Run the production build and screenshot at **375, 768, 1024, 1440, 1728, 1920** wide: no horizontal scroll, nothing hidden after scrolling, no console errors. Compare the 1440 render section by section against the Figma.
-8. **Update `docs/SPEC-VS-DESIGN.md`** (and DESIGN-SYSTEM if you added a pattern).
+7. **Verify:** `npm run lint` and `npm run build` pass. Run the production build and screenshot at **375, 768, 1024, 1440, 1728, 1920** wide: no horizontal scroll, nothing hidden after scrolling, and a clean console in both `npm run dev` (only React DevTools / HMR notices) and production. Compare the 1440 render section by section against the Figma.
+8. **Add the route to `BUILT_ROUTES` in `src/lib/routes.ts`** so links to it get prefetched again (links to unbuilt routes skip prefetch to avoid 404s in the console).
+9. **Update `docs/SPEC-VS-DESIGN.md`** (and DESIGN-SYSTEM if you added a pattern).
 
 ## Routes (planned)
 
-Built: `/`, `/mentors` (Find a Mentor), `/pricing` (Mentorle Plus). Linked but not built yet (they 404 for now): `/mentors/<slug>` (mentor profiles), `/community`, `/about`, `/events`, `/speaker-hub`, `/universities`, `/enterprise`, `/community-guidelines`, `/privacy`, `/terms`, `/login`, `/signup`. Keep these paths when building the pages, since nav and footer links already point at them (`src/data/site.ts`).
+Built: `/`, `/mentors` (Find a Mentor), `/pricing` (Mentorle Plus), `/speaker-hub`. Linked but not built yet (they 404 for now): `/mentors/<slug>` (mentor profiles), `/speaker-hub/request` (speaker requests), `/community`, `/about`, `/events`, `/universities`, `/enterprise`, `/community-guidelines`, `/privacy`, `/terms`, `/login`, `/signup`. Keep these paths when building the pages, since nav and footer links already point at them (`src/data/site.ts`).

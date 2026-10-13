@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { prefetchFor } from "@/lib/routes";
 import type { ReactNode } from "react";
 
 export type ButtonVariant = "light" | "ghost" | "brand" | "dark";
@@ -31,7 +32,7 @@ export function ButtonLink({ href, variant = "light", external, className, child
     );
   }
   return (
-    <Link href={href} className={classes}>
+    <Link href={href} prefetch={prefetchFor(href)} className={classes}>
       {children}
     </Link>
   );

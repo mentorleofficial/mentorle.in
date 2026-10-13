@@ -103,6 +103,17 @@ button:not(:disabled),
 .js-motion [data-animate="image"],
 .js-motion [data-animate="stagger"] > * {
   visibility: hidden;
+  /* Failsafe: if the JS that removes .js-motion is slow or never runs, show the content anyway. */
+  animation: motion-failsafe 0.01s linear 2.5s both;
+}
+
+@keyframes motion-failsafe {
+  from {
+    visibility: hidden;
+  }
+  to {
+    visibility: visible;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

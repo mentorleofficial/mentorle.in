@@ -12,7 +12,7 @@ Where the Figma designs differ from the written specifications. The site is bein
 
 **Status key:** `Open` = needs a decision · `Resolved` = decided (note the outcome) · `Built as design` = shipped following Figma, still needs sign-off.
 
-_Last updated: 2026-10-12 — Homepage, Find a Mentor and Mentorle Plus built._
+_Last updated: 2026-10-12 — Homepage, Find a Mentor, Mentorle Plus and Speaker Hub built._
 
 ---
 
@@ -44,10 +44,11 @@ Copy or assets the design doesn't provide. Placeholders are in use until real on
 | D3 | How it works | Only step 1 ("Find Your Insider") has a description. | Placeholder descriptions for steps 2 and 3. |
 | D4 | Success story — Rahul Verma | Quote is cut off at the frame edge. | Ending reconstructed: "…saved me months of prep time." |
 | D5 | "Your Experience Could Change…" banner | The exported image has the headline and buttons **baked into it**. | Image is heavily blurred to hide the baked text. A clean background export is needed. |
-| D6 | Hero image card (bottom-right) | Has prev/next arrows but only one image was provided. | Carousel supports multiple images; both arrows are disabled with one. |
+| D6 | Hero slideshow | The design shows one hero image and a small card with prev/next arrows. Per the product owner, the hero background rotates (every 3s) and the arrows move it; the small card previews the next image. Only two hero-suitable images exist. | Rotates the café still and the whiteboard-session photo. More images (ideally high-res, with headroom above faces) can be added in `hero.slides` in `src/data/home.ts`. |
 | D7 | Header logo position | In Figma the logo sits slightly left of centre (auto-layout spacing). | Centred exactly. Confirm that's acceptable. |
 | D8 | Mobile and tablet layouts | Figma is desktop-only (1440px). | Responsive layouts derived from the desktop design. |
 | D9 | Hero background | The hero video is only 1280×720, which looks soft on large and Retina screens. | A still frame from the video (6.3s) is used for now. A high-resolution photo or a 1080p/4K video is needed. |
+| D10 | Statement paragraph under the hero | Figma copy was "Mentorle connects you with experienced professionals and industry experts…". Replaced by the product owner with "Degrees teach you the theory. But the industry demands the practical. The game has unwritten rules, and we’re handing you the playbook." (their reference used a serif font with a yellow italic ending). | New copy in the existing style (Manrope, scroll reveal). "Degrees teach you the theory." is the always-dark lead. |
 
 ---
 
@@ -91,8 +92,17 @@ The plan cards now **match the spec**: Free ₹0, Pro Pass ₹2,500/yr (anchored
 | FD5 | Header styling | On this page the logo mark is orange and the header has no frosted bar; the homepage has a white logo on a frosted bar. | Kept the shared homepage header for consistency. Confirm which is intended. |
 | FD6 | Hero CTAs | Buttons in this design have rounded corners (~6px); everywhere else they're square. | Square, to match the rest of the site. Confirm. |
 
-## 4. Speaker Hub page — _not built yet; noted from Figma_
+## 4. Speaker Hub page (`/speaker-hub`) — built 2026-10-12
 
 | # | Item | What the spec says | What Figma shows | Status |
 |---|---|---|---|---|
-| S1 | Speaker booking for events | Not mentioned in either spec. | "Book the World's Best Speakers" for conferences, summits and corporate retreats, with "Request for Event" buttons and a request form. Needs a defined flow, pricing and payout model. | Open |
+| S1 | Speaker booking for events | Not mentioned in either spec. Both specs only cover 1:1 sessions, group masterclasses and memberships. | "Book the World's Best Speakers" for conferences, university summits and corporate retreats. Needs a defined flow, pricing, mentor payout model and escrow rules. | Built as design |
+| S2 | Who counts as a speaker | — | The two speakers are regular mentors (same cards as Find a Mentor). Are speakers a subset of mentors, a separate roster, or a mentor opt-in? | Open |
+| S3 | Hero buttons | — | "Find a Mentor" and "Explore Mentorle Plus" are copied from the other heroes; neither relates to booking a speaker. A "Request a Speaker" CTA may be intended. | Open |
+
+**Content and design gaps**
+
+| # | Item | What's missing | What's built for now |
+|---|---|---|---|
+| SD1 | Request flow | "Request for Event" has no form or page designed. | Buttons link to `/speaker-hub/request?speaker=<slug>` (generic tile: `/speaker-hub/request`), which 404s until designed. |
+| SD2 | Speaker roster | Only two speakers are shown, and they're the placeholder homepage mentors. No filters, topics or fees. | Two placeholder records drawn from `src/data/mentors.ts`; real speakers will come from the database. |
