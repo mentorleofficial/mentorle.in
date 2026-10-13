@@ -6,7 +6,7 @@ Guidance for Claude Code (and any developer) working in this repository.
 
 ## What this is
 
-The public, **mentee-facing** Mentorle website (mentorle.in): marketing pages plus, later, the mentee flows (find a mentor, booking, membership, account). The mentor and admin panel is a separate app (`../Mentorle-Version2`). "Become a Mentor" always links out to `https://platform.mentorle.in/become-a-mentor`.
+The public, **mentee-facing** Mentorle website (mentorle.in): marketing pages plus, later, the mentee flows (find a mentor, booking, membership, account). The mentor and admin panel is a separate app (`../Mentorle-Version2`). Site "Become a Mentor" links go to the `/become-a-mentor` info page; its apply buttons link out to the platform (`MENTOR_APPLY_URL` in `src/data/site.ts`).
 
 Operator: AltioraEdtech Learning (OPC) Pvt. Ltd. (legal details live in `src/data/site.ts`).
 
@@ -38,7 +38,7 @@ src/app/                  routes (layout.tsx, page.tsx per route), globals.css (
 src/components/layout/    SiteHeader, SiteFooter (shared by every page)
 src/components/ui/        reusable primitives: ButtonLink, SectionHeader, ArrowControls, ProgressiveBlur, ScrollRevealText
 src/components/motion/    ScrollAnimations (data-attribute animation runner), SmoothScroll (Lenis), CountUp
-src/components/<page>/    page-specific sections (components/home/, components/mentors/, components/pricing/, components/speakers/)
+src/components/<page>/    page-specific sections (components/home/, components/mentors/, components/pricing/, components/speakers/, components/become-a-mentor/)
 src/data/site.ts          nav, footer columns, social links, company/legal info, external URLs
 src/data/<page>.ts        all copy, image paths and image sizes for that page
 public/<page>/            assets for that page (e.g. public/homepage/)
@@ -77,4 +77,4 @@ scripts/convert-to-webp.mjs  PNG/JPG → WebP converter (npm run images)
 
 ## Routes (planned)
 
-Built: `/`, `/mentors` (Find a Mentor), `/pricing` (Mentorle Plus), `/speaker-hub`. Linked but not built yet (they 404 for now): `/mentors/<slug>` (mentor profiles), `/speaker-hub/request` (speaker requests), `/community`, `/about`, `/events`, `/universities`, `/enterprise`, `/community-guidelines`, `/privacy`, `/terms`, `/login`, `/signup`. Keep these paths when building the pages, since nav and footer links already point at them (`src/data/site.ts`).
+Built: `/`, `/mentors` (Find a Mentor), `/pricing` (Mentorle Plus), `/speaker-hub`, `/become-a-mentor`. Linked but not built yet (they 404 for now): `/mentors/<slug>` (mentor profiles), `/speaker-hub/request` (speaker requests), `/community`, `/about`, `/events`, `/universities`, `/enterprise`, `/community-guidelines`, `/privacy`, `/terms`, `/login`, `/signup`. Keep these paths when building the pages, since nav and footer links already point at them (`src/data/site.ts`).

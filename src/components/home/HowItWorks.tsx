@@ -5,8 +5,14 @@ import gsap from "gsap";
 import Image from "next/image";
 import { useRef, useState } from "react";
 import { howItWorks } from "@/data/home";
+import type { HowItWorksStep } from "@/data/home";
 
-export function HowItWorks() {
+type HowItWorksProps = {
+  steps?: HowItWorksStep[];
+  ariaLabel?: string;
+};
+
+export function HowItWorks({ steps = howItWorks, ariaLabel = "How Mentorle works" }: HowItWorksProps) {
   const [active, setActive] = useState(0);
   const sectionRef = useRef<HTMLElement>(null);
   const initialised = useRef(false);
@@ -51,10 +57,10 @@ export function HowItWorks() {
   );
 
   return (
-    <section ref={sectionRef} aria-label="How Mentorle works" className="bg-ink text-white">
+    <section ref={sectionRef} aria-label={ariaLabel} className="bg-ink text-white">
       <div data-animate="fade-up" className="grid md:grid-cols-[38%_1fr] lg:grid-cols-[34.5rem_1fr]">
         <div className="relative flex h-[13.75rem] items-center justify-center border-white/15 md:h-auto md:min-h-[24rem] md:border-r lg:min-h-[30rem]">
-          {howItWorks.map((step, index) => (
+          {steps.map((step, index) => (
             <Image
               key={step.src}
               data-step-icon
@@ -68,7 +74,7 @@ export function HowItWorks() {
         </div>
 
         <ol className="pb-4 md:flex md:flex-col md:justify-center md:py-6 lg:py-3">
-          {howItWorks.map((step, index) => {
+          {steps.map((step, index) => {
             const isActive = index === active;
             return (
               <li key={step.title} className="relative border-b border-white/15 last:border-b-0">

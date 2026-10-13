@@ -2,7 +2,7 @@ import Image from "next/image";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import type { ImageAsset } from "@/data/home";
 
-type Cta = { label: string; href: string };
+type Cta = { label: string; href: string; external?: boolean };
 
 type PageHeroProps = {
   title: string;
@@ -54,12 +54,12 @@ export function PageHero({ title, subtitle, background, primaryCta, secondaryCta
         {(primaryCta || secondaryCta) && (
           <div data-hero="3" className={`flex flex-wrap items-center justify-center gap-2 ${subtitleSize === "base" ? "mt-6" : "mt-8"}`}>
             {primaryCta && (
-              <ButtonLink href={primaryCta.href} variant="ghost">
+              <ButtonLink href={primaryCta.href} external={primaryCta.external} variant="ghost">
                 {primaryCta.label}
               </ButtonLink>
             )}
             {secondaryCta && (
-              <ButtonLink href={secondaryCta.href} variant="light">
+              <ButtonLink href={secondaryCta.href} external={secondaryCta.external} variant="light">
                 {secondaryCta.label}
               </ButtonLink>
             )}

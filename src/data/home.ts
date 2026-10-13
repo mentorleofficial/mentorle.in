@@ -129,7 +129,7 @@ export const mentorQuotes: Quote[] = [
 
 export const mentorBanner = {
   title: "Your Experience Could Change Someone’s Next Move.",
-  image: { src: "/homepage/Your-experience-could-changes.webp", width: 2880, height: 1240 },
+  image: { src: "/homepage/mentor-banner-bg.webp", width: 2880, height: 1240 },
   secondaryCta: { label: "Explore Mentorle Plus", href: "/pricing" },
 };
 

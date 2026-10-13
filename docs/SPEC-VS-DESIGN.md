@@ -12,7 +12,7 @@ Where the Figma designs differ from the written specifications. The site is bein
 
 **Status key:** `Open` = needs a decision · `Resolved` = decided (note the outcome) · `Built as design` = shipped following Figma, still needs sign-off.
 
-_Last updated: 2026-10-12 — Homepage, Find a Mentor, Mentorle Plus and Speaker Hub built._
+_Last updated: 2026-10-13 — Homepage, Find a Mentor, Mentorle Plus, Speaker Hub and Become a Mentor built._
 
 ---
 
@@ -43,7 +43,7 @@ Copy or assets the design doesn't provide. Placeholders are in use until real on
 | D2 | Live Gatherings carousel | Only the centre card has a title, tag and description. | Placeholder text for the two side events. |
 | D3 | How it works | Only step 1 ("Find Your Insider") has a description. | Placeholder descriptions for steps 2 and 3. |
 | D4 | Success story — Rahul Verma | Quote is cut off at the frame edge. | Ending reconstructed: "…saved me months of prep time." |
-| D5 | "Your Experience Could Change…" banner | The exported image has the headline and buttons **baked into it**. | Image is heavily blurred to hide the baked text. A clean background export is needed. |
+| D5 | "Your Experience Could Change…" banner | The first export had the headline and buttons baked into the image. | Resolved 2026-10-13: replaced with a clean, text-free background (no extra blur). |
 | D6 | Hero slideshow | The design shows one hero image and a small card with prev/next arrows. Per the product owner, the hero background rotates (every 3s) and the arrows move it; the small card previews the next image. Only two hero-suitable images exist. | Rotates the café still and the whiteboard-session photo. More images (ideally high-res, with headroom above faces) can be added in `hero.slides` in `src/data/home.ts`. |
 | D7 | Header logo position | In Figma the logo sits slightly left of centre (auto-layout spacing). | Centred exactly. Confirm that's acceptable. |
 | D8 | Mobile and tablet layouts | Figma is desktop-only (1440px). | Responsive layouts derived from the desktop design. |
@@ -106,3 +106,21 @@ The plan cards now **match the spec**: Free ₹0, Pro Pass ₹2,500/yr (anchored
 |---|---|---|---|
 | SD1 | Request flow | "Request for Event" has no form or page designed. | Buttons link to `/speaker-hub/request?speaker=<slug>` (generic tile: `/speaker-hub/request`), which 404s until designed. |
 | SD2 | Speaker roster | Only two speakers are shown, and they're the placeholder homepage mentors. No filters, topics or fees. | Two placeholder records drawn from `src/data/mentors.ts`; real speakers will come from the database. |
+
+## 5. Become a Mentor page (`/become-a-mentor`) — built 2026-10-13
+
+The earnings numbers on this page **match the spec**: format prices and payouts (BP §3–4), tier payouts (BP §1), Tuesday 6 PM payouts, ₹500 minimum, 24-hour buffer (BP §6), ranking weights (BP §2), reschedule penalty and non-circumvention (BP §9–10), and the ₹499 → ₹424 → ₹330 / ₹84 Pro Pass example (PP §3).
+
+| # | Item | What the spec says | What Figma shows | Status |
+|---|---|---|---|---|
+| B1 | Receipt card, second row | Pro Pass member pays ₹424 on a ₹499 session (PP §3). | "List price ₹499" repeated twice. | Fixed (shows "Pro Pass member pays ₹424") |
+| B2 | Ranking section eyebrow | — | Repeats "Seamless Payments" from the payments section. | Fixed (shows "Directory Ranking") |
+| B3 | Tier 4 copy | — | Missing spaces ("industry-leadingPrincipal", "experts,alongside", "experiencedfounders"). | Fixed |
+| B4 | Rate calculator formula | Gross-up engine: payout = rate × minutes ÷ 60; price = (payout + gateway fee) ÷ 0.70 (BP §2). Gateway fee "~2.36%" with no base given (open conflict C5). | Example at ₹1,400/hr. | Built with the fee as 2.36% of the payout, rounded up to the next ₹…99. Reproduces every design number and all three BP §4 worked examples. Confirm the rounding rule. |
+| B5 | Calculator range | No limits in either spec. | Slider thumb at ₹1,400; hint says most mentors sit at ₹500–₹2,500. | Slider ₹300–₹3,000 (₹50 steps); typed values ₹100–₹10,000. Open. |
+| B6 | Group masterclass pay | Flat ₹1,000–1,500 per session (PP §2). | Shown as a range. | Built as design |
+| B7 | Tier 3 price vs formats | Tier 3 is ₹999 retail → ₹700 (BP §1), but the 45-min standard mock is ₹499 → ₹330 (BP §4) — open conflict C4. | Both appear on this page. | Open |
+| B8 | Accordion copy and icons | — | The design showed one generic search icon and copy for one point only. | Copy and icons from the supplied `content-for-points.png` (badges, privacy, ranking). |
+| B9 | "Become a Mentor" links | Mentors apply on the separate platform (IC §2). | — | Per the product owner: site links (footer, homepage banner) → `/become-a-mentor`; this page's apply buttons → `platform.mentorle.in/become-a-mentor` (new tab). |
+| B10 | Reused icons | — | Several icons repeat across sections. | "What we ask of you" reuses the calendar (reschedule) and wallet (async SLA) icons in light colour via `MaskIcon`. Confirm, or supply dedicated icons. |
+

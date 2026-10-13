@@ -4,7 +4,9 @@ export type NavLink = {
   external?: boolean;
 };
 
-export const BECOME_A_MENTOR_URL = "https://platform.mentorle.in/become-a-mentor";
+// Where mentors actually apply (the mentor platform). The /become-a-mentor page on this site explains the programme.
+export const MENTOR_APPLY_URL = "https://platform.mentorle.in/become-a-mentor";
+export const BECOME_A_MENTOR_PATH = "/become-a-mentor";
 
 export const primaryNav: NavLink[] = [
   { label: "Mentors", href: "/mentors" },
@@ -25,7 +27,7 @@ export const footerColumns: { title: string; links: NavLink[] }[] = [
       { label: "Find a Mentor", href: "/mentors" },
       { label: "Mentorle Plus", href: "/pricing" },
       { label: "Events & Summits", href: "/events" },
-      { label: "Become a Mentor", href: BECOME_A_MENTOR_URL, external: true },
+      { label: "Become a Mentor", href: BECOME_A_MENTOR_PATH },
     ],
   },
   {
