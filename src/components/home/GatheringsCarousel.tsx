@@ -6,6 +6,7 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import type { GatheringEvent } from "@/data/home";
 import { useCarouselLoop } from "@/components/home/useCarouselLoop";
+import { ButtonLink } from "@/components/ui/ButtonLink";
 import { ProgressiveBlur } from "@/components/ui/ProgressiveBlur";
 
 const GAP_REM = 2.5;
@@ -21,6 +22,9 @@ export function GatheringsCarousel({ events }: { events: GatheringEvent[] }) {
   const offsetsRef = useRef<number[] | null>(null);
   const layoutRef = useRef(-1);
   const touchStartX = useRef<number | null>(null);
+
+  // Cards with a date and buttons need more room on phones than the homepage's title-only cards.
+  const tall = events.some((event) => event.cta);
 
   const go = (next: number) => setActive(((next % slides.length) + slides.length) % slides.length);
 
@@ -98,7 +102,7 @@ export function GatheringsCarousel({ events }: { events: GatheringEvent[] }) {
     >
       <ul
         ref={trackRef}
-        className="grid h-[18.75rem] items-center sm:h-[26.25rem] lg:h-[33.25rem]"
+        className={`grid items-center sm:h-[26.25rem] lg:h-[33.25rem] ${tall ? "h-[26rem]" : "h-[18.75rem]"}`}
         style={{ "--card-w": "min(57.375rem, 82vw)" } as React.CSSProperties}
       >
         {slides.map(({ item: event, key, sourceIndex }, index) => {
@@ -111,7 +115,9 @@ export function GatheringsCarousel({ events }: { events: GatheringEvent[] }) {
               aria-label={`${sourceIndex + 1} of ${events.length}`}
               aria-current={isActive}
               className={`relative col-start-1 row-start-1 w-[var(--card-w)] justify-self-start overflow-hidden transition-[height] duration-[900ms] ease-in-out motion-reduce:transition-none ${
-                isActive ? "h-[18.75rem] sm:h-[26.25rem] lg:h-[33.25rem]" : "h-[16.25rem] sm:h-[23.75rem] lg:h-[30.375rem]"
+                isActive
+                  ? `${tall ? "h-[26rem]" : "h-[18.75rem]"} sm:h-[26.25rem] lg:h-[33.25rem]`
+                  : `${tall ? "h-[23.5rem]" : "h-[16.25rem]"} sm:h-[23.75rem] lg:h-[30.375rem]`
               }`}
             >
               <Image
@@ -121,7 +127,8 @@ export function GatheringsCarousel({ events }: { events: GatheringEvent[] }) {
                 sizes="(min-width: 1024px) 57rem, 82vw"
                 className={`object-cover transition-transform duration-[1200ms] ease-out ${isActive ? "scale-100" : "scale-110"}`}
               />
-              <ProgressiveBlur active={isActive} className="h-[48%]" />
+              <ProgressiveBlur active={isActive} className={event.cta ? "h-[75%] sm:h-[62%]" : "h-[48%]"} />
+              {event.tag && (
               <span
                 aria-hidden={!isActive}
                 className={`absolute top-6 left-6 bg-neutral-500/70 px-3 py-1.5 text-[0.9375rem] text-white backdrop-blur-md transition-opacity duration-500 md:top-8 md:left-8 ${
@@ -130,6 +137,7 @@ export function GatheringsCarousel({ events }: { events: GatheringEvent[] }) {
               >
                 {event.tag}
               </span>
+              )}
               <div
                 aria-hidden={!isActive}
                 className={`absolute inset-x-0 bottom-0 px-6 pb-6 text-white transition-[opacity,translate] duration-500 md:px-8 md:pb-8 ${
@@ -137,7 +145,29 @@ export function GatheringsCarousel({ events }: { events: GatheringEvent[] }) {
                 }`}
               >
                 <h3 className="text-xl font-medium md:text-2xl">{event.title}</h3>
-                <p className="mt-2 max-w-[20.625rem] text-sm leading-snug text-white/90 md:text-base">{event.description}</p>
+                {event.date && <p className="mt-1.5 text-sm text-white/95 md:text-base">{event.date}</p>}
+                <p
+                  className={`text-sm leading-snug text-white/90 md:text-base ${
+                    event.date ? "mt-4 max-w-[29.5rem]" : "mt-2 max-w-[20.625rem]"
+                  }`}
+                >
+                  {event.description}
+                </p>
+                {(event.audience || event.cta) && (
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {event.audience && (
+                      <span className="inline-flex h-[2.3125rem] items-center border border-white/30 bg-black/20 px-[1.125rem] text-sm">
+                        {event.audience}
+                      </span>
+                    )}
+                    {event.cta && isActive && (
+                      <ButtonLink href={event.cta.href} external={event.cta.external} variant="light">
+                        {event.cta.label}
+                        <span className="sr-only">: {event.title}</span>
+                      </ButtonLink>
+                    )}
+                  </div>
+                )}
               </div>
               {!isActive && (
                 <button

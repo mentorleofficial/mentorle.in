@@ -61,10 +61,13 @@ export const about = {
 };
 
 export type GatheringEvent = ImageAsset & {
-  tag: string;
+  tag?: string;
   title: string;
+  date?: string;
   description: string;
   alt: string;
+  audience?: string;
+  cta?: { label: string; href: string; external?: boolean };
 };
 
 // Only the centre card's text exists in Figma; the other two cards use placeholder copy.

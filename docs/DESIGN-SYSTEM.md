@@ -141,6 +141,10 @@ Pairs on photos are always `ghost` + `light`, 8px apart (`gap-2`), centred.
 
 **Receipt card pattern** (Become a Mentor discount panel): a `bg-surface` panel with a white `<dl>` card: 16px labels / 24px values, a hairlined "You still receive" row in 20px/32px semibold.
 
+**Opportunity row pattern** (Events & Summits, `components/events/OpportunityFeed.tsx`): a full-width row card (`border-[#cbcbcb]`, 24px padding, 25px gap between rows) with a `#ea7146` source chip (37px tall) + categories, a 24px title, and a meta line of pixel icons (`OpportunityIcons.tsx`: people, pin, wallet) at 18px. A dark button (min-width 7.5rem) sits right-aligned, stacking under the content on phones. It uses the same filter bar (tabs + search, `aria-live` count, empty state) as Find a Mentor.
+
+**Gatherings carousel with CTAs** (`GatheringsCarousel`): events may carry `date`, `audience` (a non-clickable ghost-style tag) and `cta` (a light button, rendered only on the active slide so hidden slides have no tab stops). When any event has a `cta`, the carousel is taller on phones (26rem active) and the bottom blur covers more of the card.
+
 **Pages** follow `hero → content section(s) on bg-surface/bg-dots → footer`. Speaker Hub is `PageHero` + one `bg-dots` section (2 speaker cards + request tile) + footer. Find a Mentor is `PageHero` + one `bg-surface` section + footer. Mentorle Plus is `PageHero` + `PricingPlans` (`bg-dots`) + `PlusBenefits` (`bg-surface`) + footer.
 
 Content lives in typed data files: `src/data/site.ts` (nav, footer, company/legal info, external URLs), `src/data/mentors.ts` (the `Mentor` model, shaped like the future API record, plus domain filters; the homepage's featured mentors come from here too) and `src/data/<page>.ts` (page copy, image paths and sizes). Components never hard-code copy. Placeholder copy gets a one-line comment in the data file and an entry in `docs/SPEC-VS-DESIGN.md`.

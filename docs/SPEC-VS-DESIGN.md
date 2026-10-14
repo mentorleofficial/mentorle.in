@@ -12,7 +12,7 @@ Where the Figma designs differ from the written specifications. The site is bein
 
 **Status key:** `Open` = needs a decision · `Resolved` = decided (note the outcome) · `Built as design` = shipped following Figma, still needs sign-off.
 
-_Last updated: 2026-10-13 — Homepage, Find a Mentor, Mentorle Plus, Speaker Hub and Become a Mentor built._
+_Last updated: 2026-10-13 — Homepage, Find a Mentor, Mentorle Plus, Speaker Hub, Become a Mentor and Events & Summits built._
 
 ---
 
@@ -123,4 +123,24 @@ The earnings numbers on this page **match the spec**: format prices and payouts 
 | B8 | Accordion copy and icons | — | The design showed one generic search icon and copy for one point only. | Copy and icons from the supplied `content-for-points.png` (badges, privacy, ranking). |
 | B9 | "Become a Mentor" links | Mentors apply on the separate platform (IC §2). | — | Per the product owner: site links (footer, homepage banner) → `/become-a-mentor`; this page's apply buttons → `platform.mentorle.in/become-a-mentor` (new tab). |
 | B10 | Reused icons | — | Several icons repeat across sections. | "What we ask of you" reuses the calendar (reschedule) and wallet (async SLA) icons in light colour via `MaskIcon`. Confirm, or supply dedicated icons. |
+
+## 6. Events & Summits page (`/events`) — built 2026-10-13
+
+| # | Item | What the spec says | What Figma shows | Status |
+|---|---|---|---|---|
+| E1 | Opportunity types | Four types: hackathon, event, job, freelance (IC §12). | Same four as filter tabs. | Matches |
+| E2 | Sources | Prototype: "MLH, Devfolio, Eventbrite, and more"; wireframe assumed Luma, District, Wellfound, Naukri, Upwork (IC §12, an assumption). | Hero names MLH, Devfolio, Luma, Wellfound; the feed shows Upwork. | Built as design; source list still needs confirming |
+| E3 | Membership gating | Free users see only local/regional listings; Pro sees all-India, remote MNC and global (PP Table 2). | No gating, Pro badge or "unlock" state anywhere in the feed. | Open |
+| E4 | Hero buttons | — | "Become a Mentor" / "See what you would earn" are copied from the Become a Mentor hero and don't relate to events. Built linking to `/become-a-mentor` and its calculator. | Open — suggest e.g. "Browse Opportunities" / "Host with Mentorle" |
+| E5 | Eyebrow typo | — | "Hosteded by Mentorle". | Fixed ("Hosted by Mentorle") |
+| E6 | "Open for Students" | — | Looks like a ghost button but has no obvious action. | Built as a non-clickable audience tag |
+
+**Content and design gaps**
+
+| # | Item | What's missing | What's built for now |
+|---|---|---|---|
+| ED1 | Feed data | The design repeats one Upwork gig four times. | Six placeholder records across all four types in `src/data/events.ts`, shaped for a future CMS/database feed. Buttons link to each source's site (new tab). |
+| ED2 | Button labels per type | Only "Bid on Gig" is designed. | Hackathon → "Register", event → "RSVP", job → "Apply Now", freelance → "Bid on Gig". |
+| ED3 | Hosted gatherings | Only the centre card (Punjab Technical Conclave) has content. | Two placeholder gatherings; registration buttons go to `/signup` until an event/registration flow exists. |
+| ED4 | Empty state, pagination, "refreshed daily" | Not designed. | Empty state + "Clear filters" as on Find a Mentor; no pagination yet. |
 

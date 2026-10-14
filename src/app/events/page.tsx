@@ -1,0 +1,52 @@
+import type { Metadata } from "next";
+import { OpportunityFeed } from "@/components/events/OpportunityFeed";
+import { GatheringsCarousel } from "@/components/home/GatheringsCarousel";
+import { PageHero } from "@/components/ui/PageHero";
+import { SectionHeader } from "@/components/ui/SectionHeader";
+import { eventsPage, hostedGatherings, opportunities, opportunityCta, opportunityFilters } from "@/data/events";
+
+export const metadata: Metadata = {
+  title: "Events & Summits",
+  description:
+    "Mentorle's own leadership dinners, campus summits and pitch circles, plus a curated feed of hackathons, meetups, jobs and freelance gigs.",
+};
+
+export default function EventsPage() {
+  const { hero, hosted, opportunities: feed } = eventsPage;
+
+  return (
+    <>
+      <PageHero
+        title={hero.title}
+        subtitle={hero.subtitle}
+        background={hero.background}
+        primaryCta={hero.primaryCta}
+        secondaryCta={hero.secondaryCta}
+        subtitleSize="base"
+        contentOffset="md:pt-[3.75rem]"
+      />
+
+      <section aria-labelledby="hosted-title" className="bg-dots py-16 md:py-24 lg:py-[8.125rem]">
+        <div className="container-page">
+          <SectionHeader id="hosted-title" eyebrow={hosted.eyebrow} title={hosted.title} description={hosted.description} />
+        </div>
+        <div data-animate="rise" className="mt-12 md:mt-16">
+          <GatheringsCarousel events={hostedGatherings} />
+        </div>
+      </section>
+
+      <section id="opportunities" aria-labelledby="opportunities-title" className="bg-surface py-16 md:py-24 lg:py-[8.125rem]">
+        <div className="container-page">
+          <SectionHeader id="opportunities-title" eyebrow={feed.eyebrow} title={feed.title} description={feed.description} />
+          <OpportunityFeed
+            opportunities={opportunities}
+            filters={opportunityFilters}
+            ctaLabels={opportunityCta}
+            searchPlaceholder={feed.searchPlaceholder}
+            emptyState={feed.emptyState}
+          />
+        </div>
+      </section>
+    </>
+  );
+}
