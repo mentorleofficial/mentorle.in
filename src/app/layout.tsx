@@ -26,7 +26,7 @@ export const metadata: Metadata = {
 // Hides animated elements before hydration so GSAP can reveal them without a flash; skipped for reduced motion.
 const motionBootstrap = `if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){document.documentElement.classList.add('js-motion')}`;
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({ children, auth }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${manrope.variable} h-full antialiased`} suppressHydrationWarning>
       <head>
@@ -36,6 +36,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <SiteHeader />
         <main className="flex-1">{children}</main>
         <SiteFooter />
+        {auth}
         <ScrollAnimations />
         <SmoothScroll />
       </body>

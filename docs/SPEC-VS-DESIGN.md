@@ -12,7 +12,7 @@ Where the Figma designs differ from the written specifications. The site is bein
 
 **Status key:** `Open` = needs a decision · `Resolved` = decided (note the outcome) · `Built as design` = shipped following Figma, still needs sign-off.
 
-_Last updated: 2026-10-13 — Homepage, Find a Mentor, Mentorle Plus, Speaker Hub, Become a Mentor, Events & Summits and Enterprise built._
+_Last updated: 2026-10-13 — Homepage, Find a Mentor, Mentorle Plus, Speaker Hub, Become a Mentor, Events & Summits, Enterprise and Community built._
 
 ---
 
@@ -153,3 +153,27 @@ The earnings numbers on this page **match the spec**: format prices and payouts 
 | N3 | Contact Sales | — | Button with no destination designed. | Links to `/contact` (planned, 404s for now). Needs a contact form or sales email. |
 | N4 | "For Universities" footer link | — | Footer has separate "For Universities" and "For Enterprise" links; one page covers both. | "For Universities" → `/enterprise#universities`; "For Enterprise" → `/enterprise`. |
 
+## 8. Community page (`/community`) — built 2026-10-14
+
+The content **matches the spec's Free Community tier**: weekly Saturday 6–7 PM demo masterclass, local/regional jobs and hackathons, and one open expert session per quarter (PP §1, §4).
+
+| # | Item | What the spec says | What Figma shows | Status |
+|---|---|---|---|---|
+| C1 | Hero buttons | — | "Become a Mentor" / "See what you would earn" again copied from Become a Mentor; they don't fit a mentee community page. | Open — suggest "Join the community" / "See this Saturday's session" |
+| C2 | "Join the community" | The spec's free tier is a WhatsApp community (referral loop, PP §3). | Buttons with no destination designed. | Links to `/signup` for now. Needs the real join flow (WhatsApp invite, signup, or Saturday session RSVP). |
+| C3 | Saturday session details | Saturday, 6–7 PM, 60 min (PP §4). | No time, location or online/offline info. | Open |
+| C4 | Closing banner | — | Taller (622px) than the homepage banner. | Built at the shared 555px height, per the product owner's earlier decision that this banner is the same size everywhere. |
+
+
+## 9. Login and Sign up (`/login`, `/signup`) — built 2026-10-14
+
+Built as a modal over whatever page the user is on (Next intercepting routes): the page behind is blurred and darkened, the URL becomes `/login` or `/signup`, and Back, Esc, ✕ or a click outside closes it. A direct visit or refresh opens the modal over the homepage. **Frontend only:** the forms validate (required fields, email format, 8+ character password) but submitting just shows "Accounts aren't live yet".
+
+| # | Item | What the spec says | What Figma shows | Status |
+|---|---|---|---|---|
+| A1 | Date of birth / 18+ gate | Signup must collect date of birth and refuse anyone under 18 (BP §7, PP Table 1). | Full Name, Email, Password only. | Open: needs a DOB field designed before the backend goes live. |
+| A2 | Forgot password | — | No "Forgot password?" link on the login card. | Open: needed once auth is real. |
+| A3 | Social / phone login | — | Email and password only, no Google or OTP option. | Open: confirm the sign-in methods. |
+| A4 | Password placeholder | — | Lowercase "password" while the other fields are capitalised. | Built as "Password" for consistency. |
+| A5 | Terms consent | DPDP Act needs consent to the privacy policy at signup. | No terms/privacy line on the signup card. | Open: suggest "By signing up you agree to the Terms and Privacy Policy." |
+| A6 | Backend | — | — | No auth backend yet; submit shows a not-connected notice. Min password length (8) is an assumption. |
