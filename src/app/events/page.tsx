@@ -23,7 +23,8 @@ export default function EventsPage() {
         primaryCta={hero.primaryCta}
         secondaryCta={hero.secondaryCta}
         subtitleSize="base"
-        contentOffset="md:pt-[3.75rem]"
+        subtitleWidth="max-w-[35rem]"
+        contentOffset="md:pt-[6.25rem]"
       />
 
       <section aria-labelledby="hosted-title" className="bg-dots py-16 md:py-24 lg:py-[8.125rem]">

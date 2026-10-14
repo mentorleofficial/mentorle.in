@@ -12,7 +12,7 @@ Where the Figma designs differ from the written specifications. The site is bein
 
 **Status key:** `Open` = needs a decision · `Resolved` = decided (note the outcome) · `Built as design` = shipped following Figma, still needs sign-off.
 
-_Last updated: 2026-10-13 — Homepage, Find a Mentor, Mentorle Plus, Speaker Hub, Become a Mentor and Events & Summits built._
+_Last updated: 2026-10-13 — Homepage, Find a Mentor, Mentorle Plus, Speaker Hub, Become a Mentor, Events & Summits and Enterprise built._
 
 ---
 
@@ -143,4 +143,13 @@ The earnings numbers on this page **match the spec**: format prices and payouts 
 | ED2 | Button labels per type | Only "Bid on Gig" is designed. | Hackathon → "Register", event → "RSVP", job → "Apply Now", freelance → "Bid on Gig". |
 | ED3 | Hosted gatherings | Only the centre card (Punjab Technical Conclave) has content. | Two placeholder gatherings; registration buttons go to `/signup` until an event/registration flow exists. |
 | ED4 | Empty state, pagination, "refreshed daily" | Not designed. | Empty state + "Clear filters" as on Find a Mentor; no pagination yet. |
+
+## 7. Enterprise page (`/enterprise`) — built 2026-10-14
+
+| # | Item | What the spec says | What Figma shows | Status |
+|---|---|---|---|---|
+| N1 | B2B offering | Not in either spec (both are mentee/mentor only). | Universities: campus summits, white-label alumni mentoring. Companies: employee upskilling, EdTech API integrations. Needs pricing, contracts and scope. | Built as design |
+| N2 | Hero copy and buttons | — | Subtitle is copied from the Events page; buttons are copied from Become a Mentor ("Become a Mentor" / "See what you would earn"). Neither fits a B2B page. | Open — suggest a B2B subtitle and "Contact Sales" / "Book a Demo" |
+| N3 | Contact Sales | — | Button with no destination designed. | Links to `/contact` (planned, 404s for now). Needs a contact form or sales email. |
+| N4 | "For Universities" footer link | — | Footer has separate "For Universities" and "For Enterprise" links; one page covers both. | "For Universities" → `/enterprise#universities`; "For Enterprise" → `/enterprise`. |
 

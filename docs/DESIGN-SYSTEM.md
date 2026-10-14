@@ -93,7 +93,7 @@ Pairs on photos are always `ghost` + `light`, 8px apart (`gap-2`), centred.
 | Component | File | Notes |
 |---|---|---|
 | `SiteHeader` | `components/layout/SiteHeader.tsx` | Frosted bar over the hero: `bg-black/20` + `backdrop-blur-[6px]` (tuned to match Figma — don't increase). Collapses below `lg`. |
-| `SiteFooter` | `components/layout/SiteFooter.tsx` | Identical on every Figma page. Includes the **legally required Grievance Officer block** — never remove. At `xl`: columns start at x=50 / 647 / 865 / 1130 (`grid-cols-[37.3125rem_1fr]`, then `[13.625rem_16.5625rem_1fr]`); top band 131px above / 53px below; legal band 48px padding; copyright band 47px. Measured on the Find a Mentor export. |
+| `SiteFooter` | `components/layout/SiteFooter.tsx` | Identical on every Figma page. Includes the **legally required Grievance Officer block** — never remove. At ≥1440px (`min-[90rem]:`): columns start at x=50 / 647 / 865 / 1130; between `xl` and 1440 the columns size to their content so nothing overflows (`grid-cols-[37.3125rem_1fr]`, then `[13.625rem_16.5625rem_1fr]`); top band 131px above / 53px below; legal band 48px padding; copyright band 47px. Measured on the Find a Mentor export. |
 | `SectionHeader` | `components/ui/SectionHeader.tsx` | Eyebrow + title (left), description + optional `action` (right). Use for every section intro. |
 | `ButtonLink` / `buttonClasses` | `components/ui/ButtonLink.tsx` | All CTAs. Pass `external` for off-site links. |
 | `ArrowControls` | `components/ui/ArrowControls.tsx` | Orange prev/next pair. `size="sm"` (41px) in small frames, `md` (69×66) for carousels. The left arrow is drawn faded by design. |
@@ -144,6 +144,10 @@ Pairs on photos are always `ghost` + `light`, 8px apart (`gap-2`), centred.
 **Opportunity row pattern** (Events & Summits, `components/events/OpportunityFeed.tsx`): a full-width row card (`border-[#cbcbcb]`, 24px padding, 25px gap between rows) with a `#ea7146` source chip (37px tall) + categories, a 24px title, and a meta line of pixel icons (`OpportunityIcons.tsx`: people, pin, wallet) at 18px. A dark button (min-width 7.5rem) sits right-aligned, stacking under the content on phones. It uses the same filter bar (tabs + search, `aria-live` count, empty state) as Find a Mentor.
 
 **Gatherings carousel with CTAs** (`GatheringsCarousel`): events may carry `date`, `audience` (a non-clickable ghost-style tag) and `cta` (a light button, rendered only on the active slide so hidden slides have no tab stops). When any event has a `cta`, the carousel is taller on phones (26rem active) and the bottom blur covers more of the card.
+
+**Offer list pattern** (Enterprise, `components/enterprise/EnterpriseOffers.tsx`): a two-column list (50/50 below `xl`; `xl:grid-cols-[46.9375rem_1fr]`, i.e. the second column starts at x=800) of audience headings (32px) and offers (20px icon + 24px title + 16px description, max 17.25rem). Every cell draws a hairline divider that runs edge to edge of the viewport; rows are ~181px. Columns stack on phones. A brand CTA sits 64px below.
+
+**PageHero `subtitleWidth`**: overrides the subtitle max width (Events and Enterprise use `max-w-[35rem]` so the subtitle wraps in two lines as designed; both use `contentOffset="md:pt-[6.25rem]"`).
 
 **Pages** follow `hero → content section(s) on bg-surface/bg-dots → footer`. Speaker Hub is `PageHero` + one `bg-dots` section (2 speaker cards + request tile) + footer. Find a Mentor is `PageHero` + one `bg-surface` section + footer. Mentorle Plus is `PageHero` + `PricingPlans` (`bg-dots`) + `PlusBenefits` (`bg-surface`) + footer.
 

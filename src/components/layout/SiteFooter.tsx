@@ -25,7 +25,7 @@ export function SiteFooter() {
   return (
     <footer className="bg-ink text-white">
       <div className="container-page">
-        <div className="grid gap-12 py-14 md:py-20 xl:grid-cols-[37.3125rem_1fr] xl:gap-0 xl:py-0">
+        <div className="grid gap-12 py-14 md:py-20 xl:grid-cols-[1fr_auto] xl:gap-0 xl:py-0 min-[90rem]:grid-cols-[37.3125rem_1fr]">
           <div data-animate="fade-up" className="xl:pt-[8.1875rem] xl:pb-[3.3125rem] xl:pr-10">
             <Link href="/" aria-label="Mentorle home" className="inline-block">
               <Image src="/homepage/logo.svg" alt="Mentorle" width={187} height={48} loading="eager" className="h-14 w-auto md:h-[5.75rem]" />
@@ -46,7 +46,7 @@ export function SiteFooter() {
             </ul>
           </div>
 
-          <div data-animate="stagger" className="grid grid-cols-2 gap-10 sm:grid-cols-3 xl:grid-cols-[13.625rem_16.5625rem_1fr] xl:gap-0">
+          <div data-animate="stagger" className="grid grid-cols-2 gap-10 sm:grid-cols-3 xl:grid-cols-[auto_auto_auto] xl:gap-0 min-[90rem]:grid-cols-[13.625rem_16.5625rem_1fr]">
             {footerColumns.map((column, index) => (
               <nav
                 key={column.title}

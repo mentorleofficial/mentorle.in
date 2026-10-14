@@ -33,7 +33,7 @@ export const footerColumns: { title: string; links: NavLink[] }[] = [
   {
     title: "Partners",
     links: [
-      { label: "For Universities", href: "/universities" },
+      { label: "For Universities", href: "/enterprise#universities" },
       { label: "For Enterprise", href: "/enterprise" },
       { label: "Speaker Hub", href: "/speaker-hub" },
     ],

@@ -12,10 +12,11 @@ type PageHeroProps = {
   secondaryCta?: Cta;
   overlayOpacity?: number;
   subtitleSize?: "sm" | "base";
+  subtitleWidth?: string;
   contentOffset?: string;
 };
 
-export function PageHero({ title, subtitle, background, primaryCta, secondaryCta, overlayOpacity = 0, subtitleSize = "sm", contentOffset = "md:pt-[7rem]" }: PageHeroProps) {
+export function PageHero({ title, subtitle, background, primaryCta, secondaryCta, overlayOpacity = 0, subtitleSize = "sm", subtitleWidth, contentOffset = "md:pt-[7rem]" }: PageHeroProps) {
   return (
     <section
       aria-labelledby="page-hero-title"
@@ -45,7 +46,7 @@ export function PageHero({ title, subtitle, background, primaryCta, secondaryCta
           <p
             data-hero="2"
             className={`mx-auto mt-4 text-white/85 md:mt-5 ${
-              subtitleSize === "base" ? "max-w-[30rem] text-base leading-snug" : "max-w-[28rem] text-sm leading-[1.55]"
+              subtitleSize === "base" ? `${subtitleWidth ?? "max-w-[30rem]"} text-base leading-snug` : `${subtitleWidth ?? "max-w-[28rem]"} text-sm leading-[1.55]`
             }`}
           >
             {subtitle}
