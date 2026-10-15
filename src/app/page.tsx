@@ -10,6 +10,8 @@ import { MentorStories } from "@/components/home/MentorStories";
 import { PartnerStrip } from "@/components/home/PartnerStrip";
 import { PlusBenefits } from "@/components/home/PlusBenefits";
 import { SuccessStories } from "@/components/home/SuccessStories";
+import { PricingPlans } from "@/components/pricing/PricingPlans";
+import { homePlans } from "@/data/home";
 
 export default function HomePage() {
   return (
@@ -24,6 +26,7 @@ export default function HomePage() {
       <CareerComparison />
       <HowItWorks />
       <LifeAtMentorle />
+      <PricingPlans header={homePlans} className="pb-16 md:pb-24 lg:pb-[8.125rem]" />
       <PlusBenefits />
       <SuccessStories />
     </>

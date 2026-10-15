@@ -8,6 +8,9 @@ export type HeroSlide = ImageAsset & {
   alt: string;
   // Tailwind object-position classes; per image so faces stay in frame at every width.
   position: string;
+  // Small copy for the preview card. A separate file on purpose: Next tracks the LCP image by URL, so a lazy
+  // card copy of the same file as a full-screen slide triggers its "LCP image should be eager" warning.
+  thumb: string;
 };
 
 export const hero = {
@@ -19,6 +22,7 @@ export const hero = {
   slides: [
     {
       src: "/homepage/hero-background.webp",
+      thumb: "/homepage/hero-thumbs/hero-background.webp",
       width: 1280,
       height: 720,
       alt: "A mentor and a mentee reviewing a résumé together at a café table",
@@ -26,6 +30,7 @@ export const hero = {
     },
     {
       src: "/homepage/hero-section-image.webp",
+      thumb: "/homepage/hero-thumbs/hero-section-image.webp",
       width: 2880,
       height: 1882,
       alt: "A mentor walking a group of mentees through a plan on a whiteboard",
@@ -262,3 +267,11 @@ export const successStories: SuccessStory[] = [
     height: 706,
   },
 ];
+
+// Heading for the pricing plans reused on the homepage (after Life at Mentorle). Placeholder copy: the Figma
+// has no homepage pricing section (logged in SPEC-VS-DESIGN).
+export const homePlans = {
+  eyebrow: "Pricing",
+  title: "Pick the pass that fits",
+  description: "Start free in the community, or unlock every mentor, masterclass and mock interview with a yearly pass.",
+};

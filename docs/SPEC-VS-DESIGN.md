@@ -49,6 +49,7 @@ Copy or assets the design doesn't provide. Placeholders are in use until real on
 | D8 | Mobile and tablet layouts | Figma is desktop-only (1440px). | Responsive layouts derived from the desktop design. |
 | D9 | Hero background | The hero video is only 1280×720, which looks soft on large and Retina screens. | A still frame from the video (6.3s) is used for now. A high-resolution photo or a 1080p/4K video is needed. |
 | D10 | Statement paragraph under the hero | Figma copy was "Mentorle connects you with experienced professionals and industry experts…". Replaced by the product owner with "Degrees teach you the theory. But the industry demands the practical. The game has unwritten rules, and we’re handing you the playbook." (their reference used a serif font with a yellow italic ending). | New copy in the existing style (Manrope, scroll reveal). "Degrees teach you the theory." is the always-dark lead. |
+| D11 | Pricing plans on the homepage | — | Not in the homepage Figma; added on request after Life at Mentorle, reusing the pricing page's plan cards. | The heading (eyebrow "Pricing", title "Pick the pass that fits", one-line description) is placeholder copy, since the section has no design. |
 
 ---
 
