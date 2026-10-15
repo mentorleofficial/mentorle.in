@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { AuthLink, useAuthModal } from "@/components/auth/AuthModalContext";
+import { AuthLink, useAuthModal, withRedirect } from "@/components/auth/AuthModalContext";
 import { AuthFooter, AuthHeading, AuthStep, VerifyEmailStep, formColumn } from "@/components/auth/AuthStep";
 import { DateField } from "@/components/forms/DateField";
 import { PhoneField } from "@/components/forms/PhoneField";
@@ -152,10 +152,11 @@ const WELCOME_REDIRECT_MS = 3200;
 function WelcomeStep() {
   const { go } = useAuthModal();
   const welcome = authCopy.welcome;
-  const goToOnboarding = () => go("/onboarding");
+  // Keeps ?redirect= (e.g. back to the event the visitor wanted to register for) through onboarding.
+  const goToOnboarding = () => go(withRedirect("/onboarding"));
 
   useEffect(() => {
-    const timer = setTimeout(() => go("/onboarding"), WELCOME_REDIRECT_MS);
+    const timer = setTimeout(() => go(withRedirect("/onboarding")), WELCOME_REDIRECT_MS);
     return () => clearTimeout(timer);
     // Once, on mount (`go` is recreated every render).
     // eslint-disable-next-line react-hooks/exhaustive-deps

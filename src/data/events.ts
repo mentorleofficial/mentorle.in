@@ -110,6 +110,7 @@ const gatheringImages = {
 } satisfies Record<string, ImageAsset>;
 
 // Only the centre card's text exists in Figma; the other two are placeholders in the same shape.
+// Each CTA opens the event's detail page, where registration happens (src/data/event-details.ts).
 export const hostedGatherings: GatheringEvent[] = [
   {
     ...gatheringImages.dinner,
@@ -118,7 +119,7 @@ export const hostedGatherings: GatheringEvent[] = [
     description: "An intimate evening where senior operators share what they wish they had known earlier, with time for one-on-one questions.",
     alt: "Guests talking at a leadership dinner",
     audience: "Open for Professionals",
-    cta: { label: "Request Invite", href: "/signup" },
+    cta: { label: "Request Invite", href: "/events/mohali-leadership-dinner" },
   },
   {
     ...gatheringImages.conclave,
@@ -127,7 +128,7 @@ export const hostedGatherings: GatheringEvent[] = [
     description: "A full-day campus summit featuring guest lectures from FAANG engineers and startup founders for over 500+ students.",
     alt: "Attendees networking at the Punjab Technical Conclave",
     audience: "Open for Students",
-    cta: { label: "Register Free", href: "/signup" },
+    cta: { label: "Register Free", href: "/events/punjab-technical-conclave" },
   },
   {
     ...gatheringImages.sprint,
@@ -136,7 +137,7 @@ export const hostedGatherings: GatheringEvent[] = [
     description: "Early-stage founders pitch to a panel of operators and angels, then get unfiltered feedback over chai.",
     alt: "Founders pitching at a Mentorle pitch circle",
     audience: "Open for Founders",
-    cta: { label: "Apply to Pitch", href: "/signup" },
+    cta: { label: "Apply to Pitch", href: "/events/builders-pitch-circle" },
   },
 ];
 

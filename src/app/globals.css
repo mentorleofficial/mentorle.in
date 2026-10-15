@@ -9,6 +9,7 @@
   --color-brand-dark: #b6370a;
   --color-ink: #2b2b2b;
   --color-muted: #808080;
+  --color-ink-soft: #686868; /* secondary text on light cards (event detail labels, notes) */
   --color-subtle: #aaaaaa;
   --color-surface: #f3f3f3;
   --color-line: #d5d5d5;

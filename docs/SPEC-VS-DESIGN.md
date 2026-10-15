@@ -141,7 +141,7 @@ The earnings numbers on this page **match the spec**: format prices and payouts 
 |---|---|---|---|
 | ED1 | Feed data | The design repeats one Upwork gig four times. | Six placeholder records across all four types in `src/data/events.ts`, shaped for a future CMS/database feed. Buttons link to each source's site (new tab). |
 | ED2 | Button labels per type | Only "Bid on Gig" is designed. | Hackathon → "Register", event → "RSVP", job → "Apply Now", freelance → "Bid on Gig". |
-| ED3 | Hosted gatherings | Only the centre card (Punjab Technical Conclave) has content. | Two placeholder gatherings; registration buttons go to `/signup` until an event/registration flow exists. |
+| ED3 | Registration | Platform: free RSVP into `event_participants` (capacity-checked); Plus-quota and paid (Cashfree) registration too. | Only the closed state is designed. | **Built (free RSVP, mock):** "Register Now" (or the event's own label) on the detail page. Signed out → signup modal, then onboarding, then back to the event. Signed in with an unfinished profile → onboarding, then back. Signed in and onboarded → registers, then shows "You're registered" with "Cancel registration". Stored by `src/lib/events/service.ts`, which mirrors the platform's `registerForEvent` / `unregisterFromEvent`. Open: Plus and paid events, confirmation emails, and the registered/full states have no design. |
 | ED4 | Empty state, pagination, "refreshed daily" | Not designed. | Empty state + "Clear filters" as on Find a Mentor; no pagination yet. |
 
 ## 7. Enterprise page (`/enterprise`) — built 2026-10-14
@@ -190,3 +190,21 @@ The auth screens open as a modal over whatever page the user is on (Next interce
 | A8 | Screens with no design | — | Only the first login and signup screens are designed. | Verify email, You're in, Forgot/Reset password, Password updated and all 6 onboarding steps reuse the login card's style (onboarding adds a progress bar along the card's top edge). Needs design review. |
 | A9 | Code length | Guest booking spec says a 6-digit OTP (to the phone). | — | Account codes are 8 digits, matching the platform's Supabase setting (`otp_length = 8`). |
 | A10 | Mentor link on login | Platform login shows "Want to mentor? Apply here". | Not in the Figma. | Left out, per the Figma; the footer and nav already link to Become a Mentor. |
+
+
+## 10. Event detail (`/events/<slug>`) — built 2026-10-15
+
+One page template renders any event from `src/data/event-details.ts`. Each record is shaped like the row a mentor or admin will create on the platform, so moving to the database only changes `getEvent` / `getEventSlugs`. The sample event is the one in the Figma ("From Classroom to Boardroom", CT University, completed).
+
+| # | Item | What the spec says | What Figma shows | Status |
+|---|---|---|---|---|
+| ED1 | The dark card under the hero | — | Looks like an exported poster image. | Built as a component from the event data (host, title in caps, subtitle, date, time, optional "from → to" icons), so every event gets one automatically with no image to make. Only two journey icons exist (graduation cap, briefcase); more can be added per event type. |
+| ED2 | Event status | — | "Completed" chip, "Registration closed" button and "This event has been completed." | Driven by a `status` field (upcoming / live / completed / cancelled) that the admin or DB sets. Upcoming events with a registration link show a brand "Register Now" button plus "Registration closes …"; those states have no design. |
+| ED3 | Registration destination | — | Only the closed state is designed. | Open: where "Register Now" goes (platform signup, a form, an external link). The data has a `registration.href` per event. |
+| ED4 | Speaker links | — | "LinkedIn · GitHub" labels only. | The links point at linkedin.com / github.com as placeholders until real profile URLs exist. |
+| ED5 | How users reach the page | — | No link from Events & Summits to a detail page is designed. | The hosted-gathering cards' buttons ("Request Invite", "Register Free", "Apply to Pitch") now open each event's detail page, where registration happens. Past events (like the Figma's sample) aren't listed anywhere yet. |
+| ED6 | Breadcrumb | — | "Events & Summits / Event detail". | Built as designed (the generic "Event detail", not the event title). |
+| ED7 | Unknown event URLs | — | — | Show the site's not-found page with `noindex`. With Cache Components the HTTP status stays 200; a real 404 needs a Proxy check, worth adding with the database. |
+| ED9 | Register buttons for signed-in users | — | — | Resolved by ED3/ED5: the cards no longer link to `/signup`. The auth modals still send any signed-in visitor on (to onboarding if unfinished) instead of showing a form. |
+| ED8 | Body text width | — | The design's 16px text renders about 1% wider than Manrope at 16px in the browser. | Kept at the design system's 16px with no added letter-spacing, so the "About" paragraph can wrap one word differently on wide screens. |
+| ED10 | Detail content for the three hosted gatherings | — | Only their card text (title, date, description, audience, button label) exists. | Times, venues, deadlines, "What You'll Learn", prerequisites, highlights and capacities are placeholders in `src/data/event-details.ts`. They have no speakers yet (the Guest Speaker card hides), and they reuse the Figma's blurred audience hero. |

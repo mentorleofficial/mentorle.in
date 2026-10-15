@@ -62,12 +62,3 @@ export function useAuth() {
   return context;
 }
 
-export const initialsOf = (name: string, fallback = "M") =>
-  name
-    .trim()
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0])
-    .join("")
-    .toUpperCase() || fallback;

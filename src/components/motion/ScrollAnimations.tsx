@@ -8,6 +8,10 @@ import { usePathname } from "next/navigation";
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 const INK = "#2b2b2b";
+// Play once and never reverse. Deliberately not `once: true`: a `once` trigger kills itself, and if that happens
+// while ScrollTrigger is refreshing (e.g. the page is already scrolled when animations are set up), the trigger
+// list shrinks mid-loop and GSAP throws "Cannot read properties of undefined (reading 'end')".
+export const PLAY_ONCE = "play none none none";
 const ANIMATED = "[data-hero], [data-animate], [data-parallax]";
 const HYDRATION_TIMEOUT_MS = 2000;
 // Matches the CSS failsafe in globals.css that reveals hidden content if motion hasn't started by then.
@@ -62,7 +66,7 @@ export function ScrollAnimations() {
                 autoAlpha: 1,
                 duration: 1,
                 ease: "power3.out",
-                scrollTrigger: { trigger: element, start: "top 88%", once: true },
+                scrollTrigger: { trigger: element, start: "top 88%", toggleActions: PLAY_ONCE },
               },
             );
           });
@@ -76,7 +80,7 @@ export function ScrollAnimations() {
                 y: 0,
                 duration: 1.2,
                 ease: "power3.out",
-                scrollTrigger: { trigger: element, start: "top 92%", once: true },
+                scrollTrigger: { trigger: element, start: "top 92%", toggleActions: PLAY_ONCE },
                 onStart: () => {
                   element.style.visibility = "visible";
                 },
@@ -94,7 +98,7 @@ export function ScrollAnimations() {
                 duration: 1,
                 ease: "power3.out",
                 stagger: 0.12,
-                scrollTrigger: { trigger: element, start: "top 85%", once: true },
+                scrollTrigger: { trigger: element, start: "top 85%", toggleActions: PLAY_ONCE },
               },
             );
           });
@@ -102,7 +106,7 @@ export function ScrollAnimations() {
           gsap.utils.toArray<HTMLElement>('[data-animate="image"]').forEach((element) => {
             const media = element.querySelector("img, video");
             const timeline = gsap.timeline({
-              scrollTrigger: { trigger: element, start: "top 85%", once: true },
+              scrollTrigger: { trigger: element, start: "top 85%", toggleActions: PLAY_ONCE },
             });
             timeline.fromTo(
               element,

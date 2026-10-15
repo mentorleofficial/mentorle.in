@@ -33,7 +33,7 @@ export const safeRedirect = () => {
   return redirect?.startsWith("/") && !redirect.startsWith("//") ? redirect : null;
 };
 
-const withRedirect = (href: string) => {
+export const withRedirect = (href: string) => {
   const redirect = safeRedirect();
   if (!redirect || href.includes("?") || redirect === href) return href;
   return `${href}?redirect=${encodeURIComponent(redirect)}`;

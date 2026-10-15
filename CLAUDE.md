@@ -10,7 +10,7 @@ The public, **mentee-facing** Mentorle website (mentorle.in): marketing pages pl
 
 Operator: AltioraEdtech Learning (OPC) Pvt. Ltd. (legal details live in `src/data/site.ts`).
 
-**Current scope: frontend only.** No backend or payments yet. Content is static, in typed data files. Auth (login, signup with email code, forgot password, onboarding) runs on a **mock service** (`src/lib/auth/service.ts`, test code `12345678`) that mirrors the platform's Supabase calls and `mentee_profiles` columns. mentorle.in will later replace the platform's mentee side and connect to its database, so keep new account features shaped like the platform's data.
+**Current scope: frontend only.** No backend or payments yet. Content is static, in typed data files. Auth (login, signup with email code, forgot password, onboarding) runs on a **mock service** (`src/lib/auth/service.ts`, test code `12345678`), and event registration on `src/lib/events/service.ts` that mirrors the platform's Supabase calls and `mentee_profiles` columns. mentorle.in will later replace the platform's mentee side and connect to its database, so keep new account features shaped like the platform's data.
 
 ## Stack
 
@@ -40,7 +40,7 @@ src/components/ui/        reusable primitives: ButtonLink, SectionHeader, ArrowC
 src/components/motion/    ScrollAnimations (data-attribute animation runner), SmoothScroll (Lenis), CountUp
 src/components/forms/     form primitives (TextField, PasswordField, PhoneField, DateField, OtpInput, ChipInput, Checkbox, SubmitButton)
 src/lib/auth/             mock auth service, AuthProvider/useAuth, zod schemas (ported from the platform)
-src/components/<page>/    page-specific sections (components/auth/, components/onboarding/, components/home/, components/mentors/, components/pricing/, components/speakers/, components/become-a-mentor/, components/events/, components/enterprise/, components/community/)
+src/components/<page>/    page-specific sections (components/auth/, components/onboarding/, components/event-detail/, components/home/, components/mentors/, components/pricing/, components/speakers/, components/become-a-mentor/, components/events/, components/enterprise/, components/community/)
 src/data/site.ts          nav, footer columns, social links, company/legal info, external URLs
 src/data/<page>.ts        all copy, image paths and image sizes for that page
 public/<page>/            assets for that page (e.g. public/homepage/)
@@ -79,4 +79,4 @@ scripts/convert-to-webp.mjs  PNG/JPG → WebP converter (npm run images)
 
 ## Routes (planned)
 
-Built: `/`, `/mentors` (Find a Mentor), `/pricing` (Mentorle Plus), `/speaker-hub`, `/become-a-mentor`, `/events` (Events & Summits), `/enterprise` (Universities & Enterprise), `/community`, `/login`, `/signup`, `/forgot-password` (modals over the current page via the `@auth` intercepting routes) and `/onboarding` (mentee profile wizard, also a modal). Linked but not built yet (they 404 for now): `/mentors/<slug>` (mentor profiles), `/speaker-hub/request` (speaker requests), `/about`, `/contact`, `/community-guidelines`, `/privacy`, `/terms`. Keep these paths when building the pages, since nav and footer links already point at them (`src/data/site.ts`).
+Built: `/`, `/mentors` (Find a Mentor), `/pricing` (Mentorle Plus), `/speaker-hub`, `/become-a-mentor`, `/events` (Events & Summits), `/events/<slug>` (event detail, from `src/data/event-details.ts`), `/enterprise` (Universities & Enterprise), `/community`, `/login`, `/signup`, `/forgot-password` (modals over the current page via the `@auth` intercepting routes) and `/onboarding` (mentee profile wizard, also a modal). Linked but not built yet (they 404 for now): `/mentors/<slug>` (mentor profiles), `/speaker-hub/request` (speaker requests), `/about`, `/contact`, `/community-guidelines`, `/privacy`, `/terms`. Keep these paths when building the pages, since nav and footer links already point at them (`src/data/site.ts`).

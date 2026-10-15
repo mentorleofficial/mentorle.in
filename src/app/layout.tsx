@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Manrope } from "next/font/google";
+import { Suspense } from "react";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { ScrollAnimations } from "@/components/motion/ScrollAnimations";
@@ -40,7 +41,11 @@ export default function RootLayout({ children, auth }: LayoutProps<"/">) {
           <SiteFooter />
           {auth}
         </AuthProvider>
-        <ScrollAnimations />
+        {/* usePathname() is URL data on dynamic routes (/events/[slug]); Cache Components needs it inside Suspense.
+            It renders nothing, so the fallback is empty. */}
+        <Suspense fallback={null}>
+          <ScrollAnimations />
+        </Suspense>
         <SmoothScroll />
       </body>
     </html>

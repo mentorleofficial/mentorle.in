@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useEffect, useId, useRef, useState } from "react";
 import { accountMenu } from "@/data/auth";
-import { initialsOf, useAuth } from "@/lib/auth/AuthProvider";
+import { useAuth } from "@/lib/auth/AuthProvider";
+import { initialsOf } from "@/lib/initials";
 import { prefetchFor } from "@/lib/routes";
 
 export function Avatar({ name, url, className = "size-[2.3125rem] text-sm" }: { name: string; url: string | null; className?: string }) {

@@ -4,6 +4,7 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useRef } from "react";
+import { PLAY_ONCE } from "@/components/motion/ScrollAnimations";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
@@ -35,7 +36,7 @@ export function CountUp({ target, decimals = 0, prefix = "", suffix = "", as: Ta
           value: target,
           duration: 2.2,
           ease: "power2.out",
-          scrollTrigger: { trigger: element, start: "top 90%", once: true },
+          scrollTrigger: { trigger: element, start: "top 90%", toggleActions: PLAY_ONCE },
           onUpdate: () => {
             element.textContent = `${prefix}${format(counter.value, decimals)}${suffix}`;
           },
