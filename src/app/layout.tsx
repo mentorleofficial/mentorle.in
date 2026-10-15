@@ -4,6 +4,7 @@ import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { ScrollAnimations } from "@/components/motion/ScrollAnimations";
 import { SmoothScroll } from "@/components/motion/SmoothScroll";
+import { AuthProvider } from "@/lib/auth/AuthProvider";
 import "./globals.css";
 
 const manrope = Manrope({
@@ -33,10 +34,12 @@ export default function RootLayout({ children, auth }: LayoutProps<"/">) {
         <script dangerouslySetInnerHTML={{ __html: motionBootstrap }} />
       </head>
       <body className="flex min-h-full flex-col font-sans">
-        <SiteHeader />
-        <main className="flex-1">{children}</main>
-        <SiteFooter />
-        {auth}
+        <AuthProvider>
+          <SiteHeader />
+          <main className="flex-1">{children}</main>
+          <SiteFooter />
+          {auth}
+        </AuthProvider>
         <ScrollAnimations />
         <SmoothScroll />
       </body>

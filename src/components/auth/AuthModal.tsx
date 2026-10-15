@@ -1,22 +1,44 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useEffect, useId, useRef } from "react";
-import { AuthForm } from "@/components/auth/AuthForm";
+import { useEffect, useId, useRef, useState } from "react";
+import { AuthModalProvider, useAuthModal } from "@/components/auth/AuthModalContext";
+import { ForgotPasswordFlow } from "@/components/auth/ForgotPasswordFlow";
+import { LoginFlow } from "@/components/auth/LoginFlow";
+import { SignupFlow } from "@/components/auth/SignupFlow";
+import { OnboardingFlow } from "@/components/onboarding/OnboardingFlow";
+import { authCopy } from "@/data/auth";
 import type { AuthMode } from "@/data/auth";
+import { useAuth } from "@/lib/auth/AuthProvider";
 
 type AuthModalProps = {
   mode: AuthMode;
-  // True when opened over another page via an intercepted route; false on a direct visit to /login or /signup.
+  // True when opened over another page via an intercepted route; false on a direct visit.
   intercepted: boolean;
 };
 
-const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])';
+const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+const flows = { login: LoginFlow, signup: SignupFlow, forgot: ForgotPasswordFlow, onboarding: OnboardingFlow } satisfies Record<AuthMode, () => React.ReactNode>;
 
 export function AuthModal({ mode, intercepted }: AuthModalProps) {
-  const router = useRouter();
   const titleId = useId();
+  return (
+    <AuthModalProvider titleId={titleId} intercepted={intercepted}>
+      <AuthDialog mode={mode} />
+    </AuthModalProvider>
+  );
+}
+
+function AuthDialog({ mode }: { mode: AuthMode }) {
+  const { titleId, close } = useAuthModal();
+  const { status, onboarded } = useAuth();
   const dialogRef = useRef<HTMLDivElement>(null);
+  const checkedInitialStatus = useRef(false);
+  const Flow = flows[mode];
+  // With cacheComponents, Next keeps a closed modal in a hidden <Activity> and shows the same instance when
+  // the route is opened again. Effects clean up on hide, so bump a key there: the flow remounts while hidden
+  // and every reopen starts fresh (no stale "Logging in…", typed passwords or half-done steps).
+  const [openId, setOpenId] = useState(0);
 
   useEffect(() => {
     const previouslyFocused = document.activeElement as HTMLElement | null;
@@ -24,17 +46,20 @@ export function AuthModal({ mode, intercepted }: AuthModalProps) {
     const previousOverflow = root.style.overflow;
     // Lenis runs with autoToggle, so hiding overflow on <html> also pauses smooth scrolling.
     root.style.overflow = "hidden";
-    dialogRef.current?.querySelector<HTMLInputElement>("input")?.focus();
     return () => {
       root.style.overflow = previousOverflow;
       previouslyFocused?.focus?.();
+      checkedInitialStatus.current = false;
+      setOpenId((id) => id + 1);
     };
   }, []);
 
-  const close = () => {
-    if (intercepted) router.back();
-    else router.push("/");
-  };
+  // Nothing to do when the modal opens: already signed in (login/signup/forgot), or already onboarded.
+  useEffect(() => {
+    if (checkedInitialStatus.current || status === "loading") return;
+    checkedInitialStatus.current = true;
+    if (status === "signed-in" && (mode !== "onboarding" || onboarded)) close();
+  }, [status, onboarded, mode, close]);
 
   const onKeyDown = (event: React.KeyboardEvent) => {
     if (event.key === "Escape") {
@@ -58,31 +83,32 @@ export function AuthModal({ mode, intercepted }: AuthModalProps) {
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex animate-[auth-backdrop-in_300ms_ease-out] items-center justify-center overflow-y-auto bg-black/45 px-4 py-10 backdrop-blur-xl"
+      className="fixed inset-0 z-[100] flex animate-[auth-backdrop-in_300ms_ease-out] overflow-y-auto overscroll-contain bg-black/45 px-4 py-6 backdrop-blur-xl sm:py-10"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) close();
       }}
       onKeyDown={onKeyDown}
       data-lenis-prevent
     >
+      {/* m-auto centres the card when it fits and lets the overlay scroll when it doesn't (tall signup on phones). */}
       <div
         ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        className="relative w-full max-w-[34.4375rem] animate-[auth-card-in_400ms_cubic-bezier(0.22,1,0.36,1)] bg-white px-6 pt-12 pb-10 motion-reduce:animate-none md:px-10 md:pt-[3.125rem] md:pb-[3.25rem]"
+        className="relative m-auto w-full max-w-[34.4375rem] animate-[auth-card-in_400ms_cubic-bezier(0.22,1,0.36,1)] bg-white px-5 pt-12 pb-9 motion-reduce:animate-none sm:px-10 md:pt-[3.125rem] md:pb-[3.25rem]"
       >
         <button
           type="button"
           onClick={close}
-          aria-label="Close"
-          className="absolute top-4 right-4 flex size-10 items-center justify-center text-ink transition-transform duration-300 hover:rotate-90 focus-visible:outline-2 focus-visible:outline-brand md:top-[1.375rem] md:right-[1.375rem]"
+          aria-label={authCopy.close}
+          className="absolute top-3 right-3 flex size-10 items-center justify-center text-ink transition-transform duration-300 hover:rotate-90 focus-visible:outline-2 focus-visible:outline-brand md:top-[1.375rem] md:right-[1.375rem]"
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" className="size-6" aria-hidden>
             <path d="M3 3l18 18M21 3L3 21" />
           </svg>
         </button>
-        <AuthForm mode={mode} titleId={titleId} intercepted={intercepted} />
+        <Flow key={openId} />
       </div>
     </div>
   );

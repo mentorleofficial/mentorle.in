@@ -73,7 +73,9 @@ export function HeroSlideshow({ slides, autoplayMs }: HeroSlideshowProps) {
                 slideIndex === next ? "opacity-100" : "opacity-0"
               }`}
             >
-              <Image src={slide.src} alt="" fill sizes="20rem" loading="eager" className="object-cover" />
+              {/* Default (lazy) loading: the card is on screen so these still load right away, but eager images get
+                  preload hints in <head>, and the browser warns about the ones not shown within a few seconds. */}
+              <Image src={slide.src} alt="" fill sizes="20rem" className="object-cover" />
             </div>
           ))}
           <ArrowControls

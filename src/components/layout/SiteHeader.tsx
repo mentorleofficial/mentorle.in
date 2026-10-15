@@ -5,24 +5,35 @@ import Link from "next/link";
 import { prefetchFor } from "@/lib/routes";
 import { useState } from "react";
 import { buttonClasses } from "@/components/ui/ButtonLink";
+import { AccountLinks, AccountMenu, Avatar } from "@/components/layout/AccountMenu";
 import { accountNav, primaryNav } from "@/data/site";
+import { useAuth } from "@/lib/auth/AuthProvider";
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
   const close = () => setOpen(false);
+  const { status, user, onboarded, signOut } = useAuth();
+  const signedIn = status === "signed-in" && user;
 
   return (
     <header className="absolute inset-x-0 top-0 z-50 pt-4 md:pt-8 xl:pt-[3.125rem]">
       <div className="container-page">
         {/* Animate the bar itself: fading an ancestor would disable its backdrop blur until the fade completes. */}
         <div data-hero="0" className="relative flex h-16 items-center justify-between border border-white/5 bg-black/20 px-4 backdrop-blur-[6px] md:h-[5.4375rem] md:px-[1.875rem]">
-          <div className="hidden items-center gap-[0.625rem] lg:flex">
-            <Link href={accountNav.newHere.href} prefetch={prefetchFor(accountNav.newHere.href)} className={buttonClasses("light")}>
-              {accountNav.newHere.label}
-            </Link>
-            <Link href={accountNav.login.href} prefetch={prefetchFor(accountNav.login.href)} className={buttonClasses("ghost", "bg-transparent")}>
-              {accountNav.login.label}
-            </Link>
+          {/* Hidden until the session is read, so signed-in users don't see Login flash before their avatar. */}
+          <div className={`hidden items-center gap-[0.625rem] transition-opacity duration-300 lg:flex ${status === "loading" ? "opacity-0" : ""}`}>
+            {signedIn ? (
+              <AccountMenu />
+            ) : (
+              <>
+                <Link href={accountNav.newHere.href} prefetch={prefetchFor(accountNav.newHere.href)} className={buttonClasses("light")}>
+                  {accountNav.newHere.label}
+                </Link>
+                <Link href={accountNav.login.href} prefetch={prefetchFor(accountNav.login.href)} className={buttonClasses("ghost", "bg-transparent")}>
+                  {accountNav.login.label}
+                </Link>
+              </>
+            )}
           </div>
 
           <Link
@@ -89,14 +100,32 @@ export function SiteHeader() {
                   ))}
                 </ul>
               </nav>
-              <div className="mt-4 grid grid-cols-2 gap-[0.625rem] sm:max-w-sm">
-                <Link href={accountNav.newHere.href} prefetch={prefetchFor(accountNav.newHere.href)} onClick={close} className={buttonClasses("light")}>
-                  {accountNav.newHere.label}
-                </Link>
-                <Link href={accountNav.login.href} prefetch={prefetchFor(accountNav.login.href)} onClick={close} className={buttonClasses("ghost")}>
-                  {accountNav.login.label}
-                </Link>
-              </div>
+              {status === "loading" ? null : signedIn ? (
+                <div className="mt-4">
+                  <div className="flex items-center gap-3 pb-2">
+                    <Avatar name={user.full_name} url={user.avatar_url} />
+                    <div className="min-w-0">
+                      <p className="truncate text-sm text-white">{user.full_name}</p>
+                      <p className="truncate text-xs text-white/60">{user.email}</p>
+                    </div>
+                  </div>
+                  <AccountLinks
+                    onboarded={onboarded}
+                    onNavigate={close}
+                    onSignOut={() => void signOut()}
+                    itemClassName="block w-full border-b border-white/10 py-3 text-left text-base text-white/90 hover:text-white"
+                  />
+                </div>
+              ) : (
+                <div className="mt-4 grid grid-cols-2 gap-[0.625rem] sm:max-w-sm">
+                  <Link href={accountNav.newHere.href} prefetch={prefetchFor(accountNav.newHere.href)} onClick={close} className={buttonClasses("light")}>
+                    {accountNav.newHere.label}
+                  </Link>
+                  <Link href={accountNav.login.href} prefetch={prefetchFor(accountNav.login.href)} onClick={close} className={buttonClasses("ghost")}>
+                    {accountNav.login.label}
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
         </div>

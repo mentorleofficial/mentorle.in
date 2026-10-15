@@ -165,15 +165,28 @@ The content **matches the spec's Free Community tier**: weekly Saturday 6–7 PM
 | C4 | Closing banner | — | Taller (622px) than the homepage banner. | Built at the shared 555px height, per the product owner's earlier decision that this banner is the same size everywhere. |
 
 
-## 9. Login and Sign up (`/login`, `/signup`) — built 2026-10-14
+## 9. Login, Sign up, Forgot password and Onboarding (`/login`, `/signup`, `/forgot-password`, `/onboarding`) — built 2026-10-14, flows added 2026-10-15
 
-Built as a modal over whatever page the user is on (Next intercepting routes): the page behind is blurred and darkened, the URL becomes `/login` or `/signup`, and Back, Esc, ✕ or a click outside closes it. A direct visit or refresh opens the modal over the homepage. **Frontend only:** the forms validate (required fields, email format, 8+ character password) but submitting just shows "Accounts aren't live yet".
+The auth screens open as a modal over whatever page the user is on (Next intercepting routes): the page behind is blurred and darkened, the URL changes, and Back, Esc, ✕ or a click outside closes it. A direct visit or refresh opens the modal over the homepage. Each flow's steps change inside the same card.
+
+**The flows copy the Mentorle platform's mentee side** (`../Mentorle-Version2`: `MenteeSignupForm`, `Login`, `ForgotPassword`, `MenteeOnboarding`), because mentorle.in will replace the platform's mentee side and connect to its database:
+- **Sign up:** name, email, phone, date of birth, password and consent → 8-digit email code (resend after 60s, "Edit email") → "You're in!" → `/onboarding`.
+- **Log in:** email and password, plus a "Forgot password?" link. An unverified account gets the email-code step. Afterwards, a mentee who hasn't finished onboarding goes to `/onboarding`; otherwise the user goes to `?redirect=` or back to the page they were on.
+- **Forgot password:** email → 8-digit code, new password and confirm password → signed in.
+- **Onboarding:** further steps in the same modal card (not a separate page), running the platform's 6-step wizard (photo and name, about you, goals, interests (at least 3), mentor areas and links, review), with the same limits, plus Save & exit. Finishing goes to `/mentors`.
+- **Header:** when signed in, it shows the user's initials or photo with a menu: Complete your profile / Find a mentor, and Log out.
+
+**No backend yet.** `src/lib/auth/service.ts` is a mock that mirrors the platform's Supabase calls and stores data in this browser. Every code screen accepts `12345678`, and a "Test mode" note there says so.
 
 | # | Item | What the spec says | What Figma shows | Status |
 |---|---|---|---|---|
-| A1 | Date of birth / 18+ gate | Signup must collect date of birth and refuse anyone under 18 (BP §7, PP Table 1). | Full Name, Email, Password only. | Open: needs a DOB field designed before the backend goes live. |
-| A2 | Forgot password | — | No "Forgot password?" link on the login card. | Open: needed once auth is real. |
-| A3 | Social / phone login | — | Email and password only, no Google or OTP option. | Open: confirm the sign-in methods. |
+| A1 | Date of birth / 18+ gate | Signup must collect date of birth and refuse anyone under 18 (BP §7, PP Table 1). | Full Name, Email, Password only. | **Built**: Day/Month/Year selects under the phone field; under-18s are blocked. The platform's signup still lacks it, and its DB needs a `date_of_birth` column. |
+| A2 | Forgot password | — | No link or screens. | **Built** from the platform's flow (8-digit recovery code). Unlike the platform, it never says whether an account exists. |
+| A3 | Social / phone login | — | Email and password only. | Kept as email + password, matching the platform. Open: confirm whether Google login is wanted. |
 | A4 | Password placeholder | — | Lowercase "password" while the other fields are capitalised. | Built as "Password" for consistency. |
-| A5 | Terms consent | DPDP Act needs consent to the privacy policy at signup. | No terms/privacy line on the signup card. | Open: suggest "By signing up you agree to the Terms and Privacy Policy." |
-| A6 | Backend | — | — | No auth backend yet; submit shows a not-connected notice. Min password length (8) is an assumption. |
+| A5 | Terms consent | DPDP Act: unbundled consent; promotional profiling can't be forced (BP §7). | No terms/privacy line. | **Built**: a required "I agree to the Terms and Privacy Policy" checkbox plus a separate, optional updates checkbox. The platform instead asks in a banner after login; its DB needs `terms_accepted_at` / `marketing_opt_in` columns at signup. |
+| A6 | Backend | — | — | Mock service only; see above. Swap `src/lib/auth/service.ts` for the platform's Supabase client. |
+| A7 | Phone at signup | Platform signup requires a phone number. | Not in the Figma. | Built as on the platform (country code, India +91 by default, 10 digits for India). |
+| A8 | Screens with no design | — | Only the first login and signup screens are designed. | Verify email, You're in, Forgot/Reset password, Password updated and all 6 onboarding steps reuse the login card's style (onboarding adds a progress bar along the card's top edge). Needs design review. |
+| A9 | Code length | Guest booking spec says a 6-digit OTP (to the phone). | — | Account codes are 8 digits, matching the platform's Supabase setting (`otp_length = 8`). |
+| A10 | Mentor link on login | Platform login shows "Want to mentor? Apply here". | Not in the Figma. | Left out, per the Figma; the footer and nav already link to Become a Mentor. |

@@ -153,7 +153,37 @@ Pairs on photos are always `ghost` + `light`, 8px apart (`gap-2`), centred.
 
 **Dark pillar strip** (Community, `CommunityPillars.tsx`): `bg-ink`, four centred columns (32px title, 16px body at `white/90`, max 16.25rem), 2 columns on tablet, stacked on phones.
 
-**Auth modal** (`components/auth/AuthModal.tsx` + `AuthForm.tsx`, copy in `src/data/auth.ts`): a fixed overlay (`bg-black/45 backdrop-blur-xl`) over the current page with a white, square card (max 551px, 50px top padding, ✕ at top right). Title 32px medium, subtitle 16px, fields 330px wide × 36px with a `line` border, a full-width 37px brand button, and a 14px switch link underneath. Errors turn the border brand and show a 12px `brand-dark` message. It fades/scales in (`auth-backdrop-in` / `auth-card-in` keyframes in `globals.css`), traps focus, locks scroll, and closes on Esc, ✕ or an outside click. Routing: `app/@auth/(.)login` and `(.)signup` intercept soft navigations and render the modal in the layout's `auth` slot (`@auth/default.tsx` returns null); `app/login` and `app/signup` handle direct visits by rendering the homepage plus the modal. With `cacheComponents`, closed modals stay in the DOM inside a hidden `<Activity>`, so tests must check visibility, not presence.
+**Auth modal** (`components/auth/`, copy in `src/data/auth.ts`): a fixed overlay (`bg-black/45 backdrop-blur-xl`) over the current page with a white, square card (max 551px, 50px top padding, ✕ at top right). Title 32px medium, subtitle 16px, a 330px form column (`formColumn`), 36px fields with a `line` border, a full-width 37px brand button, and a 14px switch link underneath. `AuthModal` picks the flow (`LoginFlow`, `SignupFlow`, `ForgotPasswordFlow`); each flow renders one `AuthStep` at a time. `AuthStep` fades in (`auth-step-in`) and focuses its first field. The card fades/scales in (`auth-backdrop-in` / `auth-card-in`), traps focus, locks scroll, and closes on Esc, ✕ or an outside click. The card is centred with `m-auto`, so a tall step scrolls inside the overlay on phones.
+- **Links between auth screens:** use `AuthLink` (replace navigation inside the modal, full navigation on direct pages, carries `?redirect=`).
+- **After a session exists:** call `finish()` from `useAuthModal()`.
+- **Routing:** `app/@auth/(.)login`, `(.)signup` and `(.)forgot-password` intercept soft navigations and render into the layout's `auth` slot. `@auth/default.tsx`, `@auth/page.tsx` and `@auth/[...catchAll]` return null; the catch-all is what closes the modal when a flow navigates elsewhere (e.g. to `/onboarding`). `app/login`, `app/signup` and `app/forgot-password` handle direct visits (homepage + modal).
+- **Testing:** with `cacheComponents`, closed modals stay in the DOM inside a hidden `<Activity>`, so tests must check visibility, not presence.
+
+**Form primitives** (`components/forms/`), shared by auth and onboarding:
+- **`TextField`, `PasswordField` (show/hide), `TextAreaField` (counter).** Label hidden + placeholder inside auth cards (per Figma), visible 14px medium label elsewhere. 12px `brand-dark` errors, 12px `muted` hints.
+- **`PhoneField`** (country select showing "IN +91", value `"+91 9876543210"` like the platform).
+- **`DateField`** (Day / Month / Year selects; validates when focus leaves the group).
+- **`OtpInput`** (one real input drawn as square boxes, so paste and one-time-code autofill work).
+- **`Checkbox`** (square, brand when checked).
+- **`ChipInput`** (tags as `bg-ink` chips, suggestions as outlined pills).
+- **`FormAlert`** (error: brand outline on `brand/5`; info: `bg-surface`).
+- **`SubmitButton`** (full-width brand, spinner when loading).
+- **`outlineButtonClasses`** (ink outline on white, for secondary actions).
+
+Form state uses `useZodForm` (`src/lib/forms/`). Errors show after blur or submit; server errors stay until the field changes. Schemas live in `src/lib/auth/schema.ts`, ported from the platform.
+
+**Onboarding steps** (`components/onboarding/OnboardingFlow.tsx`): the 6-step wizard runs **inside the auth modal**, so signup → verify → You're in! → onboarding is one continuous card.
+- **Routes:** `/onboarding` is intercepted like `/login` (`@auth/(.)onboarding`); a direct visit opens it over the homepage.
+- **Progress:** a 4px brand bar along the card's top edge (on `surface`), with a 12px uppercase "Step x of 6" above the usual 32px title + subtitle.
+- **Fields:** they span the full card width, with visible labels (unlike the login/signup placeholders) because they need "(optional)" and counters.
+- **Footer:** Back (outline) + Continue (brand, fills the row), with a "Save & exit" text link below; it saves a draft and closes. ✕, Esc and an outside click also save what was typed (the wizard saves in its effect cleanup, which runs whenever the modal closes or Next hides it).
+- **Review step:** stacked label + Edit, value rows.
+- **Reopening:** gets a fresh flow. `AuthDialog` re-keys the flow when the hidden `<Activity>` cleans up, so no stale state survives; drafts come back from the saved profile.
+
+**Signed-in header** (`components/layout/AccountMenu.tsx`, state from `useAuth()` in `src/lib/auth/AuthProvider.tsx`, which wraps the layout):
+- **Desktop:** the left buttons become a square brand avatar (initials or photo) + first name + chevron, opening a white menu (email, then Complete your profile / Find a mentor, then Log out).
+- **Mobile:** the menu panel shows the same items.
+- **First render:** the static HTML can't know who is signed in, so the account area stays transparent (`opacity-0`) until the session is read after hydration, then fades in. Signed-in users never see Login flash before their avatar.
 
 **Pages** follow `hero → content section(s) on bg-surface/bg-dots → footer`. Speaker Hub is `PageHero` + one `bg-dots` section (2 speaker cards + request tile) + footer. Find a Mentor is `PageHero` + one `bg-surface` section + footer. Mentorle Plus is `PageHero` + `PricingPlans` (`bg-dots`) + `PlusBenefits` (`bg-surface`) + footer.
 
@@ -203,3 +233,5 @@ Other motion rules:
 9. **GSAP must not touch an element before React hydrates it.** Inline styles written early cause a "tree hydrated but some attributes didn't match" error on every page. `ScrollAnimations` waits until every animated element is hydrated (3s fallback); component-level `useGSAP` is already safe because it runs after its own hydration.
 10. **Next's LCP warning tracks images by URL.** If the same image appears twice (the logo in the header and footer), *every* copy must be `loading="eager"`, or the lazy copy re-triggers the warning. Use `loading="eager"` for above-the-fold images; `preload` is only for hero backgrounds.
 11. **Links to unbuilt pages log 404s in production**, because Next prefetches every visible link. All `Link`s pass `prefetch={prefetchFor(href)}` (`src/lib/routes.ts`); add each new page to `BUILT_ROUTES`.
+12. **`loading="eager"` images get a preload hint in `<head>` (React 19).** If an eager image isn't visible within a few seconds (e.g. inactive slides in a carousel thumbnail), the browser logs "preloaded but not used". Use eager only for images on screen at load; an on-screen lazy image still loads immediately.
+13. **Never gate a one-off animation on a "skip the first run" ref.** In development React runs effects twice on mount, so the second run slips past the flag. That fired Find a Mentor's filter animation on page load, where it fought the scroll fade-in (the cards flashed visible, vanished, then faded in). Compare against the previous values instead (see `MentorDirectory.tsx`).

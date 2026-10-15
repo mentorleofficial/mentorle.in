@@ -123,6 +123,13 @@ button:not(:disabled),
   }
 }
 
+@keyframes auth-step-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+}
+
 @keyframes auth-card-in {
   from {
     opacity: 0;

@@ -27,7 +27,6 @@ export function MentorDirectory({ mentors, filters, searchPlaceholder, emptyStat
   const [domain, setDomain] = useState<DomainFilter["value"]>("all");
   const [query, setQuery] = useState("");
   const gridRef = useRef<HTMLDivElement>(null);
-  const hasFiltered = useRef(false);
 
   const trimmedQuery = query.trim();
   const results = useMemo(
@@ -35,12 +34,15 @@ export function MentorDirectory({ mentors, filters, searchPlaceholder, emptyStat
     [mentors, domain, trimmedQuery],
   );
 
+  // Animate only when the filter or search actually changes. A "skip the first run" flag isn't enough: React
+  // runs effects twice on mount in development, which fired this on page load and fought the scroll fade-in
+  // (cards flashed visible, vanished, then faded in).
+  const shownFilter = useRef({ domain, query: trimmedQuery });
   useGSAP(
     () => {
-      if (!hasFiltered.current) {
-        hasFiltered.current = true;
-        return;
-      }
+      const previous = shownFilter.current;
+      if (previous.domain === domain && previous.query === trimmedQuery) return;
+      shownFilter.current = { domain, query: trimmedQuery };
       const cards = gridRef.current?.children;
       if (!cards?.length || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
       gsap.fromTo(
