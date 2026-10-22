@@ -2,8 +2,8 @@
 // skip Next's prefetch, which would otherwise log a 404 in the console for every visible link.
 export const BUILT_ROUTES = new Set(["/", "/mentors", "/pricing", "/speaker-hub", "/become-a-mentor", "/events", "/enterprise", "/community", "/login", "/signup", "/forgot-password", "/onboarding"]);
 
-// Dynamic routes whose pages exist for every slug (/events/<slug>).
-const BUILT_PREFIXES = ["/events/"];
+// Dynamic routes whose pages exist for every slug (/events/<slug>, /mentors/<slug>).
+const BUILT_PREFIXES = ["/events/", "/mentors/"];
 
 export const isBuiltRoute = (href: string) => {
   if (!href.startsWith("/")) return true;

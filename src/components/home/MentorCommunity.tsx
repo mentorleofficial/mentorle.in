@@ -20,7 +20,7 @@ export function MentorCommunity() {
         />
         <div data-animate="stagger" className="mt-12 grid gap-5 md:mt-16 md:grid-cols-3">
           {featuredMentors.map((mentor) => (
-            <MentorCard key={mentor.slug} mentor={mentor} />
+            <MentorCard key={mentor.slug} mentor={mentor} href={`/mentors/${mentor.slug}`} />
           ))}
         </div>
       </div>

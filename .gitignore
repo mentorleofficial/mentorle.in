@@ -42,3 +42,5 @@ next-env.d.ts
 
 # design/spec reference material (local only)
 /context-files
+# Private working docs (plans, research). Never committed.
+/local-docs/

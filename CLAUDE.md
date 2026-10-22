@@ -40,7 +40,7 @@ src/components/ui/        reusable primitives: ButtonLink, SectionHeader, IconCa
 src/components/motion/    ScrollAnimations (data-attribute animation runner), SmoothScroll (Lenis), CountUp
 src/components/forms/     form primitives (TextField, PasswordField, PhoneField, DateField, OtpInput, ChipInput, Checkbox, SubmitButton)
 src/lib/auth/             mock auth service, AuthProvider/useAuth, zod schemas (ported from the platform)
-src/components/<page>/    page-specific sections (components/auth/, components/onboarding/, components/event-detail/, components/home/, components/mentors/, components/pricing/, components/speakers/, components/become-a-mentor/, components/events/, components/enterprise/, components/community/)
+src/components/<page>/    page-specific sections (components/auth/, components/onboarding/, components/event-detail/, components/mentor-details/, components/home/, components/mentors/, components/pricing/, components/speakers/, components/become-a-mentor/, components/events/, components/enterprise/, components/community/)
 src/data/site.ts          nav, footer columns, social links, company/legal info, external URLs
 src/data/<page>.ts        all copy, image paths and image sizes for that page
 public/<page>/            assets for that page (e.g. public/homepage/)
@@ -49,6 +49,8 @@ docs/SPEC-VS-DESIGN.md    running list of differences between the spec documents
 scripts/convert-to-webp.mjs  PNG/JPG → WebP converter (npm run images)
 .claude/skills/           project skills (optimize-assets)
 ```
+
+**Private working docs** (plans, research PDFs) go in `local-docs/`, which is gitignored.
 
 **Design and spec source material lives outside the repo** in `../mentorle-context/mentorle.in/` (i.e. `C:\Programming\BeezTech\Mentorle-V2\mentorle-context\mentorle.in\`), so no git operation can delete it: the spec PDFs, `IMPLEMENTATION-CONTEXT.md`, Figma PNG exports in `figma/<page>/`, and original images replaced by WebP in `originals/`. Read it from there; never copy it into the repo.
 
@@ -79,4 +81,4 @@ scripts/convert-to-webp.mjs  PNG/JPG → WebP converter (npm run images)
 
 ## Routes (planned)
 
-Built: `/`, `/mentors` (Find a Mentor), `/pricing` (Mentorle Plus), `/speaker-hub`, `/become-a-mentor`, `/events` (Events & Summits), `/events/<slug>` (event detail, from `src/data/event-details.ts`), `/enterprise` (Universities & Enterprise), `/community`, `/login`, `/signup`, `/forgot-password` (modals over the current page via the `@auth` intercepting routes) and `/onboarding` (mentee profile wizard, also a modal). Linked but not built yet (they 404 for now): `/mentors/<slug>` (mentor profiles), `/speaker-hub/request` (speaker requests), `/about`, `/contact`, `/community-guidelines`, `/privacy`, `/terms`. Keep these paths when building the pages, since nav and footer links already point at them (`src/data/site.ts`).
+Built: `/`, `/mentors` (Find a Mentor), `/pricing` (Mentorle Plus), `/speaker-hub`, `/become-a-mentor`, `/events` (Events & Summits), `/events/<slug>` (event detail, from `src/data/event-details.ts`), `/mentors/<slug>` (mentor profile, from `src/data/mentor-details.ts`), `/enterprise` (Universities & Enterprise), `/community`, `/login`, `/signup`, `/forgot-password` (modals over the current page via the `@auth` intercepting routes) and `/onboarding` (mentee profile wizard, also a modal). Linked but not built yet (they 404 for now): `/speaker-hub/request` (speaker requests), `/about`, `/contact`, `/community-guidelines`, `/privacy`, `/terms`. Keep these paths when building the pages, since nav and footer links already point at them (`src/data/site.ts`).

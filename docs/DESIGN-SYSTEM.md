@@ -205,6 +205,13 @@ Form state uses `useZodForm` (`src/lib/forms/`). Errors show after blur or submi
 
 **FAQ accordion** (Become a Mentor, `MentorFaq`): bordered (`#cbcbcb`) rows 16px apart on `bg-surface`; 20px medium question with a "+" that rotates into "×" when open; 16px answer. One open at a time (the first by default). Opening animates with a `grid-template-rows` transition, no JS measuring.
 
+**Mentor profile** (`/mentors/<slug>`, `components/mentor-details/`):
+- **Top:** a dark band behind the transparent header (no hero image), then a white two-column hero: 14px orange uppercase tagline (`tracking-[0.15em]`), 88px name (`tracking-[-0.04em]`), 22px headline, 15px muted role line, a 56px brand "Book a Session →" button and 56px outlined LinkedIn / Portfolio buttons. Right: a 348px card with the photo (aspect 348/288) over a `#f0f0f0` panel with the years (48px) and a 13px uppercase caption.
+- **Sections:** separated by full-width `line` hairlines, 76px padding. Each opens with the orange uppercase eyebrow and a 48px title (line breaks from the data). Body text is 18px muted at 30px line height.
+- **Cards:** white with a `line` border, 30px padding. Services are numbered (14px muted), 26px titles, 16px descriptions, 2 columns with an odd last card spanning both. Sessions and experience cards use 32px and 24px titles; expertise chips are `#f0f0f0` 16px.
+- **Sparse profiles:** every section except the hero and sessions hides when its data is empty.
+- **Responsive hero:** phones stack the photo card first, then the text. Tablets (md–lg) keep text and card side by side with a 240px card, 52px name, 16px headline and compact 44px buttons (compact until xl) so the three buttons stay on one row; from lg the type grows back to 72px, and to the design's 88px at xl.
+
 **Pages** follow `hero → content section(s) on bg-surface/bg-dots → footer`. Speaker Hub is `PageHero` + one `bg-dots` section (2 speaker cards + request tile) + footer. Find a Mentor is `PageHero` + one `bg-surface` section + footer. Mentorle Plus is `PageHero` + `PricingPlans` (`bg-dots`) + `PlusBenefits` (`bg-surface`) + footer.
 
 Content lives in typed data files: `src/data/site.ts` (nav, footer, company/legal info, external URLs), `src/data/mentors.ts` (the `Mentor` model, shaped like the future API record, plus domain filters; the homepage's featured mentors come from here too) and `src/data/<page>.ts` (page copy, image paths and sizes). Components never hard-code copy. Placeholder copy gets a one-line comment in the data file and an entry in `docs/SPEC-VS-DESIGN.md`.

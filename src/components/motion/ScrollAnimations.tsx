@@ -89,6 +89,8 @@ export function ScrollAnimations() {
           });
 
           gsap.utils.toArray<HTMLElement>('[data-animate="stagger"]').forEach((element) => {
+            // Lists can be empty when data is (e.g. a mentor with no sessions); GSAP warns on empty targets.
+            if (!element.children.length) return;
             gsap.fromTo(
               element.children,
               { y: 56, autoAlpha: 0 },

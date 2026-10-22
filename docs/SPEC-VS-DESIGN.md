@@ -227,3 +227,19 @@ One page template renders any event from `src/data/event-details.ts`. Each recor
 | ED9 | Register buttons for signed-in users | — | — | Resolved by ED3/ED5: the cards no longer link to `/signup`. The auth modals still send any signed-in visitor on (to onboarding if unfinished) instead of showing a form. |
 | ED8 | Body text width | — | The design's 16px text renders about 1% wider than Manrope at 16px in the browser. | Kept at the design system's 16px with no added letter-spacing, so the "About" paragraph can wrap one word differently on wide screens. |
 | ED10 | Detail content for the three hosted gatherings | — | Only their card text (title, date, description, audience, button label) exists. | Times, venues, deadlines, "What You'll Learn", prerequisites, highlights and capacities are placeholders in `src/data/event-details.ts`. They have no speakers yet (the Guest Speaker card hides), and they reuse the Figma's blurred audience hero. |
+
+
+## 11. Mentor profile (`/mentors/<slug>`) — built 2026-10-22
+
+One template renders every mentor from `src/data/mentor-details.ts`, shaped like the platform's `get_public_mentor` record plus the mentor's `mentorship_offerings`, so moving to the database only changes `getMentorProfile` / `getMentorSlugs`. The design's profile (Neeru Sood) is fully built; the directory's placeholder mentors get pages from their card data with empty sections hidden.
+
+| # | Item | What the spec says | What Figma shows | Status |
+|---|---|---|---|---|
+| M1 | Corners and page column | — | Rounded cards and buttons; content inset 88px. | Built square with the site's page column so the page matches every other page. Say if the rounded style should spread site-wide instead. |
+| M2 | Header | — | A solid dark header bar; this page has no hero image. | A dark band sits behind the site's (transparent) header. |
+| M3 | Profile photo | — | Neeru Sood's card uses the homepage's "Arjun Malhotra" photo. | Kept as designed. Needs her real photo. |
+| M4 | Fields the platform doesn't store | `mentor_profiles` has headline, bio, expertise, role, organization, years, LinkedIn, portfolio, experiences. | Tagline ("Strategy. Brand. Growth."), core services, section intros and the About eyebrow. | Optional fields in the data. Open: add columns to `mentor_profiles` (see the backend plan). |
+| M5 | Booking | Booking flow exists on the platform (slots, payment, Plus). | "Book a Session" buttons. | Hero and banner buttons scroll to the sessions list; the session card's button opens signup and returns to the profile. Real booking is Phase 2. |
+| M6 | Experience dates | — | Current role "Aug 2026 – Present" follows a role ending Aug 2025. | Kept as designed; probably a typo for Aug 2025. |
+| M7 | LinkedIn / Portfolio links | — | Buttons only. | Placeholder URLs until real profile data. |
+| M8 | Neeru Sood in the directory | — | Not in the Find a Mentor design. | Added as the first directory card so her profile is reachable. The homepage keeps its three designed mentors, now linking to their profiles. |

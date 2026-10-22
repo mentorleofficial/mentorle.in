@@ -36,6 +36,18 @@ const photos = {
 
 // Placeholder directory: the Figma repeats the three homepage mentors; real profiles will come from the Mentorle database.
 export const mentors: Mentor[] = [
+  // From the mentor-details design (2026-10-22); its full profile is in src/data/mentor-details.ts.
+  {
+    slug: "neeru-sood",
+    name: "Neeru Sood",
+    role: "Founder · Prep4Success",
+    company: "Prep4Success",
+    experience: "22+ yrs",
+    focus: "Brand Growth",
+    domain: "startups",
+    expertise: ["Branding", "Digital marketing", "Business strategy", "Entrepreneurship"],
+    photo: photos.arjun,
+  },
   {
     slug: "arjun-malhotra",
     name: "Arjun Malhotra",
@@ -104,7 +116,9 @@ export const mentors: Mentor[] = [
   },
 ];
 
-export const featuredMentors = mentors.slice(0, 3);
+// The homepage's three mentors, as in its design.
+const FEATURED = ["arjun-malhotra", "meera-kapoor", "rohan-mehta"];
+export const featuredMentors = FEATURED.map((slug) => mentors.find((mentor) => mentor.slug === slug)!);
 
 export const mentorDirectoryPage = {
   hero: {
