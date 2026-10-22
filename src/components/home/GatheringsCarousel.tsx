@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import type { GatheringEvent } from "@/data/home";
 import { useCarouselLoop } from "@/components/home/useCarouselLoop";
 import { ButtonLink } from "@/components/ui/ButtonLink";
+import { MaskIcon } from "@/components/ui/MaskIcon";
 import { ProgressiveBlur } from "@/components/ui/ProgressiveBlur";
 
 const GAP_REM = 2.5;
@@ -140,33 +141,48 @@ export function GatheringsCarousel({ events }: { events: GatheringEvent[] }) {
               )}
               <div
                 aria-hidden={!isActive}
-                className={`absolute inset-x-0 bottom-0 px-6 pb-6 text-white transition-[opacity,translate] duration-500 md:px-8 md:pb-8 ${
+                className={`absolute inset-x-0 bottom-0 px-6 pb-6 text-white transition-[opacity,translate] duration-500 sm:flex sm:items-end sm:justify-between sm:gap-8 md:px-8 md:pb-8 ${
                   isActive ? "translate-y-0 opacity-100 delay-300" : "translate-y-3 opacity-0"
                 }`}
               >
-                <h3 className="text-xl font-medium md:text-2xl">{event.title}</h3>
-                {event.date && <p className="mt-1.5 text-sm text-white/95 md:text-base">{event.date}</p>}
-                <p
-                  className={`text-sm leading-snug text-white/90 md:text-base ${
-                    event.date ? "mt-4 max-w-[29.5rem]" : "mt-2 max-w-[20.625rem]"
-                  }`}
-                >
-                  {event.description}
-                </p>
-                {(event.audience || event.cta) && (
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    {event.audience && (
-                      <span className="inline-flex h-[2.3125rem] items-center border border-white/30 bg-black/20 px-[1.125rem] text-sm">
-                        {event.audience}
-                      </span>
-                    )}
-                    {event.cta && isActive && (
-                      <ButtonLink href={event.cta.href} external={event.cta.external} variant="light">
-                        {event.cta.label}
-                        <span className="sr-only">: {event.title}</span>
-                      </ButtonLink>
-                    )}
-                  </div>
+                <div className="min-w-0">
+                  <h3 className="text-xl font-medium md:text-2xl">{event.title}</h3>
+                  {event.date && <p className="mt-1.5 text-sm text-white/95 md:text-base">{event.date}</p>}
+                  <p
+                    className={`text-sm leading-snug text-white/90 md:text-base ${
+                      event.date ? "mt-4 max-w-[29.5rem]" : "mt-2 max-w-[20.625rem]"
+                    }`}
+                  >
+                    {event.description}
+                  </p>
+                  {(event.audience || event.cta) && (
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      {event.audience && (
+                        <span className="inline-flex h-[2.3125rem] items-center border border-white/30 bg-black/20 px-[1.125rem] text-sm">
+                          {event.audience}
+                        </span>
+                      )}
+                      {event.cta && isActive && (
+                        <ButtonLink href={event.cta.href} external={event.cta.external} variant="light">
+                          {event.cta.label}
+                          <span className="sr-only">: {event.title}</span>
+                        </ButtonLink>
+                      )}
+                    </div>
+                  )}
+                </div>
+                {/* Time and date, bottom-right. Hidden on phones, where the fixed-height card has no room. */}
+                {event.when && (
+                  <ul className="hidden shrink-0 space-y-1.5 text-sm text-white sm:block md:text-[0.9375rem]">
+                    <li className="flex items-center justify-end gap-2.5">
+                      <MaskIcon src="/event-detail/deadline.svg" className="size-4" />
+                      {event.when.time}
+                    </li>
+                    <li className="flex items-center justify-end gap-2.5">
+                      <MaskIcon src="/event-detail/date-and-time.svg" className="size-4" />
+                      {event.when.day}
+                    </li>
+                  </ul>
                 )}
               </div>
               {!isActive && (

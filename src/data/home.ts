@@ -1,3 +1,5 @@
+import type { IconCardContent } from "@/data/become-a-mentor";
+
 export type ImageAsset = {
   src: string;
   width: number;
@@ -14,12 +16,22 @@ export type HeroSlide = ImageAsset & {
 };
 
 export const hero = {
-  title: "Fast-track your growth with Industry Insiders",
+  // The line break is part of the design ("The Right Connections / Real opportunities.").
+  title: "The Right Connections\nReal opportunities.",
+  subtitle: "Meet mentors, find opportunities, build projects, and connect with people who can help you move forward.",
   primaryCta: { label: "Find a Mentor", href: "/mentors" },
   secondaryCta: { label: "Explore Mentorle Plus", href: "/pricing" },
-  autoplayMs: 3000,
+  autoplayMs: 2100,
   // Rotates as the hero background; the small card previews the next slide. Add more slides here.
   slides: [
+    {
+      src: "/homepage/hero-section-2.webp",
+      thumb: "/homepage/hero-thumbs/hero-section-2.webp",
+      width: 1672,
+      height: 941,
+      alt: "Students filling a university auditorium for a Mentorle session",
+      position: "object-center",
+    },
     {
       src: "/homepage/hero-background.webp",
       thumb: "/homepage/hero-thumbs/hero-background.webp",
@@ -73,9 +85,11 @@ export type GatheringEvent = ImageAsset & {
   alt: string;
   audience?: string;
   cta?: { label: string; href: string; external?: boolean };
+  // Bottom-right of the active card: a clock row and a calendar row.
+  when?: { time: string; day: string };
 };
 
-// Only the centre card's text exists in Figma; the other two cards use placeholder copy.
+// Only the centre card's text (and its time/date) exists in Figma; the other two cards use placeholder copy.
 export const gatherings: GatheringEvent[] = [
   {
     src: "/homepage/live-gatherings/image-1.webp",
@@ -85,6 +99,7 @@ export const gatherings: GatheringEvent[] = [
     title: "Leadership Roundtable",
     description: "An intimate dinner where senior operators share what they wish they had known earlier.",
     alt: "Guests talking at a leadership dinner",
+    when: { time: "7:30 PM – 10:00 PM IST", day: "Saturday, 24 October 2026" },
   },
   {
     src: "/homepage/live-gatherings/image-2.webp",
@@ -94,6 +109,7 @@ export const gatherings: GatheringEvent[] = [
     title: "Founders & Leaders Mixer",
     description: "An evening of networking and meaningful conversations with industry leaders.",
     alt: "Founders and leaders networking at a mixer",
+    when: { time: "5:00 PM – 7:00 PM IST", day: "Saturday, 14 November 2026" },
   },
   {
     src: "/homepage/live-gatherings/image-3.webp",
@@ -103,6 +119,7 @@ export const gatherings: GatheringEvent[] = [
     title: "Builders Tech Sprint",
     description: "A hands-on sprint where students build alongside engineers from product companies.",
     alt: "Participants at a tech sprint",
+    when: { time: "10:00 AM – 6:00 PM IST", day: "Saturday, 5 December 2026" },
   },
 ];
 
@@ -268,10 +285,29 @@ export const successStories: SuccessStory[] = [
   },
 ];
 
-// Heading for the pricing plans reused on the homepage (after Life at Mentorle). Placeholder copy: the Figma
-// has no homepage pricing section (logged in SPEC-VS-DESIGN).
+// Heading for the pricing plans on the homepage (between Career Growth and How it works).
 export const homePlans = {
-  eyebrow: "Pricing",
-  title: "Pick the pass that fits",
-  description: "Start free in the community, or unlock every mentor, masterclass and mock interview with a yearly pass.",
+  eyebrow: "Choose your access",
+  // Line break as in the design.
+  title: "Start free. Choose more\nsupport when you need it.",
+  description: "Join for free, get expert learning with Pro Pass, or choose All-Access if you want four one-to-one mock sessions included.",
+};
+
+const goalIcon = (name: string, width: number, height: number): ImageAsset => ({ src: `/homepage/start-with-your-goal/${name}.svg`, width, height });
+
+// "Start with your goal" (after Live Gatherings). The cards aren't links in the design; the button opens the
+// mentor directory, which filters by domain.
+export const helpWith = {
+  eyebrow: "Start with your goal",
+  title: "What would you like help with?",
+  description: "Choose the area you care about. We’ll help you find people who can share useful advice and real experience.",
+  action: { label: "Explore all domains", href: "/mentors" },
+  cards: [
+    { icon: goalIcon("IT", 76, 41), title: "IT & Software", description: "Build coding skills, explore emerging technologies, and learn from experienced developers." },
+    { icon: goalIcon("startup", 69, 69), title: "Startup & Pitching", description: "Turn your ideas into reality with expert guidance on business growth and investor pitching." },
+    { icon: goalIcon("academic-counselling", 69, 52), title: "Academic Counseling", description: "Make informed study choices, explore opportunities, and plan your academic confidently." },
+    { icon: goalIcon("product-management", 69, 69), title: "Product Management", description: "Master product strategy, understand user needs, and learn to build successful products." },
+    { icon: goalIcon("design", 69, 69), title: "Design & UI/UX", description: "Improve your design skills through user research, wireframing, prototyping, and visual design." },
+    { icon: goalIcon("career-transitions", 69, 69), title: "Career Transitions", description: "Navigate career changes, develop new skills, and prepare for your next professional opportunity." },
+  ] satisfies IconCardContent[],
 };

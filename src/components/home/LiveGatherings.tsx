@@ -5,7 +5,7 @@ import { gatherings } from "@/data/home";
 
 export function LiveGatherings() {
   return (
-    <section aria-labelledby="gatherings-title" className="bg-dots py-16 md:py-24 lg:py-[8.125rem]">
+    <section aria-labelledby="gatherings-title" className="bg-dots py-16 md:py-24 lg:pt-[8.125rem] lg:pb-[7.3125rem]">
       <div className="container-page">
         <SectionHeader
           id="gatherings-title"

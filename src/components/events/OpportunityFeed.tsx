@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { useMemo, useRef, useState } from "react";
@@ -103,40 +104,49 @@ export function OpportunityFeed({ opportunities, filters, ctaLabels, searchPlace
       </p>
 
       {results.length > 0 ? (
-        <ul ref={listRef} data-animate="stagger" className="mt-12 flex flex-col gap-[1.5625rem] md:mt-16">
+        <ul ref={listRef} data-animate="stagger" className="mt-12 grid gap-5 sm:grid-cols-2 md:mt-12 lg:grid-cols-3">
           {results.map((item) => (
-            <li
-              key={item.id}
-              className="flex flex-col gap-5 border border-[#cbcbcb] px-5 py-5 transition-colors duration-300 hover:border-ink/40 md:flex-row md:items-center md:justify-between md:px-6 md:py-6"
-            >
-              <div className="min-w-0">
-                <div className="flex flex-wrap items-center gap-3">
-                  <span className="inline-flex h-[2.3125rem] items-center bg-[#ea7146] px-[1.1875rem] text-sm text-white">{item.source}</span>
-                  <span className="text-sm text-ink md:text-base">{item.categories.join(", ")}</span>
-                </div>
-                <h3 className="mt-4 text-xl font-medium text-ink md:mt-5 md:text-2xl">{item.title}</h3>
-                <ul className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-base text-ink md:text-lg">
-                  <li className="flex items-center gap-2">
-                    <PeopleIcon />
-                    <span className="sr-only">Organiser: </span>
-                    {item.organiser}
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <PinIcon />
-                    <span className="sr-only">Location: </span>
-                    {item.location}
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <WalletIcon />
-                    <span className="sr-only">Pay or prize: </span>
-                    {item.reward}
-                  </li>
-                </ul>
+            // Photo, a 14px gap of section grey, then the white details block (updated design, 2026-10-22).
+            <li key={item.id} className="group flex flex-col gap-3.5">
+              <div className="relative aspect-[433/311] overflow-hidden">
+                <Image
+                  src={item.image.src}
+                  alt={item.image.alt}
+                  fill
+                  sizes="(min-width: 1024px) 27rem, (min-width: 640px) 50vw, 100vw"
+                  className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                />
               </div>
-              <ButtonLink href={item.url} external variant="dark" className="min-w-[7.5rem] self-start md:self-center">
-                {ctaLabels[item.type]}
-                <span className="sr-only">: {item.title} on {item.source}</span>
-              </ButtonLink>
+              <div className="flex flex-1 flex-col items-start bg-white p-4">
+                <div className="w-full min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <span className="inline-flex h-[2.3125rem] items-center bg-[#ea7146] px-[1.1875rem] text-sm text-white">{item.source}</span>
+                    <span className="text-sm text-ink md:text-base">{item.categories.join(", ")}</span>
+                  </div>
+                  <h3 className="mt-4 text-xl font-medium text-ink md:mt-5 md:text-2xl">{item.title}</h3>
+                  <ul className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-base text-ink md:text-lg">
+                    <li className="flex items-center gap-2">
+                      <PeopleIcon />
+                      <span className="sr-only">Organiser: </span>
+                      {item.organiser}
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <PinIcon />
+                      <span className="sr-only">Location: </span>
+                      {item.location}
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <WalletIcon />
+                      <span className="sr-only">Pay or prize: </span>
+                      {item.reward}
+                    </li>
+                  </ul>
+                </div>
+                <ButtonLink href={item.url} external variant="dark" className="mt-5 min-w-[7.5rem]">
+                  {ctaLabels[item.type]}
+                  <span className="sr-only">: {item.title} on {item.source}</span>
+                </ButtonLink>
+              </div>
             </li>
           ))}
         </ul>

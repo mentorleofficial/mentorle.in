@@ -1,3 +1,4 @@
+import type { IconCardContent } from "@/data/become-a-mentor";
 import type { GatheringEvent, ImageAsset } from "@/data/home";
 import { BECOME_A_MENTOR_PATH } from "@/data/site";
 
@@ -14,7 +15,16 @@ export type Opportunity = {
   location: string;
   reward: string;
   url: string;
+  image: ImageAsset & { alt: string };
 };
+
+// Card photos from the updated design (2026-10-22). Placeholder: the live feed will bring its own images
+// (or a per-source fallback), logged in SPEC-VS-DESIGN.
+const opportunityImages = [
+  { src: "/events-and-summits/image-1.webp", width: 866, height: 624, alt: "An audience applauding at a tech event" },
+  { src: "/events-and-summits/image-2.webp", width: 866, height: 624, alt: "Two professionals exchanging business cards" },
+  { src: "/events-and-summits/image-3.webp", width: 866, height: 624, alt: "A speaker presenting on stage to a large audience" },
+];
 
 export type OpportunityFilter = { value: OpportunityType | "all"; label: string };
 
@@ -37,6 +47,7 @@ export const opportunityCta: Record<OpportunityType, string> = {
 export const opportunities: Opportunity[] = [
   {
     id: "upwork-fintech-mvp",
+    image: opportunityImages[0],
     type: "freelance",
     source: "Upwork",
     categories: ["Freelance", "Creative"],
@@ -48,6 +59,7 @@ export const opportunities: Opportunity[] = [
   },
   {
     id: "devfolio-buildathon",
+    image: opportunityImages[1],
     type: "hackathon",
     source: "Devfolio",
     categories: ["Hackathon", "Web3"],
@@ -59,6 +71,7 @@ export const opportunities: Opportunity[] = [
   },
   {
     id: "mlh-global-hack-week",
+    image: opportunityImages[2],
     type: "hackathon",
     source: "MLH",
     categories: ["Hackathon", "AI / ML"],
@@ -70,6 +83,7 @@ export const opportunities: Opportunity[] = [
   },
   {
     id: "luma-founder-mixer",
+    image: opportunityImages[0],
     type: "event",
     source: "Luma",
     categories: ["Meetup", "Startups"],
@@ -81,6 +95,7 @@ export const opportunities: Opportunity[] = [
   },
   {
     id: "wellfound-frontend-intern",
+    image: opportunityImages[1],
     type: "job",
     source: "Wellfound",
     categories: ["Internship", "Engineering"],
@@ -92,6 +107,7 @@ export const opportunities: Opportunity[] = [
   },
   {
     id: "naukri-associate-pm",
+    image: opportunityImages[2],
     type: "job",
     source: "Naukri",
     categories: ["Full-time", "Product"],
@@ -120,6 +136,7 @@ export const hostedGatherings: GatheringEvent[] = [
     alt: "Guests talking at a leadership dinner",
     audience: "Open for Professionals",
     cta: { label: "Request Invite", href: "/events/mohali-leadership-dinner" },
+    when: { time: "7:00 PM – 10:00 PM IST", day: "Saturday, 12 September 2026" },
   },
   {
     ...gatheringImages.conclave,
@@ -129,6 +146,7 @@ export const hostedGatherings: GatheringEvent[] = [
     alt: "Attendees networking at the Punjab Technical Conclave",
     audience: "Open for Students",
     cta: { label: "Register Free", href: "/events/punjab-technical-conclave" },
+    when: { time: "10:00 AM – 5:00 PM IST", day: "Friday, 28 August 2026" },
   },
   {
     ...gatheringImages.sprint,
@@ -138,6 +156,7 @@ export const hostedGatherings: GatheringEvent[] = [
     alt: "Founders pitching at a Mentorle pitch circle",
     audience: "Open for Founders",
     cta: { label: "Apply to Pitch", href: "/events/builders-pitch-circle" },
+    when: { time: "5:00 PM – 8:00 PM IST", day: "Sunday, 4 October 2026" },
   },
 ];
 
@@ -164,5 +183,40 @@ export const eventsPage = {
       "Discover everything worth applying for in one curated feed, refreshed daily with the latest opportunities so you never miss a chance to take your next big step.",
     searchPlaceholder: "Search opportunities",
     emptyState: "No opportunities match that search.",
+  },
+  // "Exclusive for Pro Pass members" partner block (updated design, 2026-10-22).
+  proPass: {
+    eyebrow: "Exclusive for Pro Pass members",
+    title: "Mentorle × Huptle",
+    subtitle: "Learn, build, and land your next role.",
+    description: "Access Huptle’s curated programs through Mentorle Pro Pass, including its job-guarantee pathway.",
+    cta: { label: "Explore Pro Pass", href: "/pricing" },
+    features: [
+      { icon: "cap", title: "Skill with experts", note: "Structured programs" },
+      { icon: "briefcase", title: "Job guarantee", note: "Career-ready pathway" },
+      { icon: "shield", title: "Exclusive access", note: "Only for Pro Pass members" },
+    ] as const,
+    fineprint: "Eligibility criteria and program terms apply.",
+    image: {
+      src: "/events-and-summits/exclusive-for-pro-pass-members.webp",
+      width: 1288,
+      height: 966,
+      alt: "Illustration: a student at a laptop on the Mentorle × Huptle platform, moving from learning and mentoring to building a portfolio and landing a job offer",
+    },
+  },
+  howItWorks: {
+    eyebrow: "Your Path to Success",
+    title: "How it works",
+    description: "From discovery to your next opportunity, in a few simple steps.",
+    cards: [
+      { icon: { src: "/events-and-summits/explore.svg", width: 69, height: 69 }, title: "Explore", description: "Browse events, jobs, hackathons and more." },
+      { icon: { src: "/events-and-summits/check-details.svg", width: 55, height: 41 }, title: "Check details", description: "Review requirements, deadlines and eligibility." },
+      { icon: { src: "/events-and-summits/register-or-apply.svg", width: 69, height: 62 }, title: "Register or Apply", description: "Take the next step and get closer to your goals." },
+    ] satisfies IconCardContent[],
+  },
+  banner: {
+    title: "Someone is stuck on the thing you solved three years ago",
+    primaryCta: { label: "Become a Mentor", href: BECOME_A_MENTOR_PATH },
+    secondaryCta: { label: "Explore Mentorle Plus", href: "/pricing" },
   },
 };

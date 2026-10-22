@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { OpportunityFeed } from "@/components/events/OpportunityFeed";
+import { ProPassPartner } from "@/components/events/ProPassPartner";
 import { GatheringsCarousel } from "@/components/home/GatheringsCarousel";
+import { MentorBanner } from "@/components/home/MentorBanner";
+import { IconCardSection } from "@/components/ui/IconCardSection";
 import { PageHero } from "@/components/ui/PageHero";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { eventsPage, hostedGatherings, opportunities, opportunityCta, opportunityFilters } from "@/data/events";
@@ -12,7 +15,7 @@ export const metadata: Metadata = {
 };
 
 export default function EventsPage() {
-  const { hero, hosted, opportunities: feed } = eventsPage;
+  const { hero, hosted, opportunities: feed, howItWorks, banner } = eventsPage;
 
   return (
     <>
@@ -48,6 +51,20 @@ export default function EventsPage() {
           />
         </div>
       </section>
+
+      <ProPassPartner />
+      <IconCardSection
+        id="events-how-title"
+        background="surface"
+        columns={3}
+        cardHeight="lg:min-h-[15.125rem]"
+        headerAside="narrow"
+        eyebrow={howItWorks.eyebrow}
+        title={howItWorks.title}
+        description={howItWorks.description}
+        cards={howItWorks.cards}
+      />
+      <MentorBanner title={banner.title} primaryCta={banner.primaryCta} secondaryCta={banner.secondaryCta} />
     </>
   );
 }

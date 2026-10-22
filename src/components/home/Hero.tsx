@@ -10,15 +10,18 @@ export function Hero() {
     >
       <HeroSlideshow slides={hero.slides} autoplayMs={hero.autoplayMs} />
 
-      <div className="container-page pt-16 text-center text-white md:pt-24">
+      <div className="container-page pt-16 text-center text-white md:pt-[9.625rem]">
         <h1
           id="hero-title"
           data-hero="1"
-          className="mx-auto max-w-[40rem] text-[2.125rem] leading-[1.18] font-medium tracking-[-0.01em] md:text-5xl"
+          className="mx-auto max-w-[40rem] text-[2.125rem] leading-[1.2] font-medium tracking-[-0.01em] whitespace-pre-line md:text-5xl"
         >
           {hero.title}
         </h1>
-        <div data-hero="2" className="mt-8 flex flex-wrap items-center justify-center gap-2 md:mt-[2.125rem]">
+        <p data-hero="2" className="mx-auto mt-3 max-w-[27.5rem] text-[0.9375rem] leading-[1.375rem] text-white/85">
+          {hero.subtitle}
+        </p>
+        <div data-hero="3" className="mt-8 flex flex-wrap items-center justify-center gap-2 md:mt-[2.375rem]">
           <ButtonLink href={hero.primaryCta.href} variant="ghost">
             {hero.primaryCta.label}
           </ButtonLink>

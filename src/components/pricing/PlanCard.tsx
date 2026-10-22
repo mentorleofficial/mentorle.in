@@ -25,7 +25,9 @@ function FeatureIcon({ kind }: { kind: PlanFeature["kind"] }) {
 
 const featureLabel = { check: "Included", star: "Highlight", cross: "Not included" } as const;
 
-export function PlanCard({ plan }: { plan: Plan }) {
+// `onSurface`: on a grey section (homepage) the cards take the section colour with #cbcbcb borders instead of
+// white cards with `line` borders (pricing page).
+export function PlanCard({ plan, onSurface = false }: { plan: Plan; onSurface?: boolean }) {
   return (
     <article
       aria-labelledby={`plan-${plan.id}`}
@@ -35,8 +37,8 @@ export function PlanCard({ plan }: { plan: Plan }) {
         <p className="flex h-[2.625rem] items-center bg-brand px-6 text-[0.9375rem] text-white">{plan.badge}</p>
       )}
       <div
-        className={`flex flex-1 flex-col border bg-white p-6 transition-colors duration-300 ${
-          plan.featured ? "border-brand border-t-0" : "border-line hover:border-ink/40"
+        className={`flex flex-1 flex-col border p-6 transition-colors duration-300 ${onSurface ? "bg-surface" : "bg-white"} ${
+          plan.featured ? "border-brand border-t-0" : `${onSurface ? "border-[#cbcbcb]" : "border-line"} hover:border-ink/40`
         }`}
       >
         <h3 id={`plan-${plan.id}`} className="text-2xl font-medium text-ink">

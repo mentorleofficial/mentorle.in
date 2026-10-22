@@ -49,7 +49,13 @@ Copy or assets the design doesn't provide. Placeholders are in use until real on
 | D8 | Mobile and tablet layouts | Figma is desktop-only (1440px). | Responsive layouts derived from the desktop design. |
 | D9 | Hero background | The hero video is only 1280×720, which looks soft on large and Retina screens. | A still frame from the video (6.3s) is used for now. A high-resolution photo or a 1080p/4K video is needed. |
 | D10 | Statement paragraph under the hero | Figma copy was "Mentorle connects you with experienced professionals and industry experts…". Replaced by the product owner with "Degrees teach you the theory. But the industry demands the practical. The game has unwritten rules, and we’re handing you the playbook." (their reference used a serif font with a yellow italic ending). | New copy in the existing style (Manrope, scroll reveal). "Degrees teach you the theory." is the always-dark lead. |
-| D11 | Pricing plans on the homepage | — | Not in the homepage Figma; added on request after Life at Mentorle, reusing the pricing page's plan cards. | The heading (eyebrow "Pricing", title "Pick the pass that fits", one-line description) is placeholder copy, since the section has no design. |
+| D11 | Pricing plans on the homepage | — | Now in the updated homepage design: after Career Growth, on a grey section, heading "Choose your access / Start free. Choose more support when you need it." | Built as designed (replaces the placeholder heading added before the design existed). |
+| D12 | Updated homepage design (2026-10-22) | — | New hero copy ("The Right Connections / Real opportunities." + subtitle), a new first slide with a blurred background, a time/date row on gathering cards, a new "Start with your goal" section, and the pricing plans moved up (after Career Growth) on a grey section with new heading copy. | Built. |
+| D13 | Hero preview card photo | — | The card shows a "Global Education Conclave" photo that isn't in the supplied assets. | The card previews the next slide (the café and whiteboard photos). Send the conclave photo to add it as a slide. |
+| D14 | Plan feature wording | Pricing page Figma still has the old list. | The homepage design rewords Free and Pro features (e.g. "Join a free 60-minute group session every sat."). | One shared data set, so the new wording shows on the pricing page too. "sat." capitalised to "Sat." (writing "Saturday" no longer fits the card). The old Free card's crossed-out lines are gone, as in the new design. |
+| D15 | "What would you like help with?" cards | — | Six domain cards and "Explore all domains"; cards aren't shown as links. | Cards are static; the button opens Find a Mentor. Open: should each card open the directory filtered to its domain? |
+| D16 | Gathering card time/date on phones | — | Desktop only. | Shown from 640px; on phones the fixed-height card has no room, so the row is hidden there. |
+| D17 | Spacing drift below the stats strip | — | — | The homepage runs ~10–20px lower than the design from the stats strip down (also against the old design). Pre-existing; not changed in this update. |
 
 ---
 
@@ -135,6 +141,11 @@ The earnings numbers on this page **match the spec**: format prices and payouts 
 | E4 | Hero buttons | — | "Become a Mentor" / "See what you would earn" are copied from the Become a Mentor hero and don't relate to events. Built linking to `/become-a-mentor` and its calculator. | Open — suggest e.g. "Browse Opportunities" / "Host with Mentorle" |
 | E5 | Eyebrow typo | — | "Hosteded by Mentorle". | Fixed ("Hosted by Mentorle") |
 | E6 | "Open for Students" | — | Looks like a ghost button but has no obvious action. | Built as a non-clickable audience tag |
+| E9 | Updated Events design (2026-10-22) | — | Opportunity feed as a 3-column grid of photo cards; gathering cards get a time/date row; new "Mentorle × Huptle" Pro Pass section, "How it works" cards and the "Someone is stuck…" banner. | Built. |
+| E10 | Gathering card dates | — | The Events card shows "Saturday, 14 November 2026" (copied from the homepage card) under a "28th August, 2026" date. | Each event shows its own day and time (placeholder times for the three hosted gatherings). |
+| E11 | Opportunity card photos | — | Three stock photos repeated. | Placeholder; the live feed will need an image per listing or a per-source fallback. |
+| E12 | Huptle feature icons | — | Cap, briefcase and shield icons with no asset files. | Drawn as inline line icons. Open: the eligibility criteria and program terms the fine print refers to; "Explore Pro Pass" opens the pricing page. |
+| E13 | Closing banner | — | Same banner and copy as Become a Mentor. | "Become a Mentor" opens the internal info page, like other site-wide links. |
 
 **Content and design gaps**
 

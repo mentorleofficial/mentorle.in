@@ -37,9 +37,13 @@ export function HowItWorks({ steps = howItWorks, ariaLabel = "How Mentorle works
 
   // The open point's line is a progress bar: it fills over `autoplayMs`, then the next point opens (wrapping).
   // Created paused; the effect below plays or pauses it. Reduced motion: no autoplay, the line just shows full.
+  // The previous point's tween is killed first: useGSAP doesn't run a callback's cleanup on dependency changes,
+  // only on unmount, so without this every point you'd tapped kept filling its line and advancing the list.
   useGSAP(
     () => {
-      const lines = gsap.utils.toArray<HTMLElement>("[data-step-line]");
+      progress.current?.kill();
+      progress.current = null;
+      const lines = gsap.utils.toArray<HTMLElement>("[data-step-line]", sectionRef.current);
       lines.forEach((line, index) => index !== active && gsap.set(line, { scaleX: 0 }));
       const line = lines[active];
       if (!line) return;
@@ -108,7 +112,9 @@ export function HowItWorks({ steps = howItWorks, ariaLabel = "How Mentorle works
       className="bg-ink text-white"
       onPointerEnter={(event) => event.pointerType === "mouse" && setHovered(true)}
       onPointerLeave={(event) => event.pointerType === "mouse" && setHovered(false)}
-      onFocus={() => setFocused(true)}
+      // Only keyboard focus pauses: a mouse click also focuses the button, which would otherwise leave the bar
+      // stopped after the pointer has left the section.
+      onFocus={(event) => setFocused(event.target.matches(":focus-visible"))}
       onBlur={(event) => {
         if (!event.currentTarget.contains(event.relatedTarget)) setFocused(false);
       }}
@@ -159,15 +165,15 @@ export function HowItWorks({ steps = howItWorks, ariaLabel = "How Mentorle works
                     {step.description}
                   </p>
                 </div>
-                {/* Faint track under the open point; the fill on top is the progress bar. */}
+                {/* Faint track under the open point, the full width of the row; the fill on top is the progress bar. */}
                 <span
                   aria-hidden
-                  className={`absolute -bottom-px left-0 h-[0.1875rem] w-[10.8125rem] bg-white/15 transition-opacity duration-500 ${isActive ? "opacity-100" : "opacity-0"}`}
+                  className={`absolute -bottom-px left-0 h-[0.1875rem] w-full bg-white/15 transition-opacity duration-500 ${isActive ? "opacity-100" : "opacity-0"}`}
                 />
                 <span
                   data-step-line
                   aria-hidden
-                  className={`absolute -bottom-px left-0 h-[0.1875rem] w-[10.8125rem] origin-left bg-white/80 ${index === 0 ? "" : "scale-x-0"}`}
+                  className={`absolute -bottom-px left-0 h-[0.1875rem] w-full origin-left bg-white/80 ${index === 0 ? "" : "scale-x-0"}`}
                 />
               </li>
             );

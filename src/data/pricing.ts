@@ -27,13 +27,14 @@ export const plans: Plan[] = [
     price: 0,
     period: "/Free",
     features: [
-      { kind: "check", text: "Weekly Saturday onboarding masterclass" },
-      { kind: "check", text: "Local & regional jobs and internships" },
-      { kind: "check", text: "Nearby college hackathons & meetups" },
-      { kind: "check", text: "1 open expert session per quarter" },
-      { kind: "cross", text: "Standard 1:1 retail pricing" },
-      // The design repeats this line verbatim (logged as P1 in docs/SPEC-VS-DESIGN.md).
-      { kind: "cross", text: "Standard 1:1 retail pricing" },
+      // Wording from the updated homepage design (2026-10-22), used on the pricing page too. The design's
+      // "every sat." is only capitalised: written out, the line no longer fits the card.
+      { kind: "check", text: "Join a free 60-minute group session every Sat." },
+      { kind: "check", text: "Find local and regional jobs and internships" },
+      { kind: "check", text: "Discover nearby hackathons and meetups" },
+      { kind: "check", text: "Join one open expert session each quarter" },
+      { kind: "check", text: "Sample templates and community links" },
+      { kind: "check", text: "Standard 1:1 session pricing" },
     ],
     cta: { label: "Current Plan", href: "/signup", variant: "dark" },
   },
@@ -49,11 +50,11 @@ export const plans: Plan[] = [
     features: [
       { kind: "star", text: "12 live group masterclasses a year" },
       { kind: "check", text: "15% off 1:1 in month 1, then 10% all year" },
-      { kind: "check", text: "Re-boost to 15–20% through referrals" },
-      { kind: "check", text: "All-India & remote MNC job radar" },
-      { kind: "check", text: "National & global hackathons + team matching" },
-      { kind: "check", text: "Free VIP entry to regional Builder Meetups" },
-      { kind: "check", text: "Full Resource Vault & LaTeX templates" },
+      { kind: "check", text: "Invite friends to unlock bigger session discounts" },
+      { kind: "check", text: "Find opportunities across India, including remote" },
+      { kind: "check", text: "Get priority entry to regional Builder Meetups" },
+      { kind: "check", text: "Career guides, AI prompts & templates" },
+      { kind: "check", text: "Discover hackathons and find teammates." },
     ],
     cta: { label: "Get Pro Pass", href: "/signup?plan=pro", variant: "brand" },
   },

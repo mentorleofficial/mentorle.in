@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { DiscountExplainer } from "@/components/become-a-mentor/DiscountExplainer";
 import { EarningsTable } from "@/components/become-a-mentor/EarningsTable";
-import { IconCardSection } from "@/components/become-a-mentor/IconCardSection";
+import { IconCardSection } from "@/components/ui/IconCardSection";
 import { RankingWeights } from "@/components/become-a-mentor/RankingWeights";
 import { RateCalculator } from "@/components/become-a-mentor/RateCalculator";
 import { TeardownFlow } from "@/components/become-a-mentor/TeardownFlow";

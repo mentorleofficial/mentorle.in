@@ -5,18 +5,20 @@ import { plans, pricingPage } from "@/data/pricing";
 type PricingPlansProps = {
   // Shown where no page hero introduces the cards (the homepage); the pricing page leaves it out.
   header?: { eyebrow: string; title: string; description: string };
-  // Section padding; the homepage drops the top padding because it continues the dotted section above it.
+  // Section padding override.
   className?: string;
+  // The homepage puts the plans on a grey section; the pricing page on dots.
+  background?: "dots" | "surface";
 };
 
-export function PricingPlans({ header, className = "pt-16 pb-16 md:py-24 lg:pt-[8.5rem] lg:pb-[8.125rem]" }: PricingPlansProps) {
+export function PricingPlans({ header, className = "pt-16 pb-16 md:py-24 lg:pt-[8.5rem] lg:pb-[8.125rem]", background = "dots" }: PricingPlansProps) {
   const { terms } = pricingPage;
 
   return (
     <section
       id="plans"
       {...(header ? { "aria-labelledby": "plans-title" } : { "aria-label": "Mentorle Plus plans" })}
-      className={`bg-dots ${className}`}
+      className={`${background === "surface" ? "bg-surface" : "bg-dots"} ${className}`}
     >
       <div className="container-page">
         {header && (
@@ -26,7 +28,7 @@ export function PricingPlans({ header, className = "pt-16 pb-16 md:py-24 lg:pt-[
         )}
         <div data-animate="stagger" className="mx-auto grid max-w-[34rem] gap-5 lg:max-w-none lg:grid-cols-3">
           {plans.map((plan) => (
-            <PlanCard key={plan.id} plan={plan} />
+            <PlanCard key={plan.id} plan={plan} onSurface={background === "surface"} />
           ))}
         </div>
         <p data-animate="fade-up" className="mx-auto mt-10 max-w-[60rem] text-center text-base text-ink md:mt-12">

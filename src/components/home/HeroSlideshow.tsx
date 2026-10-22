@@ -46,6 +46,11 @@ export function HeroSlideshow({ slides, autoplayMs }: HeroSlideshowProps) {
     // Zoom/dim the images, not the slide boxes: scaling a box would scale its clip mask off the card's position.
     const currentImage = current.querySelector("img");
     const targetImage = target.querySelector("img");
+    // Backgrounds are blurred like the other page heroes; the card's photo is sharp. The blur lives on a wrapper
+    // (so it doesn't fight the images' brightness tween) and is 0.625rem, so it scales with the root font.
+    const currentBlur = current.querySelector<HTMLElement>("[data-hero-blur]");
+    const targetBlur = target.querySelector<HTMLElement>("[data-hero-blur]");
+    const blur = `blur(${parseFloat(getComputedStyle(document.documentElement).fontSize) * 0.625}px)`;
     // The card always previews the slide after the one in the background.
     const oldPreview = previews[(from + 1) % count];
     const newPreview = previews[(to + 1) % count];
@@ -53,6 +58,7 @@ export function HeroSlideshow({ slides, autoplayMs }: HeroSlideshowProps) {
     const done = () => {
       gsap.set(backgrounds, { zIndex: 0, autoAlpha: 0, clipPath: "none" });
       gsap.set([currentImage, targetImage], { scale: 1, filter: "brightness(1)" });
+      gsap.set([currentBlur, targetBlur], { clearProps: "filter" });
       gsap.set(target, { zIndex: 1, autoAlpha: 1 });
       gsap.set(previews, { autoAlpha: 0, xPercent: 0 });
       gsap.set(newPreview, { autoAlpha: 1 });
@@ -81,8 +87,11 @@ export function HeroSlideshow({ slides, autoplayMs }: HeroSlideshowProps) {
       gsap.set(currentImage, { scale: 1, filter: "brightness(1)" });
       gsap.set(target, { zIndex: 2, autoAlpha: 1, clipPath: cardInset });
       gsap.set(targetImage, { scale: 1.12, filter: "brightness(1)" });
+      // Leaves the card sharp, blurs as it becomes the background.
+      gsap.set(targetBlur, { filter: "blur(0px)" });
       timeline
         .to(target, { clipPath: "inset(0px 0px 0px 0px)" }, 0)
+        .to(targetBlur, { filter: blur }, 0)
         .to(targetImage, { scale: 1 }, 0)
         .to(currentImage, { scale: 1.08, filter: "brightness(0.55)" }, 0);
     } else {
@@ -91,8 +100,10 @@ export function HeroSlideshow({ slides, autoplayMs }: HeroSlideshowProps) {
       gsap.set(currentImage, { scale: 1, filter: "brightness(1)" });
       gsap.set(target, { zIndex: 1, autoAlpha: 1 });
       gsap.set(targetImage, { scale: 1.08, filter: "brightness(0.55)" });
+      gsap.set(currentBlur, { filter: blur });
       timeline
         .to(current, { clipPath: cardInset }, 0)
+        .to(currentBlur, { filter: "blur(0px)" }, 0)
         .to(currentImage, { scale: 1.12 }, 0)
         .to(targetImage, { scale: 1, filter: "brightness(1)" }, 0);
     }
@@ -125,14 +136,17 @@ export function HeroSlideshow({ slides, autoplayMs }: HeroSlideshowProps) {
             aria-hidden={slideIndex !== index}
             className={`absolute inset-0 overflow-hidden ${slideIndex === 0 ? "z-[1]" : "invisible opacity-0"}`}
           >
-            <Image
-              src={slide.src}
-              alt={slide.alt}
-              fill
-              sizes="100vw"
-              {...(slideIndex === 0 ? { preload: true } : { loading: "eager" as const })}
-              className={`object-cover ${slide.position}`}
-            />
+            {/* Oversized so the blur's soft edges fall outside the slide. */}
+            <div data-hero-blur className="absolute -inset-8 blur-[0.625rem]">
+              <Image
+                src={slide.src}
+                alt={slide.alt}
+                fill
+                sizes="100vw"
+                {...(slideIndex === 0 ? { preload: true } : { loading: "eager" as const })}
+                className={`object-cover ${slide.position}`}
+              />
+            </div>
           </div>
         ))}
       </div>
@@ -143,7 +157,7 @@ export function HeroSlideshow({ slides, autoplayMs }: HeroSlideshowProps) {
       </p>
 
       <div
-        data-hero="3"
+        data-hero="4"
         onMouseEnter={() => setPaused(true)}
         onMouseLeave={() => setPaused(false)}
         onFocus={() => setPaused(true)}

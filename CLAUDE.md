@@ -36,7 +36,7 @@ There's no test suite yet. Verify UI changes by building, running the app and ch
 ```
 src/app/                  routes (layout.tsx, page.tsx per route), globals.css (design tokens)
 src/components/layout/    SiteHeader, SiteFooter (shared by every page)
-src/components/ui/        reusable primitives: ButtonLink, SectionHeader, ArrowControls, ProgressiveBlur, ScrollRevealText
+src/components/ui/        reusable primitives: ButtonLink, SectionHeader, IconCard, IconCardSection, ArrowControls, ProgressiveBlur, ScrollRevealText
 src/components/motion/    ScrollAnimations (data-attribute animation runner), SmoothScroll (Lenis), CountUp
 src/components/forms/     form primitives (TextField, PasswordField, PhoneField, DateField, OtpInput, ChipInput, Checkbox, SubmitButton)
 src/lib/auth/             mock auth service, AuthProvider/useAuth, zod schemas (ported from the platform)
