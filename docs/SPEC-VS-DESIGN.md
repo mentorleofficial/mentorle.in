@@ -120,16 +120,23 @@ The earnings numbers on this page **match the spec**: format prices and payouts 
 
 | # | Item | What the spec says | What Figma shows | Status |
 |---|---|---|---|---|
-| B1 | Receipt card, second row | Pro Pass member pays ₹424 on a ₹499 session (PP §3). | "List price ₹499" repeated twice. | Fixed (shows "Pro Pass member pays ₹424") |
-| B2 | Ranking section eyebrow | — | Repeats "Seamless Payments" from the payments section. | Fixed (shows "Directory Ranking") |
+| B1 | Receipt card, second row | Pro Pass member pays ₹424 on a ₹499 session (PP §3). | "List price ₹499" repeated twice. | Superseded: section removed in the 2026-10-22 redesign. |
+| B2 | Ranking section eyebrow | — | Repeats "Seamless Payments" from the payments section. | Superseded: section removed in the 2026-10-22 redesign. |
 | B3 | Tier 4 copy | — | Missing spaces ("industry-leadingPrincipal", "experts,alongside", "experiencedfounders"). | Fixed |
-| B4 | Rate calculator formula | Gross-up engine: payout = rate × minutes ÷ 60; price = (payout + gateway fee) ÷ 0.70 (BP §2). Gateway fee "~2.36%" with no base given (open conflict C5). | Example at ₹1,400/hr. | Built with the fee as 2.36% of the payout, rounded up to the next ₹…99. Reproduces every design number and all three BP §4 worked examples. Confirm the rounding rule. |
-| B5 | Calculator range | No limits in either spec. | Slider thumb at ₹1,400; hint says most mentors sit at ₹500–₹2,500. | Slider ₹300–₹3,000 (₹50 steps); typed values ₹100–₹10,000. Open. |
-| B6 | Group masterclass pay | Flat ₹1,000–1,500 per session (PP §2). | Shown as a range. | Built as design |
-| B7 | Tier 3 price vs formats | Tier 3 is ₹999 retail → ₹700 (BP §1), but the 45-min standard mock is ₹499 → ₹330 (BP §4) — open conflict C4. | Both appear on this page. | Open |
+| B4 | Rate calculator formula | Gross-up engine: payout = rate × minutes ÷ 60; price = (payout + gateway fee) ÷ 0.70 (BP §2). Gateway fee "~2.36%" with no base given (open conflict C5). | Example at ₹1,400/hr. | Superseded: section removed in the 2026-10-22 redesign. |
+| B5 | Calculator range | No limits in either spec. | Slider thumb at ₹1,400; hint says most mentors sit at ₹500–₹2,500. | Superseded: section removed in the 2026-10-22 redesign. |
+| B6 | Group masterclass pay | Flat ₹1,000–1,500 per session (PP §2). | Shown as a range. | Superseded: section removed in the 2026-10-22 redesign. |
+| B7 | Tier 3 price vs formats | Tier 3 is ₹999 retail → ₹700 (BP §1), but the 45-min standard mock is ₹499 → ₹330 (BP §4) — open conflict C4. | Both appear on this page. | Superseded: section removed in the 2026-10-22 redesign. |
 | B8 | Accordion copy and icons | — | The design showed one generic search icon and copy for one point only. | Copy and icons from the supplied `content-for-points.png` (badges, privacy, ranking). |
 | B9 | "Become a Mentor" links | Mentors apply on the separate platform (IC §2). | — | Per the product owner: site links (footer, homepage banner) → `/become-a-mentor`; this page's apply buttons → `platform.mentorle.in/become-a-mentor` (new tab). |
 | B10 | Reused icons | — | Several icons repeat across sections. | "What we ask of you" reuses the calendar (reschedule) and wallet (async SLA) icons in light colour via `MaskIcon`. Confirm, or supply dedicated icons. |
+| B11 | Redesign (2026-10-22) | — | Shorter page: new hero ("Share what you know. / Help someone move forward."), "Make your experience count" cards, "Choose how you can help" format cards, a new banner ("Ready to take your next step?") and an FAQ. The discount explainer, earnings table, rate calculator, teardown flow, payments cards and ranking weights are gone. | Built as designed. |
+| B12 | Payout and pricing facts | The spec's take-home model, gross-up pricing, payout schedule and ranking formula (BP §1–§4). | No longer explained on the page. | Open: confirm this is intended; mentors now only see tier prices and the FAQ. |
+| B13 | "See how it works" (hero) | — | No destination designed. | Scrolls to "What happens after you apply". |
+| B14 | "Book a Session" (banner) | — | A mentee action on the mentor recruitment page. | Opens Find a Mentor. Open: should it be "Become a Mentor" instead? |
+| B15 | FAQ answers | — | Only the first answer is written. | The other three are placeholder copy based on the platform's rules (topics chosen at setup, take-home within the tier's range, tier confirmed after review, payouts every Tuesday). Needs sign-off. |
+| B16 | "See what you would earn" on Community, Enterprise and Events | — | Those heroes still link to the removed calculator. | Now scroll to the tier grid (`/become-a-mentor#tiers`), which shows what each tier earns. |
+| B17 | FAQ column | — | The FAQ block sits 10px left of the page column. | Aligned to the page column like every other section. |
 
 ## 6. Events & Summits page (`/events`) — built 2026-10-13
 

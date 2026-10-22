@@ -7,98 +7,37 @@ export type IconCardContent = { icon: ImageAsset; title: string; description: st
 
 export const becomeAMentorPage = {
   hero: {
-    title: "You name your take-home. We never touch it.",
-    subtitle:
-      "Tell us what you want to earn per hour. We add our margin on top of that number, never out of it so the amount that lands in your account is the amount you asked for, every time.",
-    background: { src: "/become-a-mentor/hero.webp", width: 2880, height: 1440, alt: "" } satisfies ImageAsset & { alt: string },
+    // Line break as in the design.
+    title: "Share what you know.\nHelp someone move forward.",
+    subtitle: "Your experience can help someone make a better career decision, improve a project, or take their next step with confidence.",
+    background: { src: "/become-a-mentor/hero-stage.webp", width: 1440, height: 720, alt: "" } satisfies ImageAsset & { alt: string },
     primaryCta: { label: "Become a Mentor", href: MENTOR_APPLY_URL, external: true },
-    secondaryCta: { label: "See what you would earn", href: "#calculator" },
+    // The design doesn't say where this goes; it scrolls to "What happens after you apply" (logged in SPEC-VS-DESIGN).
+    secondaryCta: { label: "See how it works", href: "#application" },
   },
 
-  discount: {
-    title: "Discounts come out of our margin, not your fee",
-    description: "When a Pro Pass member books you with a 15% discount, they pay less. You do not. Mentorle absorbs it.",
-    // The design repeats "List price ₹499" on the second row; it is the Pro Pass member's 15%-off price (logged in SPEC-VS-DESIGN).
-    rows: [
-      { label: "List price", value: "₹499" },
-      { label: "Pro Pass member pays", value: "₹424" },
-    ],
-    receive: { label: "You still receive", value: "₹330" },
-    keeps: { label: "Mentorle keeps", value: "₹84" },
-  },
-
-  takeHome: {
-    eyebrow: "Mentor Benefits",
-    title: "What you take home",
-    description: "Standard rates. Senior tiers earn more on the same formats.",
-    columns: { format: "Format", pays: "Mentee pays", keep: "You keep" },
-    rows: [
-      { format: "2-min async teardown", detail: "Voice note on a resume, no call", pays: "₹99", keep: "₹60" },
-      { format: "15-min flash call", detail: "Resume roast or one DSA check", pays: "₹199", keep: "₹125" },
-      { format: "30-min focused drill", detail: "Live coding or portfolio review", pays: "₹299", keep: "₹190" },
-      { format: "45-min standard mock", detail: "Coding, project defense, STAR rubric", pays: "₹499", keep: "₹330" },
-      { format: "60-min deep architecture", detail: "System design and scalability", pays: "₹999", keep: "₹680" },
-      { format: "90-min executive sprint", detail: "Staff transition or investor pitch", pays: "₹2,499", keep: "₹1,700" },
-      { format: "60-min group masterclass", detail: "One-to-many, 12 run each year", pays: "Included in Pro Pass", keep: "₹1,000–1,500" },
-    ],
-  },
-
-  calculator: {
-    eyebrow: "Mentor Earnings",
-    title: "Set your own rate",
-    description: "You enter one number. We work out what to charge so that number reaches you intact.",
-    inputLabel: "Your desired take-home, per hour",
-    hint: "Drag or type. Most mentors on the platform sit between ₹500 and ₹2,500 an hour.",
-    note: "You never see a commission line in your dashboard only the payout. We add the gateway fee and our margin on top of your number.",
-    // Slider range is an assumption (the design only shows the thumb at ₹1,400); typed values may go wider.
-    defaultRate: 1400,
-    slider: { min: 300, max: 3000, step: 50 },
-    typedRange: { min: 100, max: 10000 },
-    // Gross-up engine (BP §2): mentee price = payout × (1 + gateway fee) ÷ (1 − platform take), rounded up to the next ₹…99.
-    gatewayFee: 0.0236,
-    platformTake: 0.3,
-    formats: [
-      { minutes: 15, name: "Flash Call" },
-      { minutes: 30, name: "Focused Drill" },
-      { minutes: 45, name: "Standard Mock" },
-      { minutes: 60, name: "Deep Architecture" },
-      { minutes: 90, name: "Executive Sprint" },
-    ],
-    columns: { format: "Format", pays: "Mentee pays", keep: "You keep" },
-    cta: { label: "Become a Mentor", href: MENTOR_APPLY_URL, external: true },
-  },
-
-  commute: {
-    eyebrow: "Flexible Mentorship",
-    title: "Mentor from your commute",
-    intro:
-      "The lowest-effort way to start. No calendar, no call, no scheduling. A student uploads a resume and a job description. You listen on your phone and record a two-minute voice note. That is the whole job.",
-    points: [
-      { title: "Two minutes of speaking", text: "Thirty seconds on ATS formatting, a minute on project and metric gaps, thirty seconds on the exact fix." },
-      { title: "24 hours to reply", text: "Answer during lunch or on the train. Miss the window and it reassigns, so nobody is left waiting." },
-      { title: "₹60 per teardown", text: "Paid into your wallet once the student rates it." },
-    ],
-    flowTitle: "How a teardown moves",
-    flow: [
-      { title: "Assigned", text: "WhatsApp ping with a secure resume link" },
-      { title: "You review", text: "Read on mobile, record a voice note" },
-      { title: "Delivered", text: "Bot checks length, forwards to the student" },
-      { title: "Paid", text: "₹60 credited after the student rates it" },
-    ],
-  },
-
-  payments: {
-    eyebrow: "Seamless Payments",
-    title: "Getting paid is the part we over-engineered",
-    description: "You should never be chasing a student for money. You never will be.",
+  why: {
+    eyebrow: "Why Mentorle",
+    title: "Make your experience count.",
+    description: "Share practical lessons from your career, projects or founder journey—and help someone learn from your experience.",
     cards: [
-      { icon: icon("collected-upfront", 69, 69), title: "Collected upfront", description: "Student payments are secured in a regulated escrow account before your session is confirmed." },
-      { icon: icon("every-tuesday", 62, 69), title: "Every Tuesday, 6PM IST", description: "Cleared balances settle automatically by UPI or IMPS. No invoice to raise, no follow-up need." },
-      { icon: icon("24-hour-buffer", 69, 69), title: "24-hour buffer", description: "Funds sit in pending clearance for a day after the session so disputes can be raised, then clear." },
-      { icon: icon("500-minimum", 69, 62), title: "₹500 minimum", description: "Withdraw once your cleared balance passes ₹500. Anything below rolls into the next Tuesday." },
+      { icon: icon("make-a-real-impact", 76, 76), title: "Make a real impact", description: "Help someone prepare, decide, build or solve a problem." },
+      { icon: icon("build-your-reputation", 48, 76), title: "Build your reputation", description: "Showcase your expertise and the value you bring to learners." },
+      { icon: icon("mentor-on-you-terms", 62, 69), title: "Mentor on your terms", description: "Share your availability and the topics you can genuinely help with." },
     ] satisfies IconCardContent[],
   },
 
+  ways: {
+    eyebrow: "Ways to mentor",
+    title: "Choose how you can help.",
+    description: "Offer practical guidance in a format that suits your expertise.",
+    formats: [
+      { number: "01", label: "Quick Feedback", title: "Voice-note review", description: "Give focused feedback on a resume, profile or job description." },
+      { number: "02", label: "Quick Session", title: "Short 1:1 session", description: "Help with one question, a coding concept or a career concern." },
+      { number: "03", label: "Focused Session", title: "Practical review", description: "Run a mock interview, review a portfolio or discuss a project." },
+      { number: "04", label: "Deep Dive", title: "In-depth guidance", description: "Explore leadership, product, system design or startup strategy." },
+    ],
+  },
   tiers: {
     eyebrow: "Mentor Tiers",
     title: "Tiers are earned, not chosen",
@@ -144,20 +83,6 @@ export const becomeAMentorPage = {
     },
   ] satisfies HowItWorksStep[],
 
-  ranking: {
-    // The design repeats the "Seamless Payments" eyebrow here (logged in SPEC-VS-DESIGN).
-    eyebrow: "Directory Ranking",
-    title: "How the directory ranks you",
-    description: "Most platforms hide their ranking formula. We believe in transparency, so here’s exactly how your score is calculated and rankings are determined.",
-    weights: [
-      { value: "35%", title: "Conversion rate", description: "How often a profile view turns into a booking." },
-      { value: "25%", title: "Rating", description: "Structured rubric scores from the mentees you have already seen." },
-      { value: "25%", title: "Fair price index", description: "How closely your rate matches your tier’s experience benchmark." },
-      { value: "15%", title: "SLA adherence", description: "Turning up on time and answering async reviews inside 24 hours." },
-    ],
-    note: "Price yourself well above your tier benchmark and your fair-price index falls, which quietly moves you down the listings. We will not argue with you about it but after two weeks with no bookings you will get a note telling you what comparable mentors charge.",
-  },
-
   expectations: {
     eyebrow: "Mentor Expectations",
     title: "What we ask of you",
@@ -182,8 +107,23 @@ export const becomeAMentorPage = {
   },
 
   banner: {
-    title: "Someone is stuck on the thing you solved three years ago",
-    primaryCta: { label: "Become a Mentor", href: MENTOR_APPLY_URL, external: true },
+    title: "Ready to take your next step?",
+    // "Book a Session" opens the mentor directory, where sessions are booked.
+    primaryCta: { label: "Book a Session", href: "/mentors" },
     secondaryCta: { label: "Explore Mentorle Plus", href: "/pricing" },
+  },
+
+  faq: {
+    eyebrow: "FAQ",
+    title: "Good to know.",
+    description: "Everything you need to know before you apply to become a mentor on Mentorle.",
+    // Only the first answer is in the design; the other three are placeholder copy based on the platform's
+    // mentor rules (logged in SPEC-VS-DESIGN).
+    items: [
+      { question: "Do I need to be a full-time mentor?", answer: "No. You can mentor alongside your work, based on the availability you share during onboarding." },
+      { question: "Can I choose my topics?", answer: "Yes. You pick the areas and formats you want to offer when you set up your profile, and you can change them any time." },
+      { question: "Can I set my own session prices?", answer: "Yes. You name your hourly take-home within your tier’s price range, and that amount is what you receive." },
+      { question: "When will I know my tier and payouts?", answer: "We confirm your tier after reviewing your application, usually within a few days. Earnings are paid out every Tuesday once a session clears." },
+    ],
   },
 };

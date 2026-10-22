@@ -5,7 +5,7 @@ export function TierGrid() {
   const { tiers } = becomeAMentorPage;
 
   return (
-    <section aria-labelledby="tiers-title" className="bg-dots py-16 md:py-24 lg:py-[8.125rem]">
+    <section id="tiers" aria-labelledby="tiers-title" className="scroll-mt-4 bg-dots py-16 md:py-24 lg:py-[8.125rem]">
       <div className="container-page">
         <SectionHeader id="tiers-title" eyebrow={tiers.eyebrow} title={tiers.title} description={tiers.description} />
         <div data-animate="stagger" className="mt-12 grid gap-5 md:mt-16 md:grid-cols-2 lg:grid-cols-3">

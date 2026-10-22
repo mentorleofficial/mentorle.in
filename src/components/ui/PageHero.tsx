@@ -38,7 +38,7 @@ export function PageHero({ title, subtitle, background, primaryCta, secondaryCta
         <h1
           id="page-hero-title"
           data-hero="1"
-          className="mx-auto max-w-[50rem] text-[2.125rem] leading-[1.18] font-medium tracking-[-0.01em] md:text-5xl"
+          className="mx-auto max-w-[50rem] text-[2.125rem] leading-[1.18] font-medium tracking-[-0.01em] whitespace-pre-line md:text-5xl"
         >
           {title}
         </h1>

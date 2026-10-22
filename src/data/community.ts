@@ -21,7 +21,7 @@ export const communityPage = {
     background: { src: "/community/hero.webp", width: 2880, height: 1440, alt: "" } satisfies ImageAsset & { alt: string },
     // The design copies the Become a Mentor hero buttons here (logged in SPEC-VS-DESIGN).
     primaryCta: { label: "Become a Mentor", href: BECOME_A_MENTOR_PATH },
-    secondaryCta: { label: "See what you would earn", href: `${BECOME_A_MENTOR_PATH}#calculator` },
+    secondaryCta: { label: "See what you would earn", href: `${BECOME_A_MENTOR_PATH}#tiers` },
   },
   pillars: [
     { title: "Every Saturday", description: "The onboarding masterclass stays open. Come once, or keep coming back." },

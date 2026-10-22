@@ -14,7 +14,7 @@ export const enterprisePage = {
       "Our own curated gatherings, plus auto-curated hackathons, meetups, jobs and freelance gigs from MLH, Devfolio, Luma, Wellfound and more.",
     background: { src: "/enterprise/hero.webp", width: 2880, height: 1440, alt: "" } satisfies ImageAsset & { alt: string },
     primaryCta: { label: "Become a Mentor", href: BECOME_A_MENTOR_PATH },
-    secondaryCta: { label: "See what you would earn", href: `${BECOME_A_MENTOR_PATH}#calculator` },
+    secondaryCta: { label: "See what you would earn", href: `${BECOME_A_MENTOR_PATH}#tiers` },
   },
   audiences: [
     {

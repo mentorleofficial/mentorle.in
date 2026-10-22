@@ -111,7 +111,6 @@ Pairs on photos are always `ghost` + `light`, 8px apart (`gap-2`), centred.
 | `SectionHeader` `tone` | `components/ui/SectionHeader.tsx` | `tone="dark"` for headers on `bg-ink` sections (white title, `white/90` description). |
 | `HowItWorks` | `components/home/HowItWorks.tsx` | Dark pixel-icon accordion. Props `steps` and `ariaLabel` (defaults: homepage steps). Also used on Become a Mentor for badges / privacy / ranking. Autoplays: the open point's line is a progress bar across the full row width (faint `white/15` track, `white/80` fill) that fills over `autoplayMs` (default 2.5s), then the next point opens, wrapping. It pauses while a mouse hovers the section, while it's off-screen, and on keyboard focus inside it (`:focus-visible` only, so a mouse click doesn't leave it paused once the pointer leaves); clicking a point switches and restarts the bar. No autoplay with reduced motion. |
 | `MentorBanner` | `components/home/MentorBanner.tsx` | Full-bleed blurred-photo banner with title + ghost/light CTAs. Props `title`, `primaryCta`, `secondaryCta` (each may be `external`). Same height everywhere (`min-h-[26.25rem] md:min-h-[34.6875rem]`, per the product owner). Homepage default; Become a Mentor uses it as its closing banner. |
-| `RateCalculator` | `components/become-a-mentor/RateCalculator.tsx` | Mentor earnings calculator: ₹ input (digits only, clamped on blur/Enter) + range slider (`.rate-slider` in `globals.css`: 8px track, brand fill via `--fill`, square 17px thumb) driving a 5-row table. `menteePrice()` implements the gross-up engine. Config lives in `src/data/become-a-mentor.ts`. |
 | `MentorDirectory` | `components/mentors/MentorDirectory.tsx` | Filter tabs + search + mentor grid + empty state. See the filter-bar pattern below. |
 | `MaskIcon` | `components/ui/MaskIcon.tsx` | Paints a single-colour SVG with `currentColor` via CSS mask, so one icon file works on light and dark backgrounds. |
 | `useCarouselLoop` | `components/home/useCarouselLoop.ts` | Clones slides so carousels can loop seamlessly (see §6). |
@@ -137,10 +136,6 @@ Pairs on photos are always `ghost` + `light`, 8px apart (`gap-2`), centred.
 - **Section:** `bg-dots`, 136px top padding (the banner sits 136px below the hero) and 130px bottom.
 
 **Request tile pattern** (Speaker Hub "Don't see who you need?"): fills a grid cell next to cards (full width on tablet, `md:col-span-2 lg:col-span-1`). Orange gradient (`bg-brand` plus a soft radial highlight, #E8521E → ~#ED8059), centred white text: 32px heading (1.35 line height), 16px body (max 19.75rem), `light` button 24px below. Content sits slightly below centre (`pt-11`).
-
-**Earnings table pattern** (Become a Mentor): a semantic `<table>`; header row with hairline top/bottom borders, 20px labels; rows 128px tall with a 24px title + 16px detail, a centred 24px "Mentee pays" and a right-aligned 32px semibold "You keep". Below `md` each row stacks (title, then "Mentee pays: …" muted on the left and the payout on the right).
-
-**Receipt card pattern** (Become a Mentor discount panel): a `bg-surface` panel with a white `<dl>` card: 16px labels / 24px values, a hairlined "You still receive" row in 20px/32px semibold.
 
 **Opportunity row pattern** (Events & Summits, `components/events/OpportunityFeed.tsx`): a full-width row card (`border-[#cbcbcb]`, 24px padding, 25px gap between rows) with a `#ea7146` source chip (37px tall) + categories, a 24px title, and a meta line of pixel icons (`OpportunityIcons.tsx`: people, pin, wallet) at 18px. A dark button (min-width 7.5rem) sits right-aligned, stacking under the content on phones. It uses the same filter bar (tabs + search, `aria-live` count, empty state) as Find a Mentor.
 
@@ -205,6 +200,10 @@ Form state uses `useZodForm` (`src/lib/forms/`). Errors show after blur or submi
 **Opportunity cards** (Events, `OpportunityFeed`): 3 columns at lg, 2 at sm. Photo (aspect 433/311) then a 14px gap of section grey, then a white details block (16px padding) with the source chip, categories, 24px title, details row (18px) and the dark button 20px below, bottom-aligned across a row.
 
 **Partner feature block** (Events, `ProPassPartner`): on `bg-dots`, copy left and illustration right: stacked below lg, two equal columns at lg (tablets in landscape), the design's fixed 645px illustration column from xl. 24px eyebrow, 32px two-line title at 44px line height, 16px description (max 26.25rem), a compact 34px brand button (16px text), three feature points (20px line icon, 17px title, 12px note) and a 12px fine-print line 68px below. The text block sits ~24px below the illustration's centre.
+
+**Numbered format cards** (Become a Mentor, `WaysToMentor`): 4 columns at lg, 2 at sm, on `bg-surface`. Same border and hover as `IconCard`. A 36px medium number and a 20px format label on one row, then the 24px title and 16px description pinned to the bottom (min height 298px at lg).
+
+**FAQ accordion** (Become a Mentor, `MentorFaq`): bordered (`#cbcbcb`) rows 16px apart on `bg-surface`; 20px medium question with a "+" that rotates into "×" when open; 16px answer. One open at a time (the first by default). Opening animates with a `grid-template-rows` transition, no JS measuring.
 
 **Pages** follow `hero → content section(s) on bg-surface/bg-dots → footer`. Speaker Hub is `PageHero` + one `bg-dots` section (2 speaker cards + request tile) + footer. Find a Mentor is `PageHero` + one `bg-surface` section + footer. Mentorle Plus is `PageHero` + `PricingPlans` (`bg-dots`) + `PlusBenefits` (`bg-surface`) + footer.
 
