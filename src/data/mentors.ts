@@ -1,124 +1,48 @@
-import type { ImageAsset } from "@/data/home";
-
-export type MentorDomain = "it-software" | "startups" | "academics";
-
-// Shaped like the record the Mentorle API will return, so this file can be swapped for a fetch later.
+// A directory card, built from the platform's list_public_mentors() row (src/lib/mentors/queries.ts).
 export type Mentor = {
   slug: string;
   name: string;
-  role: string;
-  company: string;
-  experience: string;
-  focus: string;
-  domain: MentorDomain;
+  role: string; // "Head of Product · Microsoft"; empty when the mentor set neither
+  company: string | null;
+  years: number;
+  experience: string; // "12+ yrs"
+  focus: string | null; // first expertise tag, shown on the photo badge
   expertise: string[];
-  photo: ImageAsset;
+  sessionTypes: SessionType[]; // categories of the mentor's published offerings
+  photo: string | null; // no photo → initials
 };
 
-export type DomainFilter = {
-  value: MentorDomain | "all";
-  label: string;
-  icon?: string;
+// "08+ yrs", as the design writes it.
+export const formatYears = (years: number) => `${String(years).padStart(2, "0")}+ yrs`;
+
+// Experience filter, the same ranges as the platform's Find Mentors page.
+export type ExperienceRange = { value: string; label: string; min: number; max: number };
+export const experienceRanges: ExperienceRange[] = [
+  { value: "0-2", label: "0–2 years", min: 0, max: 2 },
+  { value: "3-5", label: "3–5 years", min: 3, max: 5 },
+  { value: "6-10", label: "6–10 years", min: 6, max: 10 },
+  { value: "10+", label: "More than 10 years", min: 11, max: Number.POSITIVE_INFINITY },
+];
+
+// Session type filter: the offering categories mentors pick on the platform (MentorOfferings CATEGORIES), in
+// that order. Older offerings store lowercase or legacy names ("mentorship"); they map onto these.
+export const SESSION_TYPES = [
+  "General Mentorship",
+  "Resume Review",
+  "Portfolio Review",
+  "Career Guidance",
+  "Mock Interview",
+  "Code Review",
+  "Project Guidance",
+  "Other",
+] as const;
+export type SessionType = (typeof SESSION_TYPES)[number];
+
+export const toSessionType = (category: string | null | undefined): SessionType => {
+  const value = category?.trim().toLowerCase() ?? "";
+  if (value === "mentorship") return "General Mentorship";
+  return SESSION_TYPES.find((type) => type.toLowerCase() === value) ?? "Other";
 };
-
-export const domainFilters: DomainFilter[] = [
-  { value: "all", label: "All Domains" },
-  { value: "it-software", label: "IT & Software", icon: "/homepage/partners/IT-software.svg" },
-  { value: "startups", label: "Startups", icon: "/homepage/partners/startup-pitching.svg" },
-  { value: "academics", label: "Academics", icon: "/homepage/partners/academic-counseling.svg" },
-];
-
-const photos = {
-  arjun: { src: "/homepage/community/arjun-malhotra.webp", width: 866, height: 756 },
-  meera: { src: "/homepage/community/meera-kapoor.webp", width: 866, height: 756 },
-  rohan: { src: "/homepage/community/rohan-mehta.webp", width: 866, height: 756 },
-} satisfies Record<string, ImageAsset>;
-
-// Placeholder directory: the Figma repeats the three homepage mentors; real profiles will come from the Mentorle database.
-export const mentors: Mentor[] = [
-  // From the mentor-details design (2026-10-22); its full profile is in src/data/mentor-details.ts.
-  {
-    slug: "neeru-sood",
-    name: "Neeru Sood",
-    role: "Founder · Prep4Success",
-    company: "Prep4Success",
-    experience: "22+ yrs",
-    focus: "Brand Growth",
-    domain: "startups",
-    expertise: ["Branding", "Digital marketing", "Business strategy", "Entrepreneurship"],
-    photo: photos.arjun,
-  },
-  {
-    slug: "arjun-malhotra",
-    name: "Arjun Malhotra",
-    role: "Head of Product · Ex-Microsoft",
-    company: "Microsoft",
-    experience: "12+ yrs",
-    focus: "Growth Strategy",
-    domain: "it-software",
-    expertise: ["Product management", "Growth", "B2B SaaS", "PM interviews"],
-    photo: photos.arjun,
-  },
-  {
-    slug: "meera-kapoor",
-    name: "Meera Kapoor",
-    role: "Founder · Ex-McKinsey",
-    company: "McKinsey",
-    experience: "10+ yrs",
-    focus: "Startup Strategy",
-    domain: "startups",
-    expertise: ["Fundraising", "Pitch decks", "Go-to-market", "Consulting"],
-    photo: photos.meera,
-  },
-  {
-    slug: "rohan-mehta",
-    name: "Rohan Mehta",
-    role: "Design Director · Ex-Adobe",
-    company: "Adobe",
-    experience: "08+ yrs",
-    focus: "Growth Strategy",
-    domain: "academics",
-    expertise: ["UX design", "Portfolio reviews", "Design careers"],
-    photo: photos.rohan,
-  },
-  {
-    slug: "arjun-malhotra-2",
-    name: "Arjun Malhotra",
-    role: "Head of Product · Ex-Microsoft",
-    company: "Microsoft",
-    experience: "12+ yrs",
-    focus: "Growth Strategy",
-    domain: "it-software",
-    expertise: ["Product management", "Growth", "B2B SaaS", "PM interviews"],
-    photo: photos.arjun,
-  },
-  {
-    slug: "meera-kapoor-2",
-    name: "Meera Kapoor",
-    role: "Founder · Ex-McKinsey",
-    company: "McKinsey",
-    experience: "10+ yrs",
-    focus: "Startup Strategy",
-    domain: "startups",
-    expertise: ["Fundraising", "Pitch decks", "Go-to-market", "Consulting"],
-    photo: photos.meera,
-  },
-  {
-    slug: "rohan-mehta-2",
-    name: "Rohan Mehta",
-    role: "Design Director · Ex-Adobe",
-    company: "Adobe",
-    experience: "08+ yrs",
-    focus: "Growth Strategy",
-    domain: "academics",
-    expertise: ["UX design", "Portfolio reviews", "Design careers"],
-    photo: photos.rohan,
-  },
-];
-
-// The homepage's three mentors, as in its design.
-const FEATURED = ["arjun-malhotra", "meera-kapoor", "rohan-mehta"];
-export const featuredMentors = FEATURED.map((slug) => mentors.find((mentor) => mentor.slug === slug)!);
 
 export const mentorDirectoryPage = {
   hero: {
@@ -132,6 +56,13 @@ export const mentorDirectoryPage = {
     },
     primaryCta: { label: "Explore Mentors", href: "#directory" },
     secondaryCta: { label: "Explore Mentorle Plus", href: "/pricing" },
+  },
+  filters: {
+    all: "All",
+    experience: "Experience",
+    anyExperience: "Any experience",
+    sessionType: "Session type",
+    anySessionType: "Any session type",
   },
   searchPlaceholder: "Search by mentor, role, company or expertise...",
   emptyState: "No mentors match that search.",

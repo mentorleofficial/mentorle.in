@@ -83,21 +83,23 @@ The plan cards now **match the spec**: Free ₹0, Pro Pass ₹2,500/yr (anchored
 
 | # | Item | What the spec says | What Figma shows | Status |
 |---|---|---|---|---|
-| F1 | Domain tabs | No taxonomy (IC §15). | All Domains / IT & Software / Startups / Academics. Doesn't match the homepage band (H6), which also has "Career Transition". | Built as design |
+| F1 | Domain tabs | No taxonomy (IC §15). | All Domains / IT & Software / Startups / Academics. | **Changed 2026-10-23 (user):** platform mentors have no domain data, so the tabs are replaced by the platform's own filters, simplified: an "All" tab, Experience (0–2 / 3–5 / 6–10 / 10+ years) and Session type dropdowns, and search. Session types are the platform's offering categories, listing only those some mentor offers. |
 | F2 | Directory ranking and pricing | Listing order uses the ranking score (BP §2). Price comes from the gross-up engine (BP §2). Tiers (Starter / Verified / Lead / Elite) affect price and ranking (BP §1). | Cards show no price, tier, rating or session count, and there's no sort control. | Built as design |
 | F3 | Session formats on the listing | Six formats from ₹99 async to ₹2,499 executive sprint (BP §3–4). | Nothing about formats or what you can book appears on the directory. | Open |
-| F4 | Mentor card destination | — | The design doesn't say what clicking a card does. Built to link to `/mentors/<slug>` (a profile page, not designed yet, so it 404s for now). | Open |
+| F4 | Mentor card destination | — | The design doesn't say what clicking a card does. | Links to the mentor's profile, `/mentors/<slug>` (built 2026-10-22). |
 
 **Content and design gaps**
 
 | # | Item | What's missing | What's built for now |
 |---|---|---|---|
-| FD1 | Mentor list | The design repeats the three homepage mentors. | Six placeholder records in `src/data/mentors.ts`, shaped for the future API. Each is assigned a domain so the tabs visibly filter. |
-| FD2 | Search scope | The placeholder says "mentor, role, company or expertise", but no expertise data is defined. | Placeholder expertise tags per mentor; search matches name, role, company, focus and expertise. |
+| FD1 | Mentor list | The design repeats the three homepage mentors. | **Live data since 2026-10-23:** every active mentor from the platform (`list_public_mentors`). Order: mentors with a photo first, then most years of experience. |
+| FD2 | Search scope | The placeholder says "mentor, role, company or expertise". | Search matches name, role, organization and expertise tags. |
 | FD3 | Empty state | No design for "no results". | A muted "No mentors match that search." line with a "Clear filters" link. |
-| FD4 | Pagination | No pagination or "load more" in the design. | Not built; needed once real data arrives. |
+| FD4 | Pagination | No pagination or "load more" in the design. | Not built; 42 mentors load at once (fine at this size). Revisit past ~100. |
 | FD5 | Header styling | On this page the logo mark is orange and the header has no frosted bar; the homepage has a white logo on a frosted bar. | Kept the shared homepage header for consistency. Confirm which is intended. |
 | FD6 | Hero CTAs | Buttons in this design have rounded corners (~6px); everywhere else they're square. | Square, to match the rest of the site. Confirm. |
+| FD7 | Card badge and role line | The design's badge reads "12+ yrs, Growth Strategy"; "focus" isn't a platform field. | Years + the mentor's first expertise tag (only the part before a `;` or `,`, since some mentors typed several skills into one tag). Role line is "Role · Organization", either part omitted when empty. |
+| FD8 | Mentors without a photo | — | 19 of 42 live mentors have no photo: the card shows their initials on the dark panel, as the profile hero does. |
 
 ## 4. Speaker Hub page (`/speaker-hub`) — built 2026-10-12
 
@@ -237,11 +239,13 @@ One template renders every mentor from `src/data/mentor-details.ts`, shaped like
 |---|---|---|---|---|
 | M1 | Corners and page column | — | Rounded cards and buttons; content inset 88px. | Built square with the site's page column so the page matches every other page. Say if the rounded style should spread site-wide instead. |
 | M2 | Header | — | A solid dark header bar; this page has no hero image. | A dark band sits behind the site's (transparent) header. |
-| M3 | Profile photo | — | Neeru Sood's card uses the homepage's "Arjun Malhotra" photo. | Kept as designed. Needs her real photo. |
+| M3 | Profile photo | — | Neeru Sood's card uses the homepage's "Arjun Malhotra" photo. | Resolved: profiles use the mentor's own platform photo (initials when missing). |
 | M4 | Fields the platform doesn't store | `mentor_profiles` + `users` + `mentorship_offerings` hold name, photo, headline, bio, expertise, years, role, organization, LinkedIn, portfolio, experiences and offerings. | Tagline, Core Services, section intros, About eyebrow, "Founder" designation. | **Decided 2026-10-23:** mentors won't edit profiles before launch, so the page uses platform fields only. Core Services removed; the tagline is generated from the first three expertise tags (only when they're 18 characters or shorter); intros and eyebrows are generic; missing photo → initials; empty sections hide. |
 | M5 | Booking | Booking flow exists on the platform (slots, payment, Plus). | "Book a Session" buttons. | Hero and banner buttons scroll to the sessions list; the session card's button opens signup and returns to the profile. Real booking is Phase 2. |
 | M6 | Experience dates | — | Current role "Aug 2026 – Present" follows a role ending Aug 2025. | Kept as designed; probably a typo for Aug 2025. |
-| M7 | LinkedIn / Portfolio links | — | Buttons only. | Placeholder URLs until real profile data. |
-| M8 | Neeru Sood in the directory | — | Not in the Find a Mentor design. | Added as the first directory card so her profile is reachable. The homepage keeps its three designed mentors, now linking to their profiles. |
+| M7 | LinkedIn / Portfolio links | — | Buttons only. | Resolved: the mentor's platform URLs; each button hides when empty. |
+| M8 | Homepage mentors | — | The design shows three mentors. | **Admin-picked (2026-10-23):** the platform's Admin → Settings → Homepage chooses up to three (`featured_mentors`, read through `list_featured_mentors`). Only those show, in slot order; with none picked the section keeps its header and button but no cards. |
 | M9 | Sessions section | Platform offerings: title, description, duration, price. | One full-width session card ("Session format: One-on-one", "Price: Free introductory session"). | Lists every offering (2 columns, odd last one full width) with duration, price and Book. Session "format" and custom price labels aren't platform fields, so duration and the formatted price ("Free" / "₹599") are shown instead. Section order: Hero, About, Sessions, Expertise, Experience. |
 | M10 | Sparse profiles | Only name, bio, years and one expertise tag are required. | — | Text centres against the photo card so short profiles don't leave a gap; headline falls back to "Role at Organization". |
+| M11 | Data freshness | — | — | Profiles, the directory and the homepage cards are cached for about a minute (`cacheLife("minutes")`, tag `mentors`): a mentor's edit on the platform appears within ~1 minute; a newly activated mentor's page renders on its first visit. |
+| M12 | Speaker Hub speakers | — | The two speakers are the design's sample mentors, not platform mentors. | Kept as static placeholders in `src/data/speakers.ts`; their cards now open the speaker request instead of a (non-existent) mentor profile. |

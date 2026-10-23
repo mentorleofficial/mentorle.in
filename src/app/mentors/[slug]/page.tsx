@@ -3,16 +3,17 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { MentorBanner } from "@/components/home/MentorBanner";
 import { MentorAbout, MentorExpertise, MentorExperience, MentorHero, MentorSessions } from "@/components/mentor-details/MentorProfileSections";
-import { getMentorProfile, getMentorSlugs, mentorDetailCopy } from "@/data/mentor-details";
+import { mentorDetailCopy } from "@/data/mentor-details";
+import { getMentorProfile, getMentorSlugs } from "@/lib/mentors/queries";
 
-// Every profile in the data is prerendered. Cache Components needs at least one slug; with the database,
-// return the active mentors' slugs (new ones render on first visit).
+// Every active mentor is prerendered at build time. Mentors who go live later get the page shell instantly on
+// their first visit, then a cached copy (ISR with Cache Components).
 export async function generateStaticParams() {
-  return getMentorSlugs().map((slug) => ({ slug }));
+  return (await getMentorSlugs()).map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({ params }: PageProps<"/mentors/[slug]">): Promise<Metadata> {
-  const mentor = getMentorProfile((await params).slug);
+  const mentor = await getMentorProfile((await params).slug);
   if (!mentor) return {};
   const role = [mentor.currentRole, mentor.currentOrganization].filter(Boolean).join(" at ");
   return { title: mentor.fullName, description: [role, mentor.headline ?? mentor.expertise.join(", ")].filter(Boolean).join(". ").slice(0, 160) };
@@ -29,8 +30,8 @@ export default function MentorProfilePage({ params }: PageProps<"/mentors/[slug]
   );
 }
 
-function MentorView({ slug }: { slug: string }) {
-  const mentor = getMentorProfile(slug);
+async function MentorView({ slug }: { slug: string }) {
+  const mentor = await getMentorProfile(slug);
   if (!mentor) notFound();
   const { banner } = mentorDetailCopy;
   return (

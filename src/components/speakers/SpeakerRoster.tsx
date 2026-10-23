@@ -13,7 +13,7 @@ export function SpeakerRoster() {
             <MentorCard
               key={speaker.slug}
               mentor={speaker}
-              href={`/mentors/${speaker.slug}`}
+              href={speakerRequestHref(speaker.slug)}
               bordered
               action={
                 <ButtonLink href={speakerRequestHref(speaker.slug)} variant="dark" className="w-full">

@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { MentorDirectory } from "@/components/mentors/MentorDirectory";
 import { PageHero } from "@/components/ui/PageHero";
-import { domainFilters, mentorDirectoryPage, mentors } from "@/data/mentors";
+import { SESSION_TYPES, mentorDirectoryPage } from "@/data/mentors";
+import { getPublicMentors } from "@/lib/mentors/queries";
 
 export const metadata: Metadata = {
   title: "Find a Mentor",
@@ -9,7 +10,11 @@ export const metadata: Metadata = {
     "Browse vetted mentors across IT & software, startups and academics. Get real, actionable insights from professionals who have already navigated your path.",
 };
 
-export default function FindAMentorPage() {
+// The mentor list is cached ("use cache" in getPublicMentors), so it's part of the prerendered page.
+export default async function FindAMentorPage() {
+  const mentors = await getPublicMentors();
+  // Only offer session types that at least one mentor has published.
+  const sessionTypes = SESSION_TYPES.filter((type) => mentors.some((mentor) => mentor.sessionTypes.includes(type)));
   const { hero } = mentorDirectoryPage;
 
   return (
@@ -25,7 +30,8 @@ export default function FindAMentorPage() {
         <div className="container-page">
           <MentorDirectory
             mentors={mentors}
-            filters={domainFilters}
+            sessionTypes={sessionTypes}
+            labels={mentorDirectoryPage.filters}
             searchPlaceholder={mentorDirectoryPage.searchPlaceholder}
             emptyState={mentorDirectoryPage.emptyState}
           />

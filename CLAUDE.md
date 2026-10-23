@@ -10,7 +10,7 @@ The public, **mentee-facing** Mentorle website (mentorle.in): marketing pages pl
 
 Operator: AltioraEdtech Learning (OPC) Pvt. Ltd. (legal details live in `src/data/site.ts`).
 
-**Current scope: frontend only.** No backend or payments yet. Content is static, in typed data files. Auth (login, signup with email code, forgot password, onboarding) runs on a **mock service** (`src/lib/auth/service.ts`, test code `12345678`), and event registration on `src/lib/events/service.ts` that mirrors the platform's Supabase calls and `mentee_profiles` columns. mentorle.in will later replace the platform's mentee side and connect to its database, so keep new account features shaped like the platform's data.
+**Current scope: mostly frontend.** No payments yet. Marketing content is static, in typed data files. **Mentor data is live** from the platform's Supabase (`src/lib/mentors/queries.ts`: public RPCs, anonymous client in `src/lib/supabase/public.ts`, cached with `"use cache"` + `cacheLife("minutes")`). `npm run dev` reads a local Docker copy of the database (`.env.development.local`, set up in `local-docs/supabase-local/`, seeded by `node scripts/seed-local-supabase.mjs`); `.env.local` and production builds read the real project. Auth (login, signup with email code, forgot password, onboarding) runs on a **mock service** (`src/lib/auth/service.ts`, test code `12345678`), and event registration on `src/lib/events/service.ts` that mirrors the platform's Supabase calls and `mentee_profiles` columns. mentorle.in will later replace the platform's mentee side and connect to its database, so keep new account features shaped like the platform's data.
 
 ## Stack
 

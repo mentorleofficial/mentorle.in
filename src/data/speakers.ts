@@ -1,18 +1,37 @@
 import type { ImageAsset } from "@/data/home";
-import { mentors } from "@/data/mentors";
 import type { Mentor } from "@/data/mentors";
 
 // No request form is designed yet; these links point at the planned request page (it 404s until built).
 export const SPEAKER_REQUEST_PATH = "/speaker-hub/request";
 
-const speakerSlugs = ["arjun-malhotra", "meera-kapoor"];
-
-// Placeholder roster: the Figma shows two homepage mentors as speakers; real speakers will come from the Mentorle database.
-export const speakers: Mentor[] = speakerSlugs.map((slug) => {
-  const mentor = mentors.find((entry) => entry.slug === slug);
-  if (!mentor) throw new Error(`Unknown speaker slug: ${slug}`);
-  return mentor;
-});
+// Placeholder roster from the Figma (the design's two sample mentors). They aren't real mentors, so their cards
+// link to the speaker request rather than a mentor profile. Real speakers will come from the Mentorle database.
+export const speakers: Mentor[] = [
+  {
+    slug: "arjun-malhotra",
+    name: "Arjun Malhotra",
+    role: "Head of Product · Ex-Microsoft",
+    company: "Microsoft",
+    years: 12,
+    experience: "12+ yrs",
+    focus: "Growth Strategy",
+    expertise: ["Product management", "Growth", "B2B SaaS", "PM interviews"],
+    sessionTypes: [],
+    photo: "/homepage/community/arjun-malhotra.webp",
+  },
+  {
+    slug: "meera-kapoor",
+    name: "Meera Kapoor",
+    role: "Founder · Ex-McKinsey",
+    company: "McKinsey",
+    years: 10,
+    experience: "10+ yrs",
+    focus: "Startup Strategy",
+    expertise: ["Fundraising", "Pitch decks", "Go-to-market", "Consulting"],
+    sessionTypes: [],
+    photo: "/homepage/community/meera-kapoor.webp",
+  },
+];
 
 export const speakerRequestHref = (slug?: string) =>
   slug ? `${SPEAKER_REQUEST_PATH}?speaker=${encodeURIComponent(slug)}` : SPEAKER_REQUEST_PATH;

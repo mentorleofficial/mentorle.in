@@ -119,12 +119,14 @@ const mentors = [
           "Get personalized guidance on business strategy, brand positioning, marketing challenges, and growth opportunities. Discuss your goals, explore practical solutions, and leave with clear next steps.",
         duration_minutes: 45,
         price: 0,
+        category: "General Mentorship",
       },
       {
         title: "Personal Branding Audit",
         description: "A focused review of your LinkedIn, portfolio and positioning, with a prioritised list of fixes.",
         duration_minutes: 30,
         price: 599,
+        category: "Career Guidance",
       },
     ],
   },
@@ -142,7 +144,7 @@ const mentors = [
       current_role: "Head of Product",
     },
     offerings: [
-      { title: "PM Interview Mock", description: "A full product-sense mock interview with written feedback.", duration_minutes: 60, price: 1499 },
+      { title: "PM Interview Mock", description: "A full product-sense mock interview with written feedback.", duration_minutes: 60, price: 1499, category: "Mock Interview" },
     ],
   },
   {
@@ -174,11 +176,12 @@ const mentors = [
       current_role: "Design Director",
     },
     offerings: [
-      { title: "Portfolio Review", description: "Walk me through two case studies; leave with concrete edits.", duration_minutes: 45, price: 999 },
+      { title: "Portfolio Review", description: "Walk me through two case studies; leave with concrete edits.", duration_minutes: 45, price: 999, category: "Portfolio Review" },
     ],
   },
 ];
 
+const mentorIds = {};
 for (const [i, mentor] of mentors.entries()) {
   const email = i === 0 ? "mentor@mentorle.local" : `${mentor.slug}@mentorle.local`;
   const userId = await ensureUser({ email, fullName: mentor.fullName, role: "mentor", avatarUrl: mentor.avatarUrl });
@@ -194,8 +197,15 @@ for (const [i, mentor] of mentors.entries()) {
       body: mentor.offerings.map((offering) => ({ ...offering, mentor_id: userId, currency: "INR", status: "active" })),
     });
   }
+  mentorIds[mentor.slug] = userId;
   console.log(`mentor   ${mentor.slug.padEnd(16)} ${email}`);
 }
+
+// Homepage featured mentors (normally picked in the platform's Admin → Settings → Homepage).
+const featured = ["neeru-sood", "meera-kapoor", "rohan-mehta"];
+await api("/rest/v1/featured_mentors?position=gte.1", { method: "DELETE" });
+await api("/rest/v1/featured_mentors", { method: "POST", body: featured.map((slug, i) => ({ position: i + 1, mentor_id: mentorIds[slug] })) });
+console.log(`featured ${featured.join(", ")}`);
 
 // --- Events (from src/data/event-details.ts, upcoming ones moved into the future) ---------------------------
 

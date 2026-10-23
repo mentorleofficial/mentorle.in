@@ -4,45 +4,60 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { useMemo, useRef, useState } from "react";
 import { MentorCard } from "@/components/mentors/MentorCard";
-import { MaskIcon } from "@/components/ui/MaskIcon";
-import type { DomainFilter, Mentor } from "@/data/mentors";
+import { FilterDropdown } from "@/components/ui/FilterDropdown";
+import { experienceRanges } from "@/data/mentors";
+import type { Mentor, SessionType } from "@/data/mentors";
 
 type MentorDirectoryProps = {
   mentors: Mentor[];
-  filters: DomainFilter[];
+  sessionTypes: SessionType[]; // the types at least one mentor offers
+  labels: { all: string; experience: string; anyExperience: string; sessionType: string; anySessionType: string };
   searchPlaceholder: string;
   emptyState: string;
 };
 
 const matchesQuery = (mentor: Mentor, query: string) => {
   if (!query) return true;
-  const haystack = [mentor.name, mentor.role, mentor.company, mentor.focus, ...mentor.expertise].join(" ").toLowerCase();
+  const haystack = [mentor.name, mentor.role, mentor.company ?? "", ...mentor.expertise].join(" ").toLowerCase();
   return query
     .toLowerCase()
     .split(/\s+/)
     .every((term) => haystack.includes(term));
 };
 
-export function MentorDirectory({ mentors, filters, searchPlaceholder, emptyState }: MentorDirectoryProps) {
-  const [domain, setDomain] = useState<DomainFilter["value"]>("all");
+const matchesExperience = (mentor: Mentor, range: string) => {
+  const bounds = experienceRanges.find((entry) => entry.value === range);
+  return !bounds || (mentor.years >= bounds.min && mentor.years <= bounds.max);
+};
+
+export function MentorDirectory({ mentors, sessionTypes, labels, searchPlaceholder, emptyState }: MentorDirectoryProps) {
+  const [experience, setExperience] = useState("");
+  const [sessionType, setSessionType] = useState("");
   const [query, setQuery] = useState("");
   const gridRef = useRef<HTMLDivElement>(null);
 
   const trimmedQuery = query.trim();
   const results = useMemo(
-    () => mentors.filter((mentor) => (domain === "all" || mentor.domain === domain) && matchesQuery(mentor, trimmedQuery)),
-    [mentors, domain, trimmedQuery],
+    () =>
+      mentors.filter(
+        (mentor) =>
+          matchesExperience(mentor, experience) &&
+          (!sessionType || mentor.sessionTypes.includes(sessionType as SessionType)) &&
+          matchesQuery(mentor, trimmedQuery),
+      ),
+    [mentors, experience, sessionType, trimmedQuery],
   );
+  const filtered = experience !== "" || sessionType !== "";
 
   // Animate only when the filter or search actually changes. A "skip the first run" flag isn't enough: React
   // runs effects twice on mount in development, which fired this on page load and fought the scroll fade-in
   // (cards flashed visible, vanished, then faded in).
-  const shownFilter = useRef({ domain, query: trimmedQuery });
+  const shownFilter = useRef({ experience, sessionType, query: trimmedQuery });
   useGSAP(
     () => {
       const previous = shownFilter.current;
-      if (previous.domain === domain && previous.query === trimmedQuery) return;
-      shownFilter.current = { domain, query: trimmedQuery };
+      if (previous.experience === experience && previous.sessionType === sessionType && previous.query === trimmedQuery) return;
+      shownFilter.current = { experience, sessionType, query: trimmedQuery };
       const cards = gridRef.current?.children;
       if (!cards?.length || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
       gsap.fromTo(
@@ -51,39 +66,50 @@ export function MentorDirectory({ mentors, filters, searchPlaceholder, emptyStat
         { y: 0, autoAlpha: 1, duration: 0.6, ease: "power3.out", stagger: 0.06, overwrite: true },
       );
     },
-    { dependencies: [domain, trimmedQuery], scope: gridRef },
+    { dependencies: [experience, sessionType, trimmedQuery], scope: gridRef },
   );
 
   const reset = () => {
-    setDomain("all");
+    setExperience("");
+    setSessionType("");
     setQuery("");
   };
 
   return (
     <div>
-      <div data-animate="fade-up" className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <div
-          role="group"
-          aria-label="Filter mentors by domain"
-          className="no-scrollbar -mx-[var(--gutter)] flex gap-3 overflow-x-auto px-[var(--gutter)] lg:mx-0 lg:px-0"
-        >
-          {filters.map((filter) => {
-            const isActive = filter.value === domain;
-            return (
-              <button
-                key={filter.value}
-                type="button"
-                aria-pressed={isActive}
-                onClick={() => setDomain(filter.value)}
-                className={`inline-flex h-[2.3125rem] shrink-0 items-center gap-2 border px-[1.125rem] text-sm whitespace-nowrap transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand ${
-                  isActive ? "border-ink bg-ink text-white" : "border-[#dadada] text-ink hover:border-ink"
-                }`}
-              >
-                {filter.icon && <MaskIcon src={filter.icon} className="h-[0.9375rem] w-[1.0625rem]" />}
-                {filter.label}
-              </button>
-            );
-          })}
+      {/* z-20: the open dropdown list must sit above the (animated) card grid. */}
+      <div data-animate="fade-up" className="relative z-20 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        {/* Wraps instead of scrolling sideways, which would clip the open lists. */}
+        <div role="group" aria-label="Filter mentors" className="flex flex-wrap gap-3">
+          <button
+            type="button"
+            aria-pressed={!filtered}
+            onClick={() => {
+              setExperience("");
+              setSessionType("");
+            }}
+            className={`inline-flex h-[2.3125rem] shrink-0 items-center border px-[1.125rem] text-sm whitespace-nowrap transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand ${
+              filtered ? "border-[#dadada] text-ink hover:border-ink" : "border-ink bg-ink text-white"
+            }`}
+          >
+            {labels.all}
+          </button>
+          <FilterDropdown
+            label={labels.experience}
+            anyLabel={labels.anyExperience}
+            options={experienceRanges.map((range) => ({ value: range.value, label: range.label }))}
+            value={experience}
+            onChange={setExperience}
+          />
+          {sessionTypes.length > 0 && (
+            <FilterDropdown
+              label={labels.sessionType}
+              anyLabel={labels.anySessionType}
+              options={sessionTypes.map((type) => ({ value: type, label: type }))}
+              value={sessionType}
+              onChange={setSessionType}
+            />
+          )}
         </div>
 
         <label className="relative block w-full lg:w-[29.5625rem]">

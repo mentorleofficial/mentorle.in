@@ -296,7 +296,7 @@ export const homePlans = {
 const goalIcon = (name: string, width: number, height: number): ImageAsset => ({ src: `/homepage/start-with-your-goal/${name}.svg`, width, height });
 
 // "Start with your goal" (after Live Gatherings). The cards aren't links in the design; the button opens the
-// mentor directory, which filters by domain.
+// mentor directory.
 export const helpWith = {
   eyebrow: "Start with your goal",
   title: "What would you like help with?",
