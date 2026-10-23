@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { MentorBanner } from "@/components/home/MentorBanner";
-import { MentorAbout, MentorExpertise, MentorExperience, MentorHero, MentorServices, MentorSessions } from "@/components/mentor-details/MentorProfileSections";
+import { MentorAbout, MentorExpertise, MentorExperience, MentorHero, MentorSessions } from "@/components/mentor-details/MentorProfileSections";
 import { getMentorProfile, getMentorSlugs, mentorDetailCopy } from "@/data/mentor-details";
 
 // Every profile in the data is prerendered. Cache Components needs at least one slug; with the database,
@@ -14,7 +14,8 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: PageProps<"/mentors/[slug]">): Promise<Metadata> {
   const mentor = getMentorProfile((await params).slug);
   if (!mentor) return {};
-  return { title: mentor.name, description: `${mentor.currentRole} at ${mentor.organization}. ${mentor.headline}`.slice(0, 160) };
+  const role = [mentor.currentRole, mentor.currentOrganization].filter(Boolean).join(" at ");
+  return { title: mentor.fullName, description: [role, mentor.headline ?? mentor.expertise.join(", ")].filter(Boolean).join(". ").slice(0, 160) };
 }
 
 // `params` is read inside Suspense so navigations stay instant (same pattern as /events/[slug]).
@@ -36,9 +37,8 @@ function MentorView({ slug }: { slug: string }) {
     <>
       <MentorHero mentor={mentor} />
       <MentorAbout mentor={mentor} />
-      <MentorServices mentor={mentor} />
-      <MentorExpertise mentor={mentor} />
       <MentorSessions mentor={mentor} />
+      <MentorExpertise mentor={mentor} />
       <MentorExperience mentor={mentor} />
       <MentorBanner title={banner.title} primaryCta={banner.primaryCta} secondaryCta={banner.secondaryCta} />
     </>
