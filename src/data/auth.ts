@@ -184,5 +184,7 @@ export const accountMenu = {
   label: "Account",
   completeProfile: { label: "Complete your profile", href: "/onboarding" },
   findMentor: { label: "Find a mentor", href: "/mentors" },
+  sessions: { label: "My sessions", href: "/sessions" },
+  account: { label: "Account", href: "/account" },
   logout: "Log out",
 };

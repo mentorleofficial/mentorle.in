@@ -24,3 +24,21 @@ const dayKeyFormat = new Intl.DateTimeFormat("en-CA", { timeZone: TIME_ZONE, yea
 export const istDayKey = (iso: string | Date) => dayKeyFormat.format(typeof iso === "string" ? new Date(iso) : iso);
 // "10:00 AM" (IST, no suffix).
 export const formatClock = clock;
+
+const shortDateFormat = new Intl.DateTimeFormat("en-US", { timeZone: TIME_ZONE, month: "short", day: "numeric" });
+// "5 min ago", "3 h ago", "2 d ago", then "Oct 21". Client-only (needs the current time).
+export function formatRelativeTime(iso: string, now: number, justNow: string) {
+  const minutes = Math.floor((now - Date.parse(iso)) / 60_000);
+  if (minutes < 1) return justNow;
+  if (minutes < 60) return `${minutes} min ago`;
+  if (minutes < 24 * 60) return `${Math.floor(minutes / 60)} h ago`;
+  if (minutes < 7 * 24 * 60) return `${Math.floor(minutes / (24 * 60))} d ago`;
+  return shortDateFormat.format(new Date(iso));
+}
+
+const partsFormat = new Intl.DateTimeFormat("en-US", { timeZone: TIME_ZONE, weekday: "short", day: "numeric", month: "short", year: "numeric" });
+// { weekday: "Mon", day: "26", month: "Oct", year: "2026" } in IST, for date blocks.
+export function formatDateParts(iso: string) {
+  const parts = Object.fromEntries(partsFormat.formatToParts(new Date(iso)).map((part) => [part.type, part.value]));
+  return { weekday: parts.weekday ?? "", day: parts.day ?? "", month: parts.month ?? "", year: parts.year ?? "" };
+}

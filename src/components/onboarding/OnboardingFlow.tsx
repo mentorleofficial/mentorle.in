@@ -5,8 +5,8 @@ import type { ReactNode } from "react";
 import { AuthLink, safeRedirect, useAuthModal } from "@/components/auth/AuthModalContext";
 import { AuthHeading, AuthStep } from "@/components/auth/AuthStep";
 import { ChipInput } from "@/components/forms/ChipInput";
+import { PhotoPicker } from "@/components/forms/PhotoPicker";
 import { FormAlert, Spinner, SubmitButton, TextAreaField, TextField, outlineButtonClasses } from "@/components/forms/fields";
-import { Avatar } from "@/components/layout/AccountMenu";
 import { buttonClasses } from "@/components/ui/ButtonLink";
 import { StickyActions } from "@/components/ui/StickyActions";
 import { areaSuggestions, interestSuggestions, onboardingCopy, onboardingLimits, onboardingSteps } from "@/data/onboarding";
@@ -17,7 +17,6 @@ import { authService } from "@/lib/auth/service";
 import type { MenteeProfile } from "@/lib/auth/types";
 
 const copy = onboardingCopy;
-const MAX_PHOTO_BYTES = 5 * 1024 * 1024;
 
 // The platform's mentee "Complete your profile" wizard (6 steps, same rules), as further steps of the auth
 // modal: signup → verify → You're in! → these steps, all in one card over the page the user was on.
@@ -365,57 +364,11 @@ type StepProps = {
 };
 
 function StepWelcome({ profile, values, set, field }: StepProps & { profile: MenteeProfile }) {
-  const { user, refresh } = useAuth();
-  const [uploading, setUploading] = useState(false);
-  const [photoError, setPhotoError] = useState("");
-  const inputRef = useRef<HTMLInputElement>(null);
   const note = copy.emailNote(profile.email);
-
-  const onFile = async (file: File | undefined) => {
-    if (!file || !user) return;
-    if (!/^image\/(png|jpe?g|webp)$/.test(file.type)) return setPhotoError(copy.photo.notImage);
-    if (file.size > MAX_PHOTO_BYTES) return setPhotoError(copy.photo.tooLarge);
-    setPhotoError("");
-    setUploading(true);
-    try {
-      const url = await authService.uploadAvatar(file);
-      await authService.upsertMenteeProfile(user.id, { avatar_url: url });
-      await refresh();
-    } catch {
-      setPhotoError(copy.errors.save);
-    } finally {
-      setUploading(false);
-    }
-  };
 
   return (
     <>
-      <div className="flex items-center gap-5">
-        <div className="relative">
-          <Avatar name={values.full_name || profile.email} url={user?.avatar_url ?? null} className="size-20 text-2xl" />
-          {uploading && (
-            <span className="absolute inset-0 flex items-center justify-center bg-black/50 text-white">
-              <Spinner />
-            </span>
-          )}
-        </div>
-        <div>
-          <button type="button" onClick={() => inputRef.current?.click()} disabled={uploading} className={outlineButtonClasses("disabled:opacity-60")}>
-            {user?.avatar_url ? copy.photo.change : copy.photo.add}
-          </button>
-          <p className="mt-2 text-xs text-muted">{copy.photo.hint}</p>
-          {photoError && <p className="mt-1 text-xs text-brand-dark">{photoError}</p>}
-          <input
-            ref={inputRef}
-            type="file"
-            accept="image/png,image/jpeg,image/webp"
-            className="sr-only"
-            tabIndex={-1}
-            aria-hidden
-            onChange={(event) => void onFile(event.target.files?.[0])}
-          />
-        </div>
-      </div>
+      <PhotoPicker name={values.full_name || profile.email} />
       <TextField
         {...field("full_name")}
         label={copy.fields.fullName.label}

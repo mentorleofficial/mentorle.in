@@ -181,6 +181,15 @@ export const authService = {
     if (error) console.error("[auth] resetPasswordForEmail", error);
   },
 
+  // Account → Password: confirms the current password before changing it (Supabase itself only needs the session).
+  async verifyPassword(email: string, password: string) {
+    const { error } = await db().auth.signInWithPassword({ email: email.trim(), password });
+    if (!error) return;
+    const code = codeOf(error);
+    if (code.includes("invalid")) fail("invalid_credentials");
+    fail(code.includes("rate") ? "rate_limited" : "unknown", error);
+  },
+
   async updatePassword(password: string) {
     const { error } = await db().auth.updateUser({ password });
     if (!error) return;

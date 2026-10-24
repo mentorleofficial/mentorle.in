@@ -6,6 +6,7 @@ import { prefetchFor } from "@/lib/routes";
 import { useState } from "react";
 import { buttonClasses } from "@/components/ui/ButtonLink";
 import { AccountLinks, AccountMenu, Avatar } from "@/components/layout/AccountMenu";
+import { NotificationBell } from "@/components/layout/NotificationBell";
 import { accountNav, primaryNav } from "@/data/site";
 import { useAuth } from "@/lib/auth/AuthProvider";
 
@@ -23,7 +24,10 @@ export function SiteHeader() {
           {/* Hidden until the session is read, so signed-in users don't see Login flash before their avatar. */}
           <div className={`hidden items-center gap-[0.625rem] transition-opacity duration-300 lg:flex ${status === "loading" ? "opacity-0" : ""}`}>
             {signedIn ? (
-              <AccountMenu />
+              <>
+                <AccountMenu />
+                <NotificationBell className="ml-2" />
+              </>
             ) : (
               <>
                 <Link href={accountNav.newHere.href} prefetch={prefetchFor(accountNav.newHere.href)} className={buttonClasses("light")}>
@@ -61,9 +65,11 @@ export function SiteHeader() {
             </ul>
           </nav>
 
+          <div className="flex items-center gap-1 lg:hidden">
+          {signedIn && <NotificationBell fullWidth />}
           <button
             type="button"
-            className="flex size-10 items-center justify-center text-white lg:hidden"
+            className="flex size-10 items-center justify-center text-white"
             aria-expanded={open}
             aria-controls="mobile-menu"
             aria-label={open ? "Close menu" : "Open menu"}
@@ -73,6 +79,7 @@ export function SiteHeader() {
               {open ? <path d="M6 6l12 12M18 6L6 18" /> : <path d="M3 7h18M3 12h18M3 17h18" />}
             </svg>
           </button>
+          </div>
         </div>
 
         <div

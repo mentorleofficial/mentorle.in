@@ -39,6 +39,7 @@ export const bookingCopy = {
     copied: "Copied",
     calendar: "Add to Google Calendar",
     close: "Done",
+    sessions: "View my sessions",
   },
   // Placeholder copy (BK9): only the mentor or a Mentorle admin cancels or reschedules a session.
   rules: ["Booked times are final: sessions can’t be cancelled or rescheduled from your account.", "If something comes up, your mentor or the Mentorle team can move or cancel it."],

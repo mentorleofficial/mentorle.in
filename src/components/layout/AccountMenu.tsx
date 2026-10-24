@@ -72,14 +72,16 @@ export function AccountMenu() {
 }
 
 export function AccountLinks({ onboarded, onNavigate, onSignOut, itemClassName }: { onboarded: boolean; onNavigate: () => void; onSignOut: () => void; itemClassName: string }) {
-  const primary = onboarded ? accountMenu.findMentor : accountMenu.completeProfile;
+  const links = [onboarded ? accountMenu.findMentor : accountMenu.completeProfile, accountMenu.sessions, accountMenu.account];
   return (
     <ul>
-      <li>
-        <Link href={primary.href} prefetch={prefetchFor(primary.href)} onClick={onNavigate} className={itemClassName}>
-          {primary.label}
-        </Link>
-      </li>
+      {links.map((link) => (
+        <li key={link.href}>
+          <Link href={link.href} prefetch={prefetchFor(link.href)} onClick={onNavigate} className={itemClassName}>
+            {link.label}
+          </Link>
+        </li>
+      ))}
       <li>
         <button
           type="button"

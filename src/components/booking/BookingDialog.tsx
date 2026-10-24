@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -12,7 +13,9 @@ import type { MentorOffering } from "@/data/mentor-details";
 import { formatPrice } from "@/data/mentor-details";
 import { useAuth } from "@/lib/auth/AuthProvider";
 import { SlotTakenError, bookingService } from "@/lib/booking/service";
+import { googleCalendarUrl } from "@/lib/calendar";
 import { formatClock, formatEventDay, istDayKey } from "@/lib/dates";
+import { prefetchFor } from "@/lib/routes";
 
 // Booking overlay over a mentor profile, in the auth dialogs' style: pick a day and time (open slots from the
 // server, IST), confirm with an optional note, then the meeting link and a calendar link. Signed-out visitors and
@@ -51,14 +54,6 @@ const addMonths = (month: string, n: number) => {
   const d = new Date(Date.UTC(y, m - 1 + n, 1));
   return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}`;
 };
-
-const toCalDate = (iso: string) => new Date(iso).toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
-
-function googleCalendarUrl(title: string, startsAt: string, minutes: number, link: string) {
-  const end = new Date(Date.parse(startsAt) + minutes * 60_000).toISOString();
-  const params = new URLSearchParams({ action: "TEMPLATE", text: title, dates: `${toCalDate(startsAt)}/${toCalDate(end)}`, details: `Meeting link: ${link}`, location: link });
-  return `https://calendar.google.com/calendar/render?${params}`;
-}
 
 export function BookingDialog({ mentor, offering, initialStartsAt, onClose }: BookingDialogProps) {
   const titleId = useId();
@@ -266,6 +261,9 @@ export function BookingDialog({ mentor, offering, initialStartsAt, onClose }: Bo
             <SubmitButton type="button" loading={false} loadingLabel="" onClick={onClose}>
               {copy.done.close}
             </SubmitButton>
+            <Link href="/sessions" prefetch={prefetchFor("/sessions")} className="mt-4 block text-center text-sm text-ink underline-offset-4 hover:underline">
+              {copy.done.sessions} <span aria-hidden>→</span>
+            </Link>
           </div>
         </div>
       );

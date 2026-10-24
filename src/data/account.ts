@@ -1,0 +1,45 @@
+// Account page (/account): the mentee's profile (same fields and rules as onboarding), password and sign-out.
+// No Figma: built from the site's patterns (logged in SPEC-VS-DESIGN, AC rows). Field labels come from
+// src/data/onboarding.ts so both screens say the same thing.
+
+export const accountCopy = {
+  eyebrow: "Your account",
+  title: "Account",
+  subtitle: "Keep your profile up to date so mentors know who they’re meeting.",
+  nav: { profile: "Profile", password: "Password", signOut: "Log out" },
+  loading: "Loading your account…",
+  profile: {
+    title: "Profile",
+    body: "What mentors see when you book with them.",
+    email: "Email",
+    emailHint: "Your sign-in email. It can’t be changed here.",
+    phone: "Phone number",
+    country: "Country code",
+  },
+  about: { title: "About you", body: "A short headline and bio help mentors understand your context." },
+  goals: { title: "Your goals", body: "What you want to achieve through mentorship." },
+  interests: { title: "Interests & mentors", body: "These help us match you with the right mentors." },
+  save: "Save changes",
+  saving: "Saving…",
+  saved: "Changes saved.",
+  unsaved: "You have unsaved changes.",
+  discard: "Discard",
+  saveError: "Couldn’t save your changes. Please try again.",
+  fixErrors: "Some fields need a look before saving.",
+  phoneError: "Enter a valid phone number.",
+  finishProfile: { body: "Finish setting up your profile first. It takes about two minutes.", cta: "Finish your profile" },
+  password: {
+    title: "Password",
+    body: "Use at least 8 characters. You’ll stay signed in on this device.",
+    current: "Current password",
+    next: "New password",
+    confirm: "Confirm new password",
+    submit: "Update password",
+    submitting: "Updating…",
+    done: "Password updated.",
+    wrongCurrent: "That’s not your current password.",
+    required: "Enter your current password.",
+  },
+  signOut: { title: "Log out", body: "Sign out of Mentorle on this device.", cta: "Log out", working: "Logging out…" },
+  gate: { title: "Log in to manage your account", body: "Your profile and password settings are here once you’re signed in.", login: "Log in", signup: "Create an account" },
+};
