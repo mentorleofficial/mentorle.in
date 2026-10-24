@@ -19,7 +19,13 @@ export type MySession = {
   cancellationReason: string;
   previousStartsAt: string | null;
   mentor: { id: string; name: string; avatarUrl: string | null; slug: string | null };
+  // The mentee's rating of the mentor (audience "mentor"), with the mentor's reply if any.
+  myRating: { rating: number; comment: string; reply: string } | null;
+  // The mentor's feedback about the mentee (audience "mentee").
+  mentorFeedback: { rating: number; comment: string } | null;
 };
+
+type FeedbackRow = { rating: number; comment: string | null; audience: string; response: string | null };
 
 type Row = {
   id: string;
@@ -33,10 +39,11 @@ type Row = {
   previous_scheduled_at: string | null;
   mentor_id: string;
   mentor: { full_name: string | null; avatar_url: string | null } | null;
+  feedback: FeedbackRow[] | null;
 };
 
 const SELECT =
-  "id, scheduled_at, duration_minutes, status, title, mentee_notes, meeting_url, cancellation_reason, previous_scheduled_at, mentor_id, mentor:users!sessions_mentor_id_fkey(full_name, avatar_url)";
+  "id, scheduled_at, duration_minutes, status, title, mentee_notes, meeting_url, cancellation_reason, previous_scheduled_at, mentor_id, mentor:users!sessions_mentor_id_fkey(full_name, avatar_url), feedback(rating, comment, audience, response)";
 
 async function mentorSlugs(ids: string[]) {
   const entries = await Promise.all(
@@ -65,9 +72,44 @@ export const sessionsService = {
       cancellationReason: row.cancellation_reason?.trim() ?? "",
       previousStartsAt: row.previous_scheduled_at,
       mentor: { id: row.mentor_id, name: row.mentor?.full_name || "Your mentor", avatarUrl: row.mentor?.avatar_url ?? null, slug: slugs.get(row.mentor_id) ?? null },
+      myRating: pickFeedback(row.feedback, "mentor", (f) => ({ rating: f.rating, comment: cleanComment(f.comment), reply: f.response?.trim() ?? "" })),
+      mentorFeedback: pickFeedback(row.feedback, "mentee", (f) => ({ rating: f.rating, comment: cleanComment(f.comment) })),
     }));
   },
+
+  // The platform's mentee survey (MenteeFeedbackSurvey): one feedback row for the mentor, rated by the rounded
+  // average, with the answers written under the comment in the platform's format. Completed sessions only.
+  async rate(input: { sessionId: string; userId: string; answers: Record<string, number>; expectationLabel: string; comment: string }) {
+    const { answers } = input;
+    const values = Object.values(answers);
+    const rating = Math.round(values.reduce((sum, value) => sum + value, 0) / values.length);
+    const survey = [
+      `Did the mentorship program help you achieve what you expected?: ${input.expectationLabel}`,
+      `Guidance quality: ${answers.guidance} / 5 stars`,
+      `Engagement: ${answers.engagement} / 5 stars`,
+      `Practical insights: ${answers.insights} / 5 stars`,
+      `Overall mentorship value: ${answers.value} / 5 stars`,
+    ].join("\n");
+    const comment = input.comment.trim() ? `${input.comment.trim()}\n\n${SURVEY_DELIMITER}${survey}` : `Survey Responses:\n${survey}`;
+    const { error } = await browserSupabase().from("feedback").insert({ session_id: input.sessionId, submitted_by: input.userId, rating, comment, audience: "mentor" });
+    if (error) throw new Error(`feedback failed: ${error.message}`);
+    return { rating, comment: input.comment.trim(), reply: "" };
+  },
 };
+
+// The platform appends the survey answers to the comment; only the mentee's own words are shown.
+const SURVEY_DELIMITER = "---\nSurvey Responses:\n";
+function cleanComment(comment: string | null) {
+  if (!comment) return "";
+  const index = comment.indexOf(SURVEY_DELIMITER);
+  if (index !== -1) return comment.slice(0, index).trim();
+  return comment.startsWith("Survey Responses:\n") ? "" : comment.trim();
+}
+
+function pickFeedback<T>(rows: FeedbackRow[] | null, audience: string, map: (row: FeedbackRow) => T): T | null {
+  const row = rows?.find((item) => item.audience === audience);
+  return row ? map(row) : null;
+}
 
 export const endsAt = (session: MySession) => Date.parse(session.startsAt) + session.durationMinutes * 60_000;
 

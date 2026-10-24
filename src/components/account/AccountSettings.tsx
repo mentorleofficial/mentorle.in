@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { ChangeEvent, FormEvent, ReactNode } from "react";
 import { AccountGate, AccountNotice } from "@/components/account/AccountGate";
 import { ChipInput } from "@/components/forms/ChipInput";
@@ -18,11 +18,13 @@ import { fieldErrors, newPasswordSchema, normaliseUrl, onboardingSchema, validPh
 import type { OnboardingField, OnboardingValues } from "@/lib/auth/schema";
 import { authService } from "@/lib/auth/service";
 import { AuthError } from "@/lib/auth/types";
+import { RESUME_ACCEPT, RESUME_MAX_BYTES, RESUME_TYPES, resumeFileName, resumeService } from "@/lib/resume/service";
 import type { MenteeProfile } from "@/lib/auth/types";
 
 const fields = onboardingCopy.fields;
 const sections = [
   { id: "profile", label: copy.nav.profile },
+  { id: "resume", label: copy.nav.resume },
   { id: "password", label: copy.nav.password },
   { id: "sign-out", label: copy.nav.signOut },
 ];
@@ -57,7 +59,10 @@ function Settings() {
         <ol className="sticky top-8 space-y-1 border-l border-line">
           {sections.map((section) => (
             <li key={section.id}>
-              <a href={`#${section.id}`} className="-ml-px block border-l border-transparent py-1.5 pl-4 text-sm text-ink/80 transition-colors hover:border-brand hover:text-ink">
+              <a
+                href={`#${section.id}`}
+                className="-ml-px block border-l border-transparent py-1.5 pl-4 text-sm text-ink/80 transition-colors hover:border-brand hover:text-ink"
+              >
                 {section.label}
               </a>
             </li>
@@ -66,15 +71,20 @@ function Settings() {
       </nav>
       <div className="flex max-w-[48rem] min-w-0 flex-col gap-6">
         {onboarded ? (
-          <ProfileForm key={user.id} profile={profile} />
+          <ProfileForm key={user.id} profile={profile}>
+            <ResumeCard userId={user.id} url={profile.resume_url} />
+          </ProfileForm>
         ) : (
-          <div id="profile" className="scroll-mt-8">
-            <AccountNotice title={copy.profile.title} body={copy.finishProfile.body}>
-              <Link href="/onboarding?redirect=%2Faccount" className={buttonClasses("brand")}>
-                {copy.finishProfile.cta}
-              </Link>
-            </AccountNotice>
-          </div>
+          <>
+            <div id="profile" className="scroll-mt-8">
+              <AccountNotice title={copy.profile.title} body={copy.finishProfile.body}>
+                <Link href="/onboarding?redirect=%2Faccount" className={buttonClasses("brand")}>
+                  {copy.finishProfile.cta}
+                </Link>
+              </AccountNotice>
+            </div>
+            <ResumeCard userId={user.id} url={profile.resume_url} />
+          </>
         )}
         <PasswordForm email={user.email} />
         <SignOut />
@@ -100,8 +110,9 @@ const fromProfile = (profile: MenteeProfile): ProfileValues => ({
   phone: profile.phone ?? "",
 });
 
-// The onboarding fields with the same rules (onboardingSchema), on one page with one Save.
-function ProfileForm({ profile }: { profile: MenteeProfile }) {
+// The onboarding fields with the same rules (onboardingSchema), on one page with one Save bar that appears once
+// something changes. `children` (the resume card, which saves on its own) sits after the Profile card.
+function ProfileForm({ profile, children }: { profile: MenteeProfile; children?: ReactNode }) {
   const { user, refresh } = useAuth();
   const [saved, setSaved] = useState<ProfileValues>(() => fromProfile(profile));
   const [values, setValues] = useState<ProfileValues>(saved);
@@ -141,6 +152,7 @@ function ProfileForm({ profile }: { profile: MenteeProfile }) {
       setSaved(next);
       setValues(next);
       setMessage({ tone: "info", text: copy.saved });
+      setTimeout(() => setMessage((current) => (current?.text === copy.saved ? null : current)), 4000);
     } catch {
       setMessage({ tone: "error", text: copy.saveError });
     } finally {
@@ -191,6 +203,8 @@ function ProfileForm({ profile }: { profile: MenteeProfile }) {
         </div>
         <TextField id="account-email" label={copy.profile.email} value={profile.email} disabled readOnly hint={copy.profile.emailHint} />
       </SettingsCard>
+
+      {children}
 
       <SettingsCard title={copy.about.title} body={copy.about.body}>
         <TextField
@@ -281,37 +295,168 @@ function ProfileForm({ profile }: { profile: MenteeProfile }) {
         </div>
       </SettingsCard>
 
-      {/* Stays at the bottom of the screen while the profile cards scroll past. */}
-      <div className="sticky bottom-0 z-10 -mx-4 flex flex-wrap items-center justify-end gap-3 border-t border-[#cbcbcb] bg-surface px-4 py-4 md:mx-0 md:px-0">
-        <p className="mr-auto text-sm text-ink-soft" aria-live="polite">
-          {message ? <span className={message.tone === "error" ? "text-brand-dark" : "text-ink"}>{message.text}</span> : dirty ? copy.unsaved : null}
-        </p>
-        {dirty && (
-          <button
-            type="button"
-            onClick={() => {
-              setValues(saved);
-              setTouched({});
-              setMessage(null);
-            }}
-            disabled={saving}
-            className={outlineButtonClasses()}
-          >
-            {copy.discard}
-          </button>
-        )}
-        <button type="submit" disabled={!dirty || saving} aria-busy={saving} className={buttonClasses("brand", "min-w-[9.5rem] gap-2 disabled:cursor-not-allowed disabled:opacity-60")}>
-          {saving ? (
-            <>
-              <Spinner />
-              {copy.saving}
-            </>
-          ) : (
-            copy.save
+      {/* Shown once something changes, pinned to the bottom of the screen until it's saved or discarded. */}
+      {(dirty || saving || message) && (
+        <div className="sticky bottom-0 z-10 -mx-4 flex animate-[auth-step-in_200ms_ease-out] flex-wrap items-center justify-end gap-3 border-t border-[#cbcbcb] bg-surface px-4 py-4 motion-reduce:animate-none md:mx-0 md:px-0">
+          <p className="mr-auto text-sm text-ink-soft" aria-live="polite">
+            {message ? <span className={message.tone === "error" ? "text-brand-dark" : "text-ink"}>{message.text}</span> : dirty ? copy.unsaved : null}
+          </p>
+          {dirty && (
+            <button
+              type="button"
+              onClick={() => {
+                setValues(saved);
+                setTouched({});
+                setMessage(null);
+              }}
+              disabled={saving}
+              className={outlineButtonClasses()}
+            >
+              {copy.discard}
+            </button>
           )}
-        </button>
-      </div>
+          <button
+            type="submit"
+            disabled={!dirty || saving}
+            aria-busy={saving}
+            className={buttonClasses("brand", "min-w-[9.5rem] gap-2 disabled:cursor-not-allowed disabled:opacity-60")}
+          >
+            {saving ? (
+              <>
+                <Spinner />
+                {copy.saving}
+              </>
+            ) : (
+              copy.save
+            )}
+          </button>
+        </div>
+      )}
     </form>
+  );
+}
+
+// Saved as soon as a file is picked (like the photo), in the platform's mentee-resumes bucket.
+function ResumeCard({ userId, url }: { userId: string; url: string | null }) {
+  const { refresh } = useAuth();
+  const [busy, setBusy] = useState<"upload" | "remove" | null>(null);
+  // The bucket is private: View is a plain link to a signed URL, made ahead (and renewed before it expires).
+  const [link, setLink] = useState<string | null>(null);
+  const [error, setError] = useState("");
+  const input = useRef<HTMLInputElement>(null);
+  const r = copy.resume;
+
+  const run = async (kind: "upload" | "remove", task: () => Promise<unknown>) => {
+    setBusy(kind);
+    setError("");
+    try {
+      await task();
+      await refresh();
+    } catch {
+      setError(r.error);
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const onFile = (file: File | undefined) => {
+    if (!file) return;
+    if (file.size > RESUME_MAX_BYTES) return setError(r.tooLarge);
+    if (file.type && !RESUME_TYPES.includes(file.type)) return setError(r.wrongType);
+    void run("upload", () => resumeService.upload(userId, file, url));
+  };
+
+  useEffect(() => {
+    if (!url) return;
+    let live = true;
+    const sign = () =>
+      resumeService
+        .signedUrl(url)
+        .then((signed) => live && setLink(signed))
+        .catch(() => live && setLink(null));
+    void sign();
+    const renew = setInterval(() => void sign(), 9 * 60_000);
+    return () => {
+      live = false;
+      clearInterval(renew);
+    };
+  }, [url]);
+
+  return (
+    <SettingsCard id="resume" title={r.title} body={r.body}>
+      {url ? (
+        <div className="flex flex-wrap items-center gap-4 border border-line bg-surface px-4 py-3.5">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" className="size-6 shrink-0 text-ink-soft" aria-hidden>
+            <path d="M14 3H6v18h12V7z" />
+            <path d="M14 3v4h4M9 12h6M9 16h6" />
+          </svg>
+          <div className="min-w-0 flex-1">
+            <p className="text-xs text-muted">{r.current}</p>
+            <p className="truncate text-sm text-ink">{resumeFileName(url)}</p>
+          </div>
+          <div className="flex flex-wrap gap-2.5">
+            {link ? (
+              <a href={link} target="_blank" rel="noopener noreferrer" className={outlineButtonClasses()}>
+                {r.view} <span aria-hidden>↗</span>
+              </a>
+            ) : (
+              <span className={outlineButtonClasses("opacity-60")} aria-disabled>
+                {r.opening}
+              </span>
+            )}
+            <button type="button" onClick={() => input.current?.click()} disabled={busy !== null} className={outlineButtonClasses("gap-2 disabled:opacity-60")}>
+              {busy === "upload" ? (
+                <>
+                  <Spinner />
+                  {r.uploading}
+                </>
+              ) : (
+                r.replace
+              )}
+            </button>
+            <button
+              type="button"
+              onClick={() => void run("remove", () => resumeService.remove(userId, url))}
+              disabled={busy !== null}
+              className="inline-flex h-[2.3125rem] items-center px-2 text-sm text-ink-soft underline-offset-4 hover:text-ink hover:underline disabled:opacity-60"
+            >
+              {busy === "remove" ? r.removing : r.remove}
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className="flex flex-wrap items-center gap-4">
+          <button type="button" onClick={() => input.current?.click()} disabled={busy !== null} className={buttonClasses("dark", "gap-2 disabled:opacity-60")}>
+            {busy === "upload" ? (
+              <>
+                <Spinner />
+                {r.uploading}
+              </>
+            ) : (
+              r.upload
+            )}
+          </button>
+          <p className="text-sm text-ink-soft">{r.empty}</p>
+        </div>
+      )}
+      <input
+        ref={input}
+        type="file"
+        accept={RESUME_ACCEPT}
+        className="sr-only"
+        tabIndex={-1}
+        aria-hidden
+        onChange={(event) => {
+          onFile(event.target.files?.[0]);
+          event.target.value = "";
+        }}
+      />
+      {error && (
+        <p className="-mt-2 text-xs text-brand-dark" role="alert">
+          {error}
+        </p>
+      )}
+    </SettingsCard>
   );
 }
 
@@ -334,7 +479,8 @@ function PasswordForm({ email }: { email: string }) {
   const parsed = newPasswordSchema.safeParse({ password: values.password, confirmPassword: values.confirmPassword });
   const errors: Record<string, string | undefined> = parsed.success ? {} : fieldErrors(parsed.error);
   if (!values.current) errors.current = copy.password.required;
-  const shown = (name: "current" | "password" | "confirmPassword") => (serverError?.field === name ? serverError.text : touched[name] ? errors[name] : undefined);
+  const shown = (name: "current" | "password" | "confirmPassword") =>
+    serverError?.field === name ? serverError.text : touched[name] ? errors[name] : undefined;
   const set = (name: keyof typeof values, value: string) => {
     setValues((current) => ({ ...current, [name]: value }));
     setServerError(null);

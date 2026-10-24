@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Avatar } from "@/components/layout/AccountMenu";
+import { Stars } from "@/components/sessions/Stars";
 import { buttonClasses } from "@/components/ui/ButtonLink";
 import { sessionsCopy as copy } from "@/data/sessions";
 import { googleCalendarUrl } from "@/lib/calendar";
@@ -20,9 +21,20 @@ const chipTone: Record<string, string> = {
 const secondaryButton =
   "inline-flex h-[2.3125rem] items-center border border-[#dadada] bg-white px-4 text-sm text-ink transition-colors hover:border-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand";
 
+type CardProps = {
+  session: MySession;
+  upcoming: boolean;
+  highlight: boolean;
+  now: number;
+  actionItems?: { open: number; total: number };
+  onShowActionItems?: () => void;
+  onRate?: () => void;
+};
+
 // One session: an IST date block, the title with the mentor, time, status and the mentee's note. Upcoming
-// sessions get Join, a calendar link and Copy link; the first one is marked "Next session".
-export function SessionCard({ session, upcoming, highlight, now }: { session: MySession; upcoming: boolean; highlight: boolean; now: number }) {
+// sessions get Join, a calendar link and Copy link; the first one is marked "Next session". Completed ones get
+// "Rate session" (or the rating given, with the mentor's reply) and the mentor's feedback.
+export function SessionCard({ session, upcoming, highlight, now, actionItems, onShowActionItems, onRate }: CardProps) {
   const [copied, setCopied] = useState(false);
   const date = formatDateParts(session.startsAt);
   const end = new Date(endsAt(session)).toISOString();
@@ -78,7 +90,41 @@ export function SessionCard({ session, upcoming, highlight, now }: { session: My
             <p className="mt-0.5 line-clamp-3 text-sm leading-relaxed whitespace-pre-line text-ink/85">{session.notes}</p>
           </div>
         )}
+        {session.myRating && (
+          <div className="mt-4 border-l-2 border-brand/40 pl-3">
+            <p className="flex items-center gap-2 text-xs text-muted">
+              {copy.yourRating} <Stars value={session.myRating.rating} label={copy.stars(session.myRating.rating)} className="size-3.5" />
+            </p>
+            {session.myRating.comment && <p className="mt-1 line-clamp-3 text-sm leading-relaxed whitespace-pre-line text-ink/85">{session.myRating.comment}</p>}
+            {session.myRating.reply && (
+              <p className="mt-2 text-sm leading-relaxed text-ink/85">
+                <span className="font-medium text-ink">{copy.mentorReply}:</span> {session.myRating.reply}
+              </p>
+            )}
+          </div>
+        )}
+        {session.mentorFeedback && (
+          <div className="mt-4 border-l-2 border-line pl-3">
+            <p className="flex items-center gap-2 text-xs text-muted">
+              {copy.mentorFeedback} <Stars value={session.mentorFeedback.rating} label={copy.stars(session.mentorFeedback.rating)} className="size-3.5" />
+            </p>
+            {session.mentorFeedback.comment && <p className="mt-1 text-sm leading-relaxed whitespace-pre-line text-ink/85">{session.mentorFeedback.comment}</p>}
+          </div>
+        )}
+        {actionItems && actionItems.total > 0 && onShowActionItems && (
+          <button type="button" onClick={onShowActionItems} className="mt-4 inline-flex items-center gap-1.5 text-sm text-ink underline-offset-4 hover:underline">
+            {copy.actionItemsLink(actionItems.open, actionItems.total)} <span aria-hidden>→</span>
+          </button>
+        )}
       </div>
+
+      {!upcoming && session.status === "completed" && !session.myRating && onRate && (
+        <div className="md:col-start-2 lg:col-start-3 lg:w-[13.5rem] lg:self-center">
+          <button type="button" onClick={onRate} className={buttonClasses("brand", "lg:w-full")}>
+            {copy.rate}
+          </button>
+        </div>
+      )}
 
       {upcoming && session.meetingUrl && (
         <div className="flex flex-wrap gap-2.5 md:col-start-2 lg:col-start-3 lg:w-[13.5rem] lg:flex-col lg:self-center">

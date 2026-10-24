@@ -15,9 +15,7 @@ export default function SessionsPage() {
       <AccountBand id="sessions-title" eyebrow={sessionsCopy.eyebrow} title={sessionsCopy.title} subtitle={sessionsCopy.subtitle} />
       <section className="bg-surface py-14 md:py-20 lg:py-24">
         <div className="container-page">
-          <div className="max-w-[64rem]">
-            <MySessions />
-          </div>
+          <MySessions />
         </div>
       </section>
     </>

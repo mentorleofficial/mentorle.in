@@ -23,4 +23,5 @@ export const notificationLinks: Record<string, string> = {
   session_rescheduled: "/sessions",
   session_completed: "/sessions",
   session_updated: "/sessions",
+  action_item_assigned: "/sessions#action-items",
 };

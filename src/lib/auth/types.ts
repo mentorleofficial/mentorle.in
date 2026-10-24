@@ -44,6 +44,8 @@ export type MenteeProfile = {
   linkedin_url: string;
   github_url: string;
   portfolio_url: string;
+  // The platform's format: a storage URL into the private mentee-resumes bucket (opened with a signed link).
+  resume_url: string | null;
   onboarded_at: string | null;
 };
 

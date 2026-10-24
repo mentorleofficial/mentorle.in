@@ -59,6 +59,7 @@ const blankProfile = (user: { id: string; email: string; full_name: string; avat
   linkedin_url: "",
   github_url: "",
   portfolio_url: "",
+  resume_url: null,
   onboarded_at: null,
 });
 
@@ -225,6 +226,7 @@ export const authService = {
       linkedin_url: profile.linkedin_url ?? "",
       github_url: profile.github_url ?? "",
       portfolio_url: profile.portfolio_url ?? "",
+      resume_url: profile.resume_url ?? null,
       onboarded_at: profile.onboarded_at ?? null,
     };
   },
