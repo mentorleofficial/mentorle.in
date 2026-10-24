@@ -23,11 +23,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<MenteeProfile | null>(null);
 
   const refresh = useCallback(async () => {
-    const session = authService.getSession();
+    const session = await authService.getSession().catch(() => null);
     if (!session) {
       setUser(null);
       setProfile(null);
       setStatus("signed-out");
+      return;
+    }
+    // mentorle.in is for mentees. A mentor or admin session (the login step already sends them to the
+    // platform) is ended here, so they're never treated as a mentee who hasn't onboarded.
+    if (session.user.role !== "mentee") {
+      await authService.signOut();
       return;
     }
     const nextProfile = await authService.fetchMenteeProfile(session.user.id).catch(() => null);

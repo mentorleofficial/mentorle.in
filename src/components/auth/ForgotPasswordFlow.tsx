@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { AuthLink, useAuthModal } from "@/components/auth/AuthModalContext";
-import { AuthFooter, AuthHeading, AuthStep, MockCodeHint, ResendButton, formColumn, useResendTimer } from "@/components/auth/AuthStep";
+import { AuthFooter, AuthHeading, AuthStep, ResendButton, formColumn, useResendTimer } from "@/components/auth/AuthStep";
 import { OtpInput } from "@/components/forms/OtpInput";
 import { FieldMessage, FormAlert, PasswordField, SubmitButton, TextField } from "@/components/forms/fields";
 import { OTP_LENGTH, authCopy, authErrors } from "@/data/auth";
@@ -98,6 +98,7 @@ function ResetStep({ email, onChangeEmail, onDone }: { email: string; onChangeEm
   const [notice, setNotice] = useState("");
   const timer = useResendTimer();
   const form = useZodForm(resetSchema, { otp: "", password: "", confirmPassword: "" }, "reset");
+  const verifiedUser = useRef<string | null>(null);
 
   const onSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -106,16 +107,20 @@ function ResetStep({ email, onChangeEmail, onDone }: { email: string; onChangeEm
     if (!values) return;
     setSaving(true);
     try {
-      // Platform order: verifying the recovery code signs the user in, then the password is updated.
-      const session = await authService.verifyOtp({ email, token: values.otp, type: "recovery" });
+      // Platform order: verifying the recovery code signs the user in, then the password is updated. A code
+      // works once, so if the new password is rejected the retry skips straight to updating it.
+      verifiedUser.current ??= (await authService.verifyOtp({ email, token: values.otp, type: "recovery" })).user.id;
       await authService.updatePassword(values.password);
-      onDone(session.user.id);
+      onDone(verifiedUser.current);
     } catch (caught) {
       setSaving(false);
-      if (caught instanceof AuthError && caught.code === "otp_invalid") {
+      const code = caught instanceof AuthError ? caught.code : "unknown";
+      if (code === "otp_invalid") {
         form.setValue("otp", "");
         form.setError("otp", authErrors.otpWrong);
-      } else setFormError(authErrors.generic);
+      } else if (code === "same_password" || code === "weak_password") {
+        form.setError("password", code === "same_password" ? authErrors.samePassword : authErrors.weakPassword);
+      } else setFormError(code === "rate_limited" ? authErrors.rateLimited : authErrors.generic);
     }
   };
 
@@ -140,7 +145,6 @@ function ResetStep({ email, onChangeEmail, onDone }: { email: string; onChangeEm
           <FieldMessage id={otp.id} error={otp.error} />
         </div>
         {notice && <FormAlert tone="info">{notice}</FormAlert>}
-        <MockCodeHint />
         <PasswordField
           {...form.field("password")}
           className="mt-2"

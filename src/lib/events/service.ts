@@ -1,56 +1,46 @@
 "use client";
 
+import { browserSupabase } from "@/lib/supabase/browser";
+
 /*
- * MOCK event registration service. Frontend only, for now.
- *
- * Mirrors the Mentorle platform's mentee registration (../Mentorle-Version2/src/features/mentor-events/api/events.ts):
- *   registerForEvent      → capacity check on events_programs, then insert into event_participants
- *   unregisterFromEvent   → delete from event_participants
- *   isRegistered          → select from event_participants by event + user
- * The platform also has Plus-quota and paid (Cashfree) registration; only the free RSVP is mocked here.
- * Data lives in this browser's localStorage, next to the mock auth store.
+ * Event registration on the platform's tables, the same calls as its mentee events page
+ * (../Mentorle-Version2/src/features/mentor-events/api/events.ts):
+ *   registerForEvent    → capacity check on events_programs, then insert into event_participants
+ *   unregisterFromEvent → delete from event_participants
+ *   isRegistered        → the user's own event_participants row (RLS: users read their own)
+ *   getMeetingLink      → rpc("get_event_meeting_links"), which only answers registered attendees, the event's
+ *                         creator and admins
+ * Plus-quota and paid (Cashfree) registration aren't here yet: paid events don't offer registration.
  */
 
-const STORAGE_KEY = "mentorle.mock-events.v1";
-const LATENCY_MS = 500;
-
-// event slug → user id → registered_at
-type Store = Record<string, Record<string, string>>;
-
-const read = (): Store => {
-  try {
-    return JSON.parse(window.localStorage.getItem(STORAGE_KEY) ?? "{}") as Store;
-  } catch {
-    return {};
-  }
-};
-
-const write = (store: Store) => window.localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
-const delay = () => new Promise((resolve) => setTimeout(resolve, LATENCY_MS));
+const db = () => browserSupabase();
 
 export class EventFullError extends Error {}
 
 export const eventsService = {
-  isRegistered(eventSlug: string, userId: string) {
-    return Boolean(read()[eventSlug]?.[userId]);
+  async isRegistered(eventId: string, userId: string) {
+    const { data, error } = await db().from("event_participants").select("id").eq("event_id", eventId).eq("user_id", userId).maybeSingle();
+    if (error) throw error;
+    return Boolean(data);
   },
 
-  async registerForEvent(eventSlug: string, userId: string, maxParticipants?: number) {
-    await delay();
-    const store = read();
-    const participants = store[eventSlug] ?? {};
-    if (participants[userId]) return;
-    if (maxParticipants && Object.keys(participants).length >= maxParticipants) throw new EventFullError();
-    store[eventSlug] = { ...participants, [userId]: new Date().toISOString() };
-    write(store);
+  async registerForEvent(eventId: string, userId: string) {
+    const { data: event, error: eventError } = await db().from("events_programs").select("max_participants, participant_count").eq("id", eventId).single();
+    if (eventError) throw eventError;
+    if (event.max_participants && (event.participant_count ?? 0) >= event.max_participants) throw new EventFullError();
+    const { error } = await db().from("event_participants").insert({ event_id: eventId, user_id: userId, registered_at: new Date().toISOString() });
+    // 23505: already registered (e.g. in another tab), which is the outcome the user wanted.
+    if (error && error.code !== "23505") throw error;
   },
 
-  async unregisterFromEvent(eventSlug: string, userId: string) {
-    await delay();
-    const store = read();
-    if (store[eventSlug]) {
-      delete store[eventSlug][userId];
-      write(store);
-    }
+  async unregisterFromEvent(eventId: string, userId: string) {
+    const { error } = await db().from("event_participants").delete().eq("event_id", eventId).eq("user_id", userId);
+    if (error) throw error;
+  },
+
+  async getMeetingLink(eventId: string): Promise<string | null> {
+    const { data, error } = await db().rpc("get_event_meeting_links", { _event_ids: [eventId] });
+    if (error) throw error;
+    return (data as { meeting_link: string | null }[] | null)?.[0]?.meeting_link ?? null;
   },
 };

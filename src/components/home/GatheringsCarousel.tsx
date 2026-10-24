@@ -125,6 +125,8 @@ export function GatheringsCarousel({ events }: { events: GatheringEvent[] }) {
                 src={event.src}
                 alt={event.alt}
                 fill
+                // Event banners come from many hosts (platform storage, stock sites); only local photos are optimized.
+                unoptimized={event.src.startsWith("http")}
                 sizes="(min-width: 1024px) 57rem, 82vw"
                 className={`object-cover transition-transform duration-[1200ms] ease-out ${isActive ? "scale-100" : "scale-110"}`}
               />

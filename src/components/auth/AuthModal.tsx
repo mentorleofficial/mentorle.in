@@ -4,6 +4,7 @@ import { useEffect, useId, useRef, useState } from "react";
 import { AuthModalProvider, useAuthModal, withRedirect } from "@/components/auth/AuthModalContext";
 import { ForgotPasswordFlow } from "@/components/auth/ForgotPasswordFlow";
 import { LoginFlow } from "@/components/auth/LoginFlow";
+import { ResetLinkFlow } from "@/components/auth/ResetLinkFlow";
 import { SignupFlow } from "@/components/auth/SignupFlow";
 import { OnboardingFlow } from "@/components/onboarding/OnboardingFlow";
 import { authCopy } from "@/data/auth";
@@ -18,7 +19,7 @@ type AuthModalProps = {
 
 const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
-const flows = { login: LoginFlow, signup: SignupFlow, forgot: ForgotPasswordFlow, onboarding: OnboardingFlow } satisfies Record<AuthMode, () => React.ReactNode>;
+const flows = { login: LoginFlow, signup: SignupFlow, forgot: ForgotPasswordFlow, reset: ResetLinkFlow, onboarding: OnboardingFlow } satisfies Record<AuthMode, () => React.ReactNode>;
 
 export function AuthModal({ mode, intercepted }: AuthModalProps) {
   const titleId = useId();
@@ -40,7 +41,8 @@ function AuthDialog({ mode }: { mode: AuthMode }) {
   const [started, setStarted] = useState(false);
   const redirected = useRef(false);
   const checkedOnboarding = useRef(false);
-  const isAuthForm = mode !== "onboarding";
+  // /reset-password works for anyone holding a valid link, signed in or not.
+  const isAuthForm = mode !== "onboarding" && mode !== "reset";
   const alreadySignedIn = isAuthForm && !started && status === "signed-in";
 
   // Reset when the modal closes (or Next hides it in an <Activity>), so a reopen is judged afresh.
@@ -62,10 +64,10 @@ function AuthDialog({ mode }: { mode: AuthMode }) {
 
   // Onboarding opened by someone who has already finished it: nothing to do.
   useEffect(() => {
-    if (isAuthForm || checkedOnboarding.current || status === "loading") return;
+    if (mode !== "onboarding" || checkedOnboarding.current || status === "loading") return;
     checkedOnboarding.current = true;
     if (status === "signed-in" && onboarded) close();
-  }, [isAuthForm, status, onboarded, close]);
+  }, [mode, status, onboarded, close]);
 
   // Signed-in (or not known yet, which resolves within a frame): render nothing rather than flash the form.
   if (isAuthForm && !started && status !== "signed-out") return null;

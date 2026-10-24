@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { RegisterAction } from "@/components/event-detail/RegisterAction";
+import { JoinLink, RegisterAction } from "@/components/event-detail/RegisterAction";
 import { eventDetailCopy } from "@/data/event-details";
 import type { EventDetail, EventSpeaker } from "@/data/event-details";
 import { initialsOf } from "@/lib/initials";
@@ -19,7 +19,14 @@ export function EventDetailsCard({ event }: { event: EventDetail }) {
     { icon: "/event-detail/deadline.svg", width: 20, height: 20, label: details.deadline, value: deadline },
   ];
   const registrationOpen = event.status === "upcoming" ? event.registration : undefined;
-  const note = event.status === "upcoming" ? registration.notes.upcoming(deadline) : registration.notes[event.status];
+  const note =
+    event.status !== "upcoming"
+      ? registration.notes[event.status]
+      : event.closedReason === "deadline"
+        ? registration.notes.deadline(deadline)
+        : event.closedReason
+          ? registration.notes[event.closedReason]
+          : registration.notes.upcoming(deadline);
 
   return (
     <section aria-labelledby="event-details-title" data-animate="fade-up" className="border border-[#cbcbcb] bg-surface p-6 md:p-7 lg:self-start">
@@ -53,6 +60,8 @@ export function EventDetailsCard({ event }: { event: EventDetail }) {
               {registration.closed}
             </button>
             <p className="mt-5 text-sm text-ink-soft">{note}</p>
+            {/* Happening now: registered attendees get the meeting link (nobody else can read it). */}
+            {event.status === "live" && <JoinLink eventId={event.id} />}
           </>
         )}
       </div>
@@ -62,7 +71,17 @@ export function EventDetailsCard({ event }: { event: EventDetail }) {
 
 function SpeakerAvatar({ speaker }: { speaker: EventSpeaker }) {
   if (speaker.photo) {
-    return <Image src={speaker.photo.src} alt="" width={speaker.photo.width} height={speaker.photo.height} className="size-[4.5rem] shrink-0 object-cover" />;
+    // Speaker photos are links from the event form (any host), so they skip the image optimizer.
+    return (
+      <Image
+        src={speaker.photo.src}
+        alt=""
+        width={speaker.photo.width}
+        height={speaker.photo.height}
+        unoptimized={speaker.photo.src.startsWith("http")}
+        className="size-[4.5rem] shrink-0 object-cover"
+      />
+    );
   }
   return (
     <span className="flex size-[4.5rem] shrink-0 items-center justify-center bg-surface text-2xl font-medium text-ink" aria-hidden>
@@ -85,7 +104,7 @@ export function SpeakersCard({ speakers }: { speakers: EventSpeaker[] }) {
               <SpeakerAvatar speaker={speaker} />
               <p className="text-xl leading-tight font-medium text-ink md:text-2xl">{speaker.name}</p>
             </div>
-            <p className="mt-6 text-base text-ink">{speaker.role}</p>
+            {speaker.role && <p className="mt-6 text-base text-ink">{speaker.role}</p>}
             {speaker.links.length > 0 && (
               <p className="mt-6 border-t border-line pt-6 text-sm text-ink-soft">
                 {speaker.links.map((link, index) => (

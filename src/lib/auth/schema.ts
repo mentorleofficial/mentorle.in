@@ -69,6 +69,17 @@ export const forgotSchema = z.object({ email });
 
 export const otpSchema = z.string().regex(new RegExp(`^\\d{${OTP_LENGTH}}$`), authErrors.otp);
 
+// Setting a new password from the email link (no code to type).
+export const newPasswordSchema = z
+  .object({
+    password: newPassword,
+    confirmPassword: z.string().min(1, authErrors.passwordMismatch),
+  })
+  .refine((values) => values.password === values.confirmPassword, {
+    message: authErrors.passwordMismatch,
+    path: ["confirmPassword"],
+  });
+
 export const resetSchema = z
   .object({
     otp: otpSchema,

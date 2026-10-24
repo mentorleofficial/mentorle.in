@@ -243,6 +243,7 @@ const events = [
     start: "2026-11-28T10:00:00+05:30",
     registration_deadline: "2026-11-25T23:59:00+05:30",
     max_participants: 500,
+    banner_image_url: "/homepage/live-gatherings/image-2.webp",
     description:
       "A full-day campus summit featuring guest lectures from FAANG engineers and startup founders for over 500+ students.",
     learning_outcomes: "What top tech companies look for in fresh graduates\nHow founders hire their first engineers",

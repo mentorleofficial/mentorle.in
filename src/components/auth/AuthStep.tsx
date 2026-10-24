@@ -4,10 +4,12 @@ import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { useAuthModal } from "@/components/auth/AuthModalContext";
 import { FormAlert, SubmitButton } from "@/components/forms/fields";
+import { buttonClasses } from "@/components/ui/ButtonLink";
 import { OtpInput } from "@/components/forms/OtpInput";
 import { OTP_LENGTH, RESEND_SECONDS, authCopy, authErrors } from "@/data/auth";
+import { PLATFORM_LOGIN_URL } from "@/data/site";
 import { otpSchema } from "@/lib/auth/schema";
-import { AUTH_IS_MOCK, MOCK_OTP, authService } from "@/lib/auth/service";
+import { authService } from "@/lib/auth/service";
 import { AuthError } from "@/lib/auth/types";
 import type { Session } from "@/lib/auth/types";
 
@@ -45,11 +47,6 @@ export const formColumn = "mx-auto mt-8 flex w-full max-w-[20.625rem] flex-col g
 
 export function AuthFooter({ children }: { children: ReactNode }) {
   return <p className="mt-6 text-sm text-ink">{children}</p>;
-}
-
-export function MockCodeHint() {
-  if (!AUTH_IS_MOCK) return null;
-  return <FormAlert tone="info">{authCopy.mockCodeHint(MOCK_OTP)}</FormAlert>;
 }
 
 export function useResendTimer(initial = RESEND_SECONDS) {
@@ -102,7 +99,8 @@ export function VerifyEmailStep({ email, onVerified, onEdit }: { email: string; 
     try {
       onVerified(await authService.verifyOtp({ email, token, type: "signup" }));
     } catch (caught) {
-      setError(caught instanceof AuthError && caught.code === "otp_invalid" ? authErrors.otpWrong : authErrors.generic);
+      const code = caught instanceof AuthError ? caught.code : "unknown";
+      setError(code === "otp_invalid" ? authErrors.otpWrong : code === "rate_limited" ? authErrors.rateLimited : authErrors.generic);
       setCode("");
       inputRef.current?.focus();
       setVerifying(false);
@@ -140,7 +138,6 @@ export function VerifyEmailStep({ email, onVerified, onEdit }: { email: string; 
           {error && <FormAlert>{error}</FormAlert>}
         </div>
         {notice && !error && <FormAlert tone="info">{notice}</FormAlert>}
-        <MockCodeHint />
         <SubmitButton loading={verifying} loadingLabel={copy.submitting} className="mt-1">
           {copy.submit}
         </SubmitButton>
@@ -162,6 +159,26 @@ export function VerifyEmailStep({ email, onVerified, onEdit }: { email: string; 
           {copy.edit}
         </button>
       </AuthFooter>
+    </AuthStep>
+  );
+}
+
+// Mentor and admin accounts: they sign in on the platform instead (mentorle.in signs them out again).
+export function PlatformAccountStep({ role, onBack }: { role: "mentor" | "admin"; onBack?: () => void }) {
+  const platform = authCopy.platformAccount;
+  return (
+    <AuthStep>
+      <AuthHeading title={platform.title}>{platform.body(role)}</AuthHeading>
+      <div className={formColumn}>
+        <a href={PLATFORM_LOGIN_URL} className={buttonClasses("brand", "h-12 w-full")}>
+          {platform.cta}
+        </a>
+        {onBack && (
+          <button type="button" onClick={onBack} className="mt-2 text-sm text-ink underline-offset-4 hover:underline focus-visible:underline">
+            {platform.back}
+          </button>
+        )}
+      </div>
     </AuthStep>
   );
 }

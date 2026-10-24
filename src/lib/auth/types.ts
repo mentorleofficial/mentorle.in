@@ -1,11 +1,13 @@
-// Shapes mirror the Mentorle platform's Supabase tables (users, mentee_profiles) so the mock service in
-// ./service.ts can later be swapped for the real database without touching the screens.
+// Shapes mirror the Mentorle platform's Supabase tables (users, mentee_profiles); ./service.ts reads and
+// writes them.
+
+export type AppRole = "admin" | "mentor" | "mentee";
 
 export type AuthUser = {
   id: string;
   email: string;
   full_name: string;
-  role: "mentee";
+  role: AppRole; // mentorle.in is for mentees; mentor and admin accounts are sent to the platform
   avatar_url: string | null;
 };
 
@@ -16,7 +18,8 @@ export type SignUpInput = {
   password: string;
   full_name: string;
   phone: string;
-  // Not yet columns on the platform: the spec's 18+ gate and DPDP consent record (SPEC-VS-DESIGN A1, A5).
+  // date_of_birth and marketing_opt_in are mentee_profiles columns; terms_accepted_at is kept on the auth
+  // user's metadata as the consent record (SPEC-VS-DESIGN A1, A5).
   date_of_birth: string;
   terms_accepted_at: string;
   marketing_opt_in: boolean;
@@ -51,6 +54,9 @@ export type AuthErrorCode =
   | "invalid_credentials"
   | "email_not_confirmed"
   | "otp_invalid"
+  | "weak_password"
+  | "same_password"
+  | "rate_limited"
   | "not_signed_in"
   | "unknown";
 

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useSyncExternalStore } from "react";
+import { useEffect, useState } from "react";
 import { Spinner } from "@/components/forms/fields";
 import { eventDetailCopy } from "@/data/event-details";
 import type { EventDetail } from "@/data/event-details";
@@ -9,46 +9,70 @@ import { useAuth } from "@/lib/auth/AuthProvider";
 import { EventFullError, eventsService } from "@/lib/events/service";
 
 const copy = eventDetailCopy.registration;
-const CHANGE_EVENT = "mentorle-registrations-change";
-
-const subscribe = (onChange: () => void) => {
-  window.addEventListener(CHANGE_EVENT, onChange);
-  window.addEventListener("storage", onChange);
-  return () => {
-    window.removeEventListener(CHANGE_EVENT, onChange);
-    window.removeEventListener("storage", onChange);
-  };
-};
 
 const brandButton =
   "flex h-12 w-full items-center justify-center gap-2.5 bg-brand text-sm text-white transition-colors duration-300 hover:bg-brand-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand disabled:cursor-wait disabled:opacity-70";
 const noteClasses = "mt-5 text-sm text-ink-soft";
 
+// The meeting link for a registered attendee (get_event_meeting_links answers nobody else), if the event has one.
+export function JoinLink({ eventId }: { eventId: string }) {
+  const { status } = useAuth();
+  const [link, setLink] = useState<string | null>(null);
+  useEffect(() => {
+    if (status !== "signed-in") return;
+    let current = true;
+    eventsService
+      .getMeetingLink(eventId)
+      .then((value) => current && setLink(value))
+      .catch(() => undefined);
+    return () => {
+      current = false;
+      setLink(null);
+    };
+  }, [eventId, status]);
+  if (!link) return null;
+  return (
+    <a href={link} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-brand underline-offset-4 hover:underline">
+      {copy.join}
+      <span aria-hidden>↗</span>
+    </a>
+  );
+}
+
 // Registration for an open event, following the platform's mentee rules: you need an account and a finished
-// profile (MenteeOnboardingGuard), then it's a free RSVP. Signed-out visitors and unfinished profiles are sent
-// through the signup / onboarding modals with ?redirect= back to this page.
+// profile (MenteeOnboardingGuard), then it's a free RSVP into event_participants. Signed-out visitors and
+// unfinished profiles are sent through the signup / onboarding modals with ?redirect= back to this page.
 export function RegisterAction({ event, deadlineNote }: { event: EventDetail & { registration: NonNullable<EventDetail["registration"]> }; deadlineNote: string }) {
   const { status, user, onboarded } = useAuth();
-  // Registrations live in browser storage (mock), so the server and first client render always say "not registered".
-  const registered = useSyncExternalStore(
-    subscribe,
-    () => Boolean(user && eventsService.isRegistered(event.slug, user.id)),
-    () => false,
-  );
+  // The answer is stored with the user and event it belongs to; until it matches, it's still being checked.
+  const key = user ? `${event.id}:${user.id}` : null;
+  const [answer, setAnswer] = useState<{ key: string; registered: boolean } | null>(null);
+  const registered = key && answer?.key === key ? answer.registered : null;
+  const setRegistered = (value: boolean) => key && setAnswer({ key, registered: value });
+  useEffect(() => {
+    if (!key) return;
+    const [eventId, userId] = key.split(":");
+    let current = true;
+    eventsService
+      .isRegistered(eventId, userId)
+      .catch(() => false)
+      .then((value) => current && setAnswer({ key, registered: value }));
+    return () => {
+      current = false;
+    };
+  }, [key]);
   const [working, setWorking] = useState<"register" | "cancel" | null>(null);
   const [error, setError] = useState("");
   const here = `/events/${event.slug}`;
   const label = event.registration.label;
-
-  const notify = () => window.dispatchEvent(new Event(CHANGE_EVENT));
 
   const register = async () => {
     if (!user) return;
     setWorking("register");
     setError("");
     try {
-      await eventsService.registerForEvent(event.slug, user.id, event.registration.maxParticipants);
-      notify();
+      await eventsService.registerForEvent(event.id, user.id);
+      setRegistered(true);
       if (event.registration.externalLink) window.open(event.registration.externalLink, "_blank", "noopener,noreferrer");
     } catch (caught) {
       setError(caught instanceof EventFullError ? copy.full : copy.failed);
@@ -60,9 +84,14 @@ export function RegisterAction({ event, deadlineNote }: { event: EventDetail & {
   const cancel = async () => {
     if (!user) return;
     setWorking("cancel");
-    await eventsService.unregisterFromEvent(event.slug, user.id);
-    notify();
-    setWorking(null);
+    try {
+      await eventsService.unregisterFromEvent(event.id, user.id);
+      setRegistered(false);
+    } catch {
+      setError(copy.failed);
+    } finally {
+      setWorking(null);
+    }
   };
 
   if (status === "signed-in" && user && registered) {
@@ -74,6 +103,7 @@ export function RegisterAction({ event, deadlineNote }: { event: EventDetail & {
           </svg>
           {copy.registered}
         </p>
+        <JoinLink eventId={event.id} />
         <p className={noteClasses}>
           {copy.registeredNote}{" "}
           <button
@@ -85,6 +115,18 @@ export function RegisterAction({ event, deadlineNote }: { event: EventDetail & {
             {working === "cancel" ? copy.cancelling : copy.cancel}
           </button>
         </p>
+      </>
+    );
+  }
+
+  // Checking whether this user is already registered: hold the button rather than flash "Register".
+  if (status === "signed-in" && user && onboarded && registered === null) {
+    return (
+      <>
+        <p aria-busy className={`${brandButton} cursor-wait opacity-70`}>
+          <Spinner />
+        </p>
+        <p className={noteClasses}>{deadlineNote}</p>
       </>
     );
   }

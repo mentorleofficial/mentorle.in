@@ -50,8 +50,10 @@ export function SignupFlow() {
       });
       setStep("verify");
     } catch (caught) {
-      if (caught instanceof AuthError && caught.code === "email_taken") form.setError("email", authErrors.emailTaken);
-      else setFormError(authErrors.generic);
+      const code = caught instanceof AuthError ? caught.code : "unknown";
+      if (code === "email_taken") form.setError("email", authErrors.emailTaken);
+      else if (code === "weak_password") form.setError("password", authErrors.weakPassword);
+      else setFormError(code === "rate_limited" ? authErrors.rateLimited : authErrors.generic);
     } finally {
       setSubmitting(false);
     }

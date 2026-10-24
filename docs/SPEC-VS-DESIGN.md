@@ -155,6 +155,7 @@ The earnings numbers on this page **match the spec**: format prices and payouts 
 | E11 | Opportunity card photos | — | Three stock photos repeated. | Placeholder; the live feed will need an image per listing or a per-source fallback. |
 | E12 | Huptle feature icons | — | Cap, briefcase and shield icons with no asset files. | Drawn as inline line icons. Open: the eligibility criteria and program terms the fine print refers to; "Explore Pro Pass" opens the pricing page. |
 | E13 | Closing banner | — | Same banner and copy as Become a Mentor. | "Become a Mentor" opens the internal info page, like other site-wide links. |
+| E14 | Hosted gatherings carousel (also the homepage's "Upcoming Events & Summits") | — | Three designed cards. | **Live data (2026-10-23):** upcoming and live events from `events_programs`, soonest in the centre, topped up with the most recent past events (marked "· Completed", button "View Event") so the carousel is never empty; up to five cards. Banners are used as card photos; events without one use the design's gathering photos. |
 
 **Content and design gaps**
 
@@ -162,7 +163,7 @@ The earnings numbers on this page **match the spec**: format prices and payouts 
 |---|---|---|---|
 | ED1 | Feed data | The design repeats one Upwork gig four times. | Six placeholder records across all four types in `src/data/events.ts`, shaped for a future CMS/database feed. Buttons link to each source's site (new tab). |
 | ED2 | Button labels per type | Only "Bid on Gig" is designed. | Hackathon → "Register", event → "RSVP", job → "Apply Now", freelance → "Bid on Gig". |
-| ED3 | Registration | Platform: free RSVP into `event_participants` (capacity-checked); Plus-quota and paid (Cashfree) registration too. | Only the closed state is designed. | **Built (free RSVP, mock):** "Register Now" (or the event's own label) on the detail page. Signed out → signup modal, then onboarding, then back to the event. Signed in with an unfinished profile → onboarding, then back. Signed in and onboarded → registers, then shows "You're registered" with "Cancel registration". Stored by `src/lib/events/service.ts`, which mirrors the platform's `registerForEvent` / `unregisterFromEvent`. Open: Plus and paid events, confirmation emails, and the registered/full states have no design. |
+| ED3 | Registration | Platform: free RSVP into `event_participants` (capacity-checked); Plus-quota and paid (Cashfree) registration too. | Only the closed state is designed. | **Built (free RSVP, live since 2026-10-24):** "Register Now" (or the event's own label) on the detail page. Signed out → signup modal, then onboarding, then back to the event. Signed in with an unfinished profile → onboarding, then back. Signed in and onboarded → registers, then shows "You're registered" with "Cancel registration". Stored in `event_participants` by `src/lib/events/service.ts`, which makes the platform's `registerForEvent` / `unregisterFromEvent`. Open: Plus and paid events, confirmation emails, and the registered/full states have no design. |
 | ED4 | Empty state, pagination, "refreshed daily" | Not designed. | Empty state + "Clear filters" as on Find a Mentor; no pagination yet. |
 
 ## 7. Enterprise page (`/enterprise`) — built 2026-10-14
@@ -197,7 +198,7 @@ The auth screens open as a modal over whatever page the user is on (Next interce
 - **Onboarding:** further steps in the same modal card (not a separate page), running the platform's 6-step wizard (photo and name, about you, goals, interests (at least 3), mentor areas and links, review), with the same limits, plus Save & exit. Finishing goes to `/mentors`.
 - **Header:** when signed in, it shows the user's initials or photo with a menu: Complete your profile / Find a mentor, and Log out.
 
-**No backend yet.** `src/lib/auth/service.ts` is a mock that mirrors the platform's Supabase calls and stores data in this browser. Every code screen accepts `12345678`, and a "Test mode" note there says so.
+**Live since 2026-10-24.** `src/lib/auth/service.ts` makes the platform's own Supabase calls (accounts are shared with the platform). Codes arrive by email (production templates contain the 8-digit code). Mentor and admin accounts that log in here get a "Use the Mentorle platform" step and are signed out of mentorle.in (A9).
 
 | # | Item | What the spec says | What Figma shows | Status |
 |---|---|---|---|---|
@@ -206,11 +207,13 @@ The auth screens open as a modal over whatever page the user is on (Next interce
 | A3 | Social / phone login | — | Email and password only. | Kept as email + password, matching the platform. Open: confirm whether Google login is wanted. |
 | A4 | Password placeholder | — | Lowercase "password" while the other fields are capitalised. | Built as "Password" for consistency. |
 | A5 | Terms consent | DPDP Act: unbundled consent; promotional profiling can't be forced (BP §7). | No terms/privacy line. | **Built**: a required "I agree to the Terms and Privacy Policy" checkbox plus a separate, optional updates checkbox. The platform instead asks in a banner after login; its DB needs `terms_accepted_at` / `marketing_opt_in` columns at signup. |
-| A6 | Backend | — | — | Mock service only; see above. Swap `src/lib/auth/service.ts` for the platform's Supabase client. |
+| A6 | Backend | — | — | **Live:** Supabase auth on the platform's project. Signup stores phone, date of birth and marketing consent in `mentee_profiles`, and the terms acceptance time on the auth user's metadata (`terms_accepted_at`). |
 | A7 | Phone at signup | Platform signup requires a phone number. | Not in the Figma. | Built as on the platform (country code, India +91 by default, 10 digits for India). |
 | A8 | Screens with no design | — | Only the first login and signup screens are designed. | Verify email, You're in, Forgot/Reset password, Password updated and all 6 onboarding steps reuse the login card's style (onboarding adds a progress bar along the card's top edge). Needs design review. |
 | A9 | Code length | Guest booking spec says a 6-digit OTP (to the phone). | — | Account codes are 8 digits, matching the platform's Supabase setting (`otp_length = 8`). |
-| A10 | Mentor link on login | Platform login shows "Want to mentor? Apply here". | Not in the Figma. | Left out, per the Figma; the footer and nav already link to Become a Mentor. |
+| A10 | Reset email button | — | — | **Built (2026-10-24):** the button returns people to the site they asked from. Requests made here send `redirectTo: <site>/reset-password`; the platform sends its own. Supabase's redirect list has mentorle.in, www.mentorle.in and the platform. `/reset-password` works on any device (the link carries its own short-lived session, used through a throwaway client so it never becomes the browser's session), then mentees are logged in and mentor/admin accounts get the platform step (A9). Used or expired links show "This link has expired" with "Send a New Link". The 8-digit code in the same email still works. |
+| A9 | Mentor and admin accounts | — | — | mentorle.in is for mentees and sessions aren't shared with the platform, so a mentor/admin login shows "Use the Mentorle platform" (button to platform.mentorle.in/login, "Use a different account") and ends the session here. Placeholder copy; no design. |
+| A10 | Email links | — | — | Production's auth "redirect URLs" list is empty and its site URL is the platform, so any link in an auth email opens the platform. mentorle.in's flows use the 8-digit code only, so this doesn't block anything; add mentorle.in to the redirect list before relying on email links. |
 
 
 ## 10. Event detail (`/events/<slug>`) — built 2026-10-15
@@ -219,17 +222,18 @@ One page template renders any event from `src/data/event-details.ts`. Each recor
 
 | # | Item | What the spec says | What Figma shows | Status |
 |---|---|---|---|---|
-| ED1 | The dark card under the hero | — | Looks like an exported poster image. | Built as a component from the event data (host, title in caps, subtitle, date, time, optional "from → to" icons), so every event gets one automatically with no image to make. Only two journey icons exist (graduation cap, briefcase); more can be added per event type. |
-| ED2 | Event status | — | "Completed" chip, "Registration closed" button and "This event has been completed." | Driven by a `status` field (upcoming / live / completed / cancelled) that the admin or DB sets. Upcoming events with a registration link show a brand "Register Now" button plus "Registration closes …"; those states have no design. |
+| ED1 | The dark card under the hero | — | Looks like an exported poster image. | The event's own banner (`banner_image_url`) fills this slot, shown whole (posters carry text, so no cropping; capped at 640px tall). Events without a banner get the generated card (host, title in caps, subtitle, date, time; the "from → to" icons for campus events). |
+| ED2 | Event status | — | "Completed" chip, "Registration closed" button and "This event has been completed." | **Live data (2026-10-23):** the platform's `status` is rarely updated after an event ends (two 2025/2026 events still say "upcoming"), so status comes from the dates (upcoming → live → completed); only "cancelled" is taken from the row. Upcoming events also close for registration when the deadline passes, the event is full, or it's paid (checkout isn't built: "Registration for this event opens soon.", placeholder). |
 | ED3 | Registration destination | — | Only the closed state is designed. | Open: where "Register Now" goes (platform signup, a form, an external link). The data has a `registration.href` per event. |
-| ED4 | Speaker links | — | "LinkedIn · GitHub" labels only. | The links point at linkedin.com / github.com as placeholders until real profile URLs exist. |
+| ED4 | Speaker links | — | "LinkedIn · GitHub" labels only. | Resolved: the event's `speaker_name` / `speaker_image` / `speaker_linkedin` / `speaker_github`; the role line hides (the platform stores none). |
 | ED5 | How users reach the page | — | No link from Events & Summits to a detail page is designed. | The hosted-gathering cards' buttons ("Request Invite", "Register Free", "Apply to Pitch") now open each event's detail page, where registration happens. Past events (like the Figma's sample) aren't listed anywhere yet. |
 | ED6 | Breadcrumb | — | "Events & Summits / Event detail". | Built as designed (the generic "Event detail", not the event title). |
 | ED7 | Unknown event URLs | — | — | Show the site's not-found page with `noindex`. With Cache Components the HTTP status stays 200; a real 404 needs a Proxy check, worth adding with the database. |
 | ED9 | Register buttons for signed-in users | — | — | Resolved by ED3/ED5: the cards no longer link to `/signup`. The auth modals still send any signed-in visitor on (to onboarding if unfinished) instead of showing a form. |
 | ED8 | Body text width | — | The design's 16px text renders about 1% wider than Manrope at 16px in the browser. | Kept at the design system's 16px with no added letter-spacing, so the "About" paragraph can wrap one word differently on wide screens. |
-| ED10 | Detail content for the three hosted gatherings | — | Only their card text (title, date, description, audience, button label) exists. | Times, venues, deadlines, "What You'll Learn", prerequisites, highlights and capacities are placeholders in `src/data/event-details.ts`. They have no speakers yet (the Guest Speaker card hides), and they reuse the Figma's blurred audience hero. |
-
+| ED10 | Detail content | — | Only card text existed for the three sample gatherings. | Resolved: every field comes from `events_programs`. Free text is cleaned: HTML entities decoded ("&amp;"), Markdown bold removed, ✓ / • / - bullets turned into list items. Host "Online"/"Mentorle" in `college_name` shows as "Hosted by: Mentorle". |
+| ED11 | Hero background | — | A pre-blurred, darkened auditorium photo. | Every event uses the design's background; real banners are bright photos that would make the white hero text unreadable, so they go in the cover slot (ED1). |
+| ED12 | Meeting links (security) | Platform: the join link is for registered attendees. | — | mentorle.in never selects `meeting_link`. **Fixed in the platform (2026-10-24, migration `20261024130000_private_event_meeting_links`):** links moved to the private `event_meeting_links` table, readable only by the event's creator, admins and registered attendees through `get_event_meeting_links()`. When registration goes live here, show the link to registered users through that function. |
 
 ## 11. Mentor profile (`/mentors/<slug>`) — built 2026-10-22
 

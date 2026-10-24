@@ -6,6 +6,8 @@ export type NavLink = {
 
 // Where mentors actually apply (the mentor platform). The /become-a-mentor page on this site explains the programme.
 export const MENTOR_APPLY_URL = "https://platform.mentorle.in/become-a-mentor";
+// Mentor and admin accounts sign in here.
+export const PLATFORM_LOGIN_URL = "https://platform.mentorle.in/login";
 export const BECOME_A_MENTOR_PATH = "/become-a-mentor";
 
 export const primaryNav: NavLink[] = [

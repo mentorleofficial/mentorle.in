@@ -22,7 +22,7 @@ export function EventCover({ event }: { event: EventDetail }) {
 
       <span className="mt-12 block h-[3px] w-12 bg-brand md:mt-[4.25rem]" />
       <p className="mt-4 max-w-[28rem] text-[1.75rem] leading-[1.13] font-medium uppercase sm:text-[2.25rem] md:text-[2.875rem]">{event.title}</p>
-      <p className="mt-4 text-base text-white/80 md:text-lg">{event.subtitle}</p>
+      {event.subtitle && <p className="mt-4 text-base text-white/80 md:text-lg">{event.subtitle}</p>}
 
       <div className="mt-auto flex items-center justify-between gap-6 pt-10 md:pt-12">
         {journey ? (
@@ -40,6 +40,17 @@ export function EventCover({ event }: { event: EventDetail }) {
           <span className="text-white/80">{formatEventTime(event.startsAt)}</span>
         </p>
       </div>
+    </div>
+  );
+}
+
+// The event's own banner in the cover slot. Banners are often posters with text, so they keep their shape
+// (no cropping), capped in height so a portrait poster doesn't take over the page. They come from many hosts
+// (platform storage, stock sites), so they skip the image optimizer.
+export function EventBanner({ banner }: { banner: NonNullable<EventDetail["banner"]> }) {
+  return (
+    <div className="flex justify-center bg-ink">
+      <Image src={banner.src} alt={banner.alt} width={1600} height={900} unoptimized className="h-auto max-h-[40rem] w-full object-contain" />
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { eventDetailCopy } from "@/data/event-details";
+import { eventDetailCopy, eventHeroBackground } from "@/data/event-details";
 import type { EventDetail } from "@/data/event-details";
 import { prefetchFor } from "@/lib/routes";
 
@@ -11,7 +11,7 @@ const { breadcrumb, hostedBy, status: statusLabels } = eventDetailCopy;
 export function EventHero({ event }: { event: EventDetail }) {
   return (
     <section aria-labelledby="event-title" className="relative isolate overflow-hidden bg-ink text-white md:min-h-[32.5rem]">
-      <Image src={event.hero.src} alt={event.hero.alt} fill preload sizes="100vw" className="-z-10 object-cover" />
+      <Image src={eventHeroBackground.src} alt={eventHeroBackground.alt} fill preload sizes="100vw" className="-z-10 object-cover" />
 
       <div className="container-page pt-28 pb-12 md:pt-[10.5rem] md:pb-16 xl:pt-[12.125rem]">
         <nav aria-label="Breadcrumb" data-hero="1">
@@ -50,9 +50,11 @@ export function EventHero({ event }: { event: EventDetail }) {
         <h1 id="event-title" data-hero="3" className="mt-6 max-w-[56rem] text-[2.125rem] leading-[1.18] font-medium md:text-5xl">
           {event.title}
         </h1>
-        <p data-hero="4" className="mt-5 text-lg leading-snug md:mt-[1.625rem] md:text-xl">
-          {event.subtitle}
-        </p>
+        {event.subtitle && (
+          <p data-hero="4" className="mt-5 text-lg leading-snug md:mt-[1.625rem] md:text-xl">
+            {event.subtitle}
+          </p>
+        )}
         <p data-hero="5" className="mt-5 text-base text-white/85 md:mt-6">
           {hostedBy} {event.host}
         </p>

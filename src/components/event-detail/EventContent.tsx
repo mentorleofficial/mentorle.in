@@ -8,12 +8,20 @@ const heading = "text-[1.75rem] leading-tight font-medium text-ink md:text-[2rem
 export function EventContent({ event }: { event: EventDetail }) {
   return (
     <div className="min-w-0">
-      <section aria-labelledby="about-title" data-animate="fade-up">
-        <h2 id="about-title" className={heading}>
-          {sections.about}
-        </h2>
-        <p className="mt-5 text-base leading-[1.8125] text-ink">{event.about}</p>
-      </section>
+      {event.about.length > 0 && (
+        <section aria-labelledby="about-title" data-animate="fade-up">
+          <h2 id="about-title" className={heading}>
+            {sections.about}
+          </h2>
+          <div className="mt-5 space-y-4">
+            {event.about.map((paragraph, index) => (
+              <p key={index} className="text-base leading-[1.8125] text-ink">
+                {paragraph}
+              </p>
+            ))}
+          </div>
+        </section>
+      )}
 
       {event.learn.length > 0 && (
         <>

@@ -2,23 +2,34 @@
 
 import { useState } from "react";
 import { AuthLink, useAuthModal } from "@/components/auth/AuthModalContext";
-import { AuthFooter, AuthHeading, AuthStep, VerifyEmailStep, formColumn } from "@/components/auth/AuthStep";
+import { AuthFooter, AuthHeading, AuthStep, PlatformAccountStep, VerifyEmailStep, formColumn } from "@/components/auth/AuthStep";
 import { FormAlert, PasswordField, SubmitButton, TextField } from "@/components/forms/fields";
 import { authCopy, authErrors } from "@/data/auth";
 import { loginSchema } from "@/lib/auth/schema";
 import { authService } from "@/lib/auth/service";
 import { AuthError } from "@/lib/auth/types";
+import type { AuthUser } from "@/lib/auth/types";
 import { useZodForm } from "@/lib/forms/useZodForm";
 
 const copy = authCopy.login;
 
 // Login (Figma) → if the account was never verified, the platform's email-code step, then finish().
+// Mentor and admin accounts get the "use the platform" step instead.
 export function LoginFlow() {
   const { finish } = useAuthModal();
-  const [step, setStep] = useState<"form" | "verify">("form");
+  const [step, setStep] = useState<"form" | "verify" | "platform">("form");
+  const [platformRole, setPlatformRole] = useState<"mentor" | "admin">("mentor");
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState("");
   const form = useZodForm(loginSchema, { email: "", password: "" }, "login");
+
+  const done = async (user: AuthUser) => {
+    if (user.role === "mentee") return finish(user.id);
+    setPlatformRole(user.role);
+    setStep("platform");
+    setSubmitting(false);
+    await authService.signOut();
+  };
 
   const onSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -28,17 +39,20 @@ export function LoginFlow() {
     setSubmitting(true);
     try {
       const session = await authService.signInWithPassword(values);
-      await finish(session.user.id);
+      await done(session.user);
     } catch (caught) {
       setSubmitting(false);
       const code = caught instanceof AuthError ? caught.code : "unknown";
       if (code === "email_not_confirmed") setStep("verify");
-      else setFormError(code === "invalid_credentials" ? authErrors.credentials : authErrors.generic);
+      else setFormError(code === "invalid_credentials" ? authErrors.credentials : code === "rate_limited" ? authErrors.rateLimited : authErrors.generic);
     }
   };
 
   if (step === "verify") {
-    return <VerifyEmailStep key="verify" email={form.values.email.trim()} onVerified={(session) => void finish(session.user.id)} onEdit={() => setStep("form")} />;
+    return <VerifyEmailStep key="verify" email={form.values.email.trim()} onVerified={(session) => void done(session.user)} onEdit={() => setStep("form")} />;
+  }
+  if (step === "platform") {
+    return <PlatformAccountStep key="platform" role={platformRole} onBack={() => setStep("form")} />;
   }
 
   return (

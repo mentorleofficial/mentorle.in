@@ -3,7 +3,7 @@
 // Only the first login and signup screens have a Figma design; the other screens extend that card's style
 // (logged in SPEC-VS-DESIGN).
 
-export type AuthMode = "login" | "signup" | "forgot" | "onboarding";
+export type AuthMode = "login" | "signup" | "forgot" | "reset" | "onboarding";
 
 export const OTP_LENGTH = 8;
 export const RESEND_SECONDS = 60;
@@ -60,7 +60,7 @@ export const authCopy = {
   },
   forgot: {
     title: "Forgot Password",
-    subtitle: "Enter your email and we’ll send you a code to reset your password.",
+    subtitle: "Enter your email and we’ll send you a code and a link to reset your password.",
     submit: "Send Code",
     submitting: "Sending…",
     back: "Back to log in",
@@ -72,6 +72,20 @@ export const authCopy = {
     submit: "Reset Password",
     submitting: "Resetting…",
     change: "Change email",
+  },
+  // /reset-password, opened from the "Reset Password" button in the email.
+  resetLink: {
+    checking: "Checking your link…",
+    title: "Choose a New Password",
+    subtitle: (email: string) => ({ before: "For", email }),
+    submit: "Save Password",
+    submitting: "Saving…",
+    expired: {
+      title: "This link has expired",
+      subtitle: "Reset links work once and expire after 10 minutes. Ask for a new one.",
+      cta: "Send a New Link",
+      href: "/forgot-password",
+    },
   },
   resetDone: {
     title: "Password updated",
@@ -94,8 +108,16 @@ export const authCopy = {
     hidePassword: "Hide password",
   },
   close: "Close",
-  // Shown only while the mock auth service is in use, so testers know the code (no emails are sent).
-  mockCodeHint: (code: string) => `Test mode: no email is sent. Use code ${code}.`,
+  // Mentor and admin accounts log in on the platform (accounts aren't shared between the two sites' sessions).
+  platformAccount: {
+    title: "Use the Mentorle platform",
+    body: (role: "mentor" | "admin") =>
+      role === "mentor"
+        ? "This is a mentor account. Mentors manage their sessions and profile on the Mentorle platform."
+        : "This is an admin account. Admins work on the Mentorle platform.",
+    cta: "Go to the platform",
+    back: "Use a different account",
+  },
 };
 
 export const authErrors = {
@@ -116,6 +138,9 @@ export const authErrors = {
   otp: `Enter the ${OTP_LENGTH}-digit code.`,
   otpWrong: "That code is wrong or has expired. Check your email or resend it.",
   credentials: "Wrong email or password.",
+  rateLimited: "Too many attempts. Please wait a minute and try again.",
+  weakPassword: "That password is too easy to guess. Try a longer one.",
+  samePassword: "Choose a password different from your current one.",
   unverified: "Verify your email first. We’ve sent you a new code.",
   generic: "Something went wrong. Please try again.",
 };

@@ -6,7 +6,8 @@ import { MentorBanner } from "@/components/home/MentorBanner";
 import { IconCardSection } from "@/components/ui/IconCardSection";
 import { PageHero } from "@/components/ui/PageHero";
 import { SectionHeader } from "@/components/ui/SectionHeader";
-import { eventsPage, hostedGatherings, opportunities, opportunityCta, opportunityFilters } from "@/data/events";
+import { eventsPage, opportunities, opportunityCta, opportunityFilters } from "@/data/events";
+import { getGatherings } from "@/lib/events/queries";
 
 export const metadata: Metadata = {
   title: "Events & Summits",
@@ -14,8 +15,10 @@ export const metadata: Metadata = {
     "Mentorle's own leadership dinners, campus summits and pitch circles, plus a curated feed of hackathons, meetups, jobs and freelance gigs.",
 };
 
-export default function EventsPage() {
+// Hosted events come from the platform (cached, so still part of the prerendered page).
+export default async function EventsPage() {
   const { hero, hosted, opportunities: feed, howItWorks, banner } = eventsPage;
+  const gatherings = await getGatherings();
 
   return (
     <>
@@ -34,9 +37,11 @@ export default function EventsPage() {
         <div className="container-page">
           <SectionHeader id="hosted-title" eyebrow={hosted.eyebrow} title={hosted.title} description={hosted.description} />
         </div>
-        <div data-animate="rise" className="mt-12 md:mt-16">
-          <GatheringsCarousel events={hostedGatherings} />
-        </div>
+        {gatherings.length > 0 && (
+          <div data-animate="rise" className="mt-12 md:mt-16">
+            <GatheringsCarousel events={gatherings} />
+          </div>
+        )}
       </section>
 
       <section id="opportunities" aria-labelledby="opportunities-title" className="bg-surface py-16 md:py-24 lg:py-[8.125rem]">

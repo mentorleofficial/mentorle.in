@@ -1,5 +1,5 @@
 import type { IconCardContent } from "@/data/become-a-mentor";
-import type { GatheringEvent, ImageAsset } from "@/data/home";
+import type { ImageAsset } from "@/data/home";
 import { BECOME_A_MENTOR_PATH } from "@/data/site";
 
 export type OpportunityType = "hackathon" | "event" | "job" | "freelance";
@@ -116,47 +116,6 @@ export const opportunities: Opportunity[] = [
     location: "Gurugram",
     reward: "₹12–16 LPA",
     url: "https://www.naukri.com",
-  },
-];
-
-const gatheringImages = {
-  conclave: { src: "/homepage/live-gatherings/image-2.webp", width: 1836, height: 1064 },
-  dinner: { src: "/homepage/live-gatherings/image-1.webp", width: 700, height: 998 },
-  sprint: { src: "/homepage/live-gatherings/image-3.webp", width: 1200, height: 1800 },
-} satisfies Record<string, ImageAsset>;
-
-// Only the centre card's text exists in Figma; the other two are placeholders in the same shape.
-// Each CTA opens the event's detail page, where registration happens (src/data/event-details.ts).
-export const hostedGatherings: GatheringEvent[] = [
-  {
-    ...gatheringImages.dinner,
-    title: "Mohali Leadership Dinner",
-    date: "12th September, 2026",
-    description: "An intimate evening where senior operators share what they wish they had known earlier, with time for one-on-one questions.",
-    alt: "Guests talking at a leadership dinner",
-    audience: "Open for Professionals",
-    cta: { label: "Request Invite", href: "/events/mohali-leadership-dinner" },
-    when: { time: "7:00 PM – 10:00 PM IST", day: "Saturday, 12 September 2026" },
-  },
-  {
-    ...gatheringImages.conclave,
-    title: "Punjab Technical Conclave",
-    date: "28th August, 2026",
-    description: "A full-day campus summit featuring guest lectures from FAANG engineers and startup founders for over 500+ students.",
-    alt: "Attendees networking at the Punjab Technical Conclave",
-    audience: "Open for Students",
-    cta: { label: "Register Free", href: "/events/punjab-technical-conclave" },
-    when: { time: "10:00 AM – 5:00 PM IST", day: "Friday, 28 August 2026" },
-  },
-  {
-    ...gatheringImages.sprint,
-    title: "Builders Pitch Circle",
-    date: "4th October, 2026",
-    description: "Early-stage founders pitch to a panel of operators and angels, then get unfiltered feedback over chai.",
-    alt: "Founders pitching at a Mentorle pitch circle",
-    audience: "Open for Founders",
-    cta: { label: "Apply to Pitch", href: "/events/builders-pitch-circle" },
-    when: { time: "5:00 PM – 8:00 PM IST", day: "Sunday, 4 October 2026" },
   },
 ];
 

@@ -89,39 +89,6 @@ export type GatheringEvent = ImageAsset & {
   when?: { time: string; day: string };
 };
 
-// Only the centre card's text (and its time/date) exists in Figma; the other two cards use placeholder copy.
-export const gatherings: GatheringEvent[] = [
-  {
-    src: "/homepage/live-gatherings/image-1.webp",
-    width: 700,
-    height: 998,
-    tag: "Leadership Dinner",
-    title: "Leadership Roundtable",
-    description: "An intimate dinner where senior operators share what they wish they had known earlier.",
-    alt: "Guests talking at a leadership dinner",
-    when: { time: "7:30 PM – 10:00 PM IST", day: "Saturday, 24 October 2026" },
-  },
-  {
-    src: "/homepage/live-gatherings/image-2.webp",
-    width: 1836,
-    height: 1064,
-    tag: "University Summit",
-    title: "Founders & Leaders Mixer",
-    description: "An evening of networking and meaningful conversations with industry leaders.",
-    alt: "Founders and leaders networking at a mixer",
-    when: { time: "5:00 PM – 7:00 PM IST", day: "Saturday, 14 November 2026" },
-  },
-  {
-    src: "/homepage/live-gatherings/image-3.webp",
-    width: 1200,
-    height: 1800,
-    tag: "Tech Sprint",
-    title: "Builders Tech Sprint",
-    description: "A hands-on sprint where students build alongside engineers from product companies.",
-    alt: "Participants at a tech sprint",
-    when: { time: "10:00 AM – 6:00 PM IST", day: "Saturday, 5 December 2026" },
-  },
-];
 
 
 export type Quote = {
