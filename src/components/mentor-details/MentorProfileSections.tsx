@@ -194,7 +194,6 @@ export function MentorSessions({ mentor }: { mentor: MentorProfile }) {
                     <BookButton
                       mentor={{ userId: mentor.userId, fullName: mentor.fullName, slug: mentor.slug }}
                       offering={offering}
-                      rules={mentor.bookingRules}
                       label={copy.bookSession}
                       className={bookButton}
                     />

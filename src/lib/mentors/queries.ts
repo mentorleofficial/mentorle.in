@@ -1,7 +1,7 @@
 import { cacheLife, cacheTag } from "next/cache";
 import { SESSION_TYPES, formatYears, toSessionType } from "@/data/mentors";
 import type { Mentor, SessionType } from "@/data/mentors";
-import type { BookingRules, MentorExperience, MentorOffering, MentorProfile } from "@/data/mentor-details";
+import type { MentorExperience, MentorOffering, MentorProfile } from "@/data/mentor-details";
 import { publicSupabase } from "@/lib/supabase/public";
 
 // Public mentor data from the platform's database, through the same RPCs the platform's public pages use:
@@ -140,15 +140,6 @@ async function getMentorOfferings(mentorId: string): Promise<MentorOffering[]> {
   );
 }
 
-type RulesRow = { cancellation_notice_hours: number; allow_reschedule: boolean; reschedule_notice_hours: number };
-
-async function getBookingRules(mentorId: string): Promise<BookingRules | null> {
-  const { data, error } = await publicSupabase().rpc("mentor_booking_rules", { _mentor_id: mentorId });
-  if (error) throw new Error(`mentor_booking_rules failed: ${error.message}`);
-  const row = (data as RulesRow[] | null)?.[0];
-  return row ? { cancellationNoticeHours: row.cancellation_notice_hours, allowReschedule: row.allow_reschedule, rescheduleNoticeHours: row.reschedule_notice_hours } : null;
-}
-
 export async function getMentorProfile(slug: string): Promise<MentorProfile | null> {
   "use cache";
   cacheLife("minutes");
@@ -158,7 +149,7 @@ export async function getMentorProfile(slug: string): Promise<MentorProfile | nu
   const row = (data as ProfileRow[])[0];
   // Only the canonical slug is a public URL (the RPC also accepts a user id).
   if (!row || !row.is_active || row.slug !== slug) return null;
-  const [offerings, bookingRules] = await Promise.all([getMentorOfferings(row.user_id), getBookingRules(row.user_id)]);
+  const offerings = await getMentorOfferings(row.user_id);
   return {
     userId: row.user_id,
     slug,
@@ -174,6 +165,5 @@ export async function getMentorProfile(slug: string): Promise<MentorProfile | nu
     portfolioUrl: clean(row.portfolio_url),
     experiences: toExperiences(row.experiences),
     offerings,
-    bookingRules,
   };
 }

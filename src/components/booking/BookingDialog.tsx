@@ -8,7 +8,7 @@ import { FormAlert, Spinner, SubmitButton, TextAreaField } from "@/components/fo
 import { AnimatedHeight } from "@/components/ui/AnimatedHeight";
 import { StickyActions } from "@/components/ui/StickyActions";
 import { bookingCopy as copy } from "@/data/booking";
-import type { BookingRules, MentorOffering } from "@/data/mentor-details";
+import type { MentorOffering } from "@/data/mentor-details";
 import { formatPrice } from "@/data/mentor-details";
 import { useAuth } from "@/lib/auth/AuthProvider";
 import { SlotTakenError, bookingService } from "@/lib/booking/service";
@@ -26,7 +26,6 @@ type Mentor = { userId: string; fullName: string; slug: string };
 export type BookingDialogProps = {
   mentor: Mentor;
   offering: MentorOffering;
-  rules: BookingRules | null;
   initialStartsAt?: string | null; // resume at this time after signing up
   onClose: () => void;
 };
@@ -61,7 +60,7 @@ function googleCalendarUrl(title: string, startsAt: string, minutes: number, lin
   return `https://calendar.google.com/calendar/render?${params}`;
 }
 
-export function BookingDialog({ mentor, offering, rules, initialStartsAt, onClose }: BookingDialogProps) {
+export function BookingDialog({ mentor, offering, initialStartsAt, onClose }: BookingDialogProps) {
   const titleId = useId();
   const router = useRouter();
   const { status, user, onboarded } = useAuth();
@@ -273,7 +272,6 @@ export function BookingDialog({ mentor, offering, rules, initialStartsAt, onClos
     }
 
     if (step === "confirm" && startsAt) {
-      const rulesLines = copy.rules(rules);
       return (
         <div className="text-center">
           <h2 id={titleId} className="text-[1.75rem] leading-tight font-medium text-ink md:text-[2rem]">
@@ -281,16 +279,14 @@ export function BookingDialog({ mentor, offering, rules, initialStartsAt, onClos
           </h2>
           <div className="mt-8 space-y-4 text-left">
             {summary}
-            {rulesLines.length > 0 && (
-              <ul className="space-y-1.5 text-sm text-ink-soft">
-                {rulesLines.map((line) => (
-                  <li key={line} className="flex gap-2.5">
-                    <span className="mt-2 size-1 shrink-0 bg-ink-soft" aria-hidden />
-                    {line}
-                  </li>
-                ))}
-              </ul>
-            )}
+            <ul className="space-y-1.5 text-sm text-ink-soft">
+              {copy.rules.map((line) => (
+                <li key={line} className="flex gap-2.5">
+                  <span className="mt-2 size-1 shrink-0 bg-ink-soft" aria-hidden />
+                  {line}
+                </li>
+              ))}
+            </ul>
             {status === "signed-in" && onboarded && user?.role === "mentee" && (
               <TextAreaField
                 id={`${titleId}-notes`}

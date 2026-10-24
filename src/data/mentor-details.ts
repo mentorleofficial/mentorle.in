@@ -16,13 +16,6 @@ export type MentorOffering = {
   hasOpenTimes: boolean; // any open slot in the next 90 days (mentor_open_slots)
 };
 
-// The mentor's own rules for mentees (platform: Availability → Booking Settings).
-export type BookingRules = {
-  cancellationNoticeHours: number;
-  allowReschedule: boolean;
-  rescheduleNoticeHours: number;
-};
-
 // Platform `experiences` item: start_date / end_date are "YYYY-MM"; no end_date = current role.
 export type MentorExperience = {
   title: string;
@@ -48,7 +41,6 @@ export type MentorProfile = {
   portfolioUrl: string | null;
   experiences: MentorExperience[];
   offerings: MentorOffering[];
-  bookingRules: BookingRules | null;
 };
 
 // --- Derived display values: generated from the mentor's own fields, never invented -------------------------

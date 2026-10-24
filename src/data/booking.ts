@@ -1,9 +1,5 @@
-import type { BookingRules } from "@/data/mentor-details";
-
 // Booking dialog on mentor profiles (/mentors/<slug>, "Book a Session" on a session card). No Figma: built in the
 // auth dialogs' style (logged in SPEC-VS-DESIGN, BK rows). Times are always IST, like the platform.
-
-const hours = (n: number) => (n === 1 ? "1 hour" : `${n} hours`);
 
 export const bookingCopy = {
   close: "Close",
@@ -44,17 +40,8 @@ export const bookingCopy = {
     calendar: "Add to Google Calendar",
     close: "Done",
   },
-  rules: (rules: BookingRules | null) => {
-    if (!rules) return [];
-    const cancel =
-      rules.cancellationNoticeHours > 0 ? `Free cancellation up to ${hours(rules.cancellationNoticeHours)} before.` : "Free cancellation any time before it starts.";
-    const reschedule = !rules.allowReschedule
-      ? "This mentor doesn’t allow rescheduling."
-      : rules.rescheduleNoticeHours > 0
-        ? `You can reschedule once, up to ${hours(rules.rescheduleNoticeHours)} before.`
-        : "You can reschedule once, any time before it starts.";
-    return [cancel, reschedule];
-  },
+  // Placeholder copy (BK9): only the mentor or a Mentorle admin cancels or reschedules a session.
+  rules: ["Booked times are final: sessions can’t be cancelled or rescheduled from your account.", "If something comes up, your mentor or the Mentorle team can move or cancel it."],
   errors: {
     taken: "That time was just taken. Please pick another.",
     generic: "Couldn’t book this session. Please try again.",

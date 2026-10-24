@@ -4,12 +4,11 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { BookingDialog } from "@/components/booking/BookingDialog";
 import { bookingCopy } from "@/data/booking";
-import type { BookingRules, MentorOffering } from "@/data/mentor-details";
+import type { MentorOffering } from "@/data/mentor-details";
 
 type BookButtonProps = {
   mentor: { userId: string; fullName: string; slug: string };
   offering: MentorOffering;
-  rules: BookingRules | null;
   label: string;
   className: string;
 };
@@ -17,7 +16,7 @@ type BookButtonProps = {
 // "Book a Session" on a session card: opens the booking dialog. ?book=<offering>&at=<time> (set when signup or
 // onboarding sends someone back here) reopens it at that time. Paid offerings and mentors without open times
 // get a disabled note instead.
-export function BookButton({ mentor, offering, rules, label, className }: BookButtonProps) {
+export function BookButton({ mentor, offering, label, className }: BookButtonProps) {
   const params = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
@@ -45,7 +44,7 @@ export function BookButton({ mentor, offering, rules, label, className }: BookBu
         {label} <span aria-hidden>→</span>
         <span className="sr-only">: {offering.title}</span>
       </button>
-      {isOpen && <BookingDialog mentor={mentor} offering={offering} rules={rules} initialStartsAt={resume} onClose={close} />}
+      {isOpen && <BookingDialog mentor={mentor} offering={offering} initialStartsAt={resume} onClose={close} />}
     </>
   );
 }
