@@ -24,7 +24,7 @@ export function SignupFlow() {
   const [formError, setFormError] = useState("");
   const form = useZodForm(
     signupSchema,
-    { fullName: "", email: "", phone: "", dateOfBirth: "", password: "", terms: false, marketing: false },
+    { fullName: "", email: "", phone: "", dateOfBirth: "", password: "", terms: false },
     "signup",
   );
 
@@ -46,7 +46,6 @@ export function SignupFlow() {
         phone: values.phone,
         date_of_birth: values.dateOfBirth,
         terms_accepted_at: new Date().toISOString(),
-        marketing_opt_in: values.marketing,
       });
       setStep("verify");
     } catch (caught) {
@@ -123,9 +122,6 @@ export function SignupFlow() {
           {copy.terms.before}{" "}
           <TermsLink href={copy.terms.terms.href}>{copy.terms.terms.label}</TermsLink> {copy.terms.and}{" "}
           <TermsLink href={copy.terms.privacy.href}>{copy.terms.privacy.label}</TermsLink>
-        </Checkbox>
-        <Checkbox {...form.field("marketing")} checked={form.values.marketing} onChange={(event) => form.setValue("marketing", event.target.checked)}>
-          {copy.marketing}
         </Checkbox>
         <FormAlert>{formError}</FormAlert>
         <SubmitButton loading={submitting} loadingLabel={copy.submitting} className="mt-1">

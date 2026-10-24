@@ -39,7 +39,6 @@ export const authCopy = {
       and: "and",
       privacy: { label: "Privacy Policy", href: "/privacy" },
     },
-    marketing: "Send me session reminders, new mentors and offers. You can opt out any time.",
   },
   verify: {
     title: "Verify your email",

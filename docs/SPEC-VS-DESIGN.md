@@ -206,7 +206,7 @@ The auth screens open as a modal over whatever page the user is on (Next interce
 | A2 | Forgot password | — | No link or screens. | **Built** from the platform's flow (8-digit recovery code). Unlike the platform, it never says whether an account exists. |
 | A3 | Social / phone login | — | Email and password only. | Kept as email + password, matching the platform. Open: confirm whether Google login is wanted. |
 | A4 | Password placeholder | — | Lowercase "password" while the other fields are capitalised. | Built as "Password" for consistency. |
-| A5 | Terms consent | DPDP Act: unbundled consent; promotional profiling can't be forced (BP §7). | No terms/privacy line. | **Built**: a required "I agree to the Terms and Privacy Policy" checkbox plus a separate, optional updates checkbox. The platform instead asks in a banner after login; its DB needs `terms_accepted_at` / `marketing_opt_in` columns at signup. |
+| A5 | Terms consent | DPDP Act: unbundled consent; promotional profiling can't be forced (BP §7). | No terms/privacy line. | **Built**: a required "I agree to the Terms and Privacy Policy" checkbox. **Changed 2026-10-24 (user):** the optional "session reminders, new mentors and offers" checkbox is removed. Service emails (session reminders, booking and account emails) go to everyone; **marketing emails (new mentors, offers) need separate consent under DPDP**, so `mentee_profiles.marketing_opt_in` stays false and none should be sent until a mentee opts in (e.g. a future account-settings toggle). |
 | A6 | Backend | — | — | **Live:** Supabase auth on the platform's project. Signup stores phone, date of birth and marketing consent in `mentee_profiles`, and the terms acceptance time on the auth user's metadata (`terms_accepted_at`). |
 | A7 | Phone at signup | Platform signup requires a phone number. | Not in the Figma. | Built as on the platform (country code, India +91 by default, 10 digits for India). |
 | A8 | Screens with no design | — | Only the first login and signup screens are designed. | Verify email, You're in, Forgot/Reset password, Password updated and all 6 onboarding steps reuse the login card's style (onboarding adds a progress bar along the card's top edge). Needs design review. |
@@ -234,6 +234,7 @@ One page template renders any event from `src/data/event-details.ts`. Each recor
 | ED10 | Detail content | — | Only card text existed for the three sample gatherings. | Resolved: every field comes from `events_programs`. Free text is cleaned: HTML entities decoded ("&amp;"), Markdown bold removed, ✓ / • / - bullets turned into list items. Host "Online"/"Mentorle" in `college_name` shows as "Hosted by: Mentorle". |
 | ED11 | Hero background | — | A pre-blurred, darkened auditorium photo. | Every event uses the design's background; real banners are bright photos that would make the white hero text unreadable, so they go in the cover slot (ED1). |
 | ED12 | Meeting links (security) | Platform: the join link is for registered attendees. | — | mentorle.in never selects `meeting_link`. **Fixed in the platform (2026-10-24, migration `20261024130000_private_event_meeting_links`):** links moved to the private `event_meeting_links` table, readable only by the event's creator, admins and registered attendees through `get_event_meeting_links()`. When registration goes live here, show the link to registered users through that function. |
+| ED13 | Who fills subtitle, highlights and the web address | — | — | **Platform event form (2026-10-24):** "Subtitle" (120 characters) and "Web address" (`mentorle.in/events/…`, empty = generated from the title, taken addresses refused, warning when registered people would lose the old link, "View on mentorle.in") under Event Basics; "Highlights" (one per line, up to 6) under Content Details. The database only accepts lowercase letters, digits and single hyphens (migration `20261024140000_event_slug_format`). |
 
 ## 11. Mentor profile (`/mentors/<slug>`) — built 2026-10-22
 
@@ -253,3 +254,17 @@ One template renders every mentor from `src/data/mentor-details.ts`, shaped like
 | M10 | Sparse profiles | Only name, bio, years and one expertise tag are required. | — | Text centres against the photo card so short profiles don't leave a gap; headline falls back to "Role at Organization". |
 | M11 | Data freshness | — | — | Profiles, the directory and the homepage cards are cached for about a minute (`cacheLife("minutes")`, tag `mentors`): a mentor's edit on the platform appears within ~1 minute; a newly activated mentor's page renders on its first visit. |
 | M12 | Speaker Hub speakers | — | The two speakers are the design's sample mentors, not platform mentors. | Kept as static placeholders in `src/data/speakers.ts`; their cards now open the speaker request instead of a (non-existent) mentor profile. |
+
+## 12. Privacy Policy and Terms of Service (`/privacy`, `/terms`) — built 2026-10-24
+
+No Figma. Text copied word for word from the legacy site (`main`: `/privacy-policy`, the DPDP notice, and `/terms-of-service`) into `src/data/legal.ts`; layout built from the site's patterns (see DESIGN-SYSTEM, Legal pages).
+
+| # | Item | What the legacy pages say | Rest of the site | Status |
+|---|---|---|---|---|
+| L1 | **Grievance contact and SLA** | Privacy §7: support@mentorle.in / rachitjain@mentorle.in (+91 9888409232); "addressed within 7 working days". | Footer: grievance@mentorle.in, "Resolution SLA: 30 days". | **Deferred (user, 2026-10-24):** left as is for now. Pick one email and one SLA later; the footer and the policy should match (the policy is the legal document). |
+| L2 | Separate "DPDP Compliance Notice" | Terms linked `/privacy-policy` and `/dpdp-compliance`. | The privacy page *is* the DPDP notice. | The Terms link reads "Privacy Policy (DPDP Compliance Notice)" and goes to `/privacy`. |
+| L3 | Old addresses | `/privacy-policy`, `/private-policy` (an older privacy text), `/terms-of-service`, `/dpdp-compliance`. | New: `/privacy`, `/terms`. | Permanent redirects in `next.config.ts`, so old links keep working after launch. The older `/private-policy` text isn't carried over. |
+| L4 | Cancellation & Refund Policy | Exists on the legacy site (`/cancellation-refund-policy`). | Not linked anywhere on the new site. | **Waiting for content (user will share):** not ported yet; same for the Community Guidelines page. Payment gateways (Cashfree) usually require the refund policy to be public before going live. |
+| L5 | Effective dates | Privacy: September 2, 2026. Terms: September 1, 2026. | — | Kept. Update `effectiveDate` in `src/data/legal.ts` when the text changes. |
+| L6 | Footer label | — | The footer's bottom row said "Terms and Conditions". | Resolved (user, 2026-10-24): "Terms of Service" everywhere. |
+

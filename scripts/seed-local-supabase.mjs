@@ -270,7 +270,9 @@ const events = [
 
 // One row per request: a bulk upsert needs every row to have the same keys.
 for (const { start, ...event } of events) {
-  await upsert("events_programs", [{ ...event, start_date: start, end_date: start, start_time: start, created_by: adminId }], "slug");
+  // Three hours long, so the platform's event form accepts the dates when an event is edited.
+  const end = new Date(Date.parse(start) + 3 * 60 * 60 * 1000).toISOString();
+  await upsert("events_programs", [{ ...event, start_date: start, end_date: end, start_time: start, created_by: adminId }], "slug");
   console.log(`event    ${event.slug}`);
 }
 

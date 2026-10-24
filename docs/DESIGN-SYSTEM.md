@@ -183,6 +183,14 @@ Form state uses `useZodForm` (`src/lib/forms/`). Errors show after blur or submi
 - **Mobile:** the menu panel shows the same items.
 - **First render:** the static HTML can't know who is signed in, so the account area stays transparent (`opacity-0`) until the session is read after hydration, then fades in. Signed-in users never see Login flash before their avatar.
 
+**Legal pages** (`/privacy`, `/terms`, `components/legal/LegalPage.tsx`, text in `src/data/legal.ts`; no Figma):
+- **Header:** a `bg-ink` band (the event hero without a photo): 14px uppercase "LEGAL" at `white/75`, the hero headline scale (34 → 48px), an 16/18px subtitle at `white/90`, and "Effective <date>" at 14px. Same top padding as the event hero so it clears the header.
+- **Body:** `bg-white`, `container-page`. From `lg` a 15rem sticky "On this page" list (left hairline, links turn their left border `brand` on hover) beside a `max-w-[48rem]` text column; below `lg` one column, no list.
+- **Facts box:** `bg-surface` + `border-line`, 2 columns from `sm` (long values span both): 14px `ink-soft` label over a 16px `ink` value.
+- **Sections:** separated by a top hairline (`border-line`, 36–40px above the heading). Heading at the card-title scale (20 → 24px, 500). Body 16px, line height 1.8125, `text-ink/85`. A short "Label:" at the start of a paragraph or list item is set `font-medium text-ink`. Lists use the event pages' 4px square `ink-soft` bullets.
+- **Tables:** from `md` a bordered table (`border-line`, `bg-surface` header, 15px text, first column medium); on phones each row is a bordered card with the column names as 14px labels.
+- Ends with the copyright line (14px `ink-soft`).
+
 **Event detail** (`/events/<slug>`, `components/event-detail/`, types and copy in `src/data/event-details.ts`, rows from `events_programs` via `src/lib/events/queries.ts`):
 - **Hero (`EventHero`):** left-aligned, 520px tall on desktop, no overlay (the exported background is already blurred and dark). It holds a 15px breadcrumb with a back arrow, then a 36px status chip (`bg-[#fff0ea]`, brand text, check icon when completed) with the event kind beside it. Below those come the 48px title, a 20px subtitle and a 16px "Hosted by" line at `white/85`.
 - **Layout:** a 2-column grid (`minmax(0,1fr)` + 25.875rem at xl, 22rem at lg, 40px gap, 72px between rows) on `bg-dots`. Row 1 is the cover + "Event details" card; row 2 is the content + speaker/highlights stack (28px gap). Below lg everything stacks in that order.

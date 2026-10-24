@@ -18,11 +18,11 @@ export type SignUpInput = {
   password: string;
   full_name: string;
   phone: string;
-  // date_of_birth and marketing_opt_in are mentee_profiles columns; terms_accepted_at is kept on the auth
-  // user's metadata as the consent record (SPEC-VS-DESIGN A1, A5).
+  // date_of_birth is a mentee_profiles column; terms_accepted_at is kept on the auth user's metadata as the
+  // consent record (SPEC-VS-DESIGN A1, A5). Signup asks for no marketing consent: service emails (reminders,
+  // bookings) need none, and mentee_profiles.marketing_opt_in stays false until a mentee opts in later.
   date_of_birth: string;
   terms_accepted_at: string;
-  marketing_opt_in: boolean;
 };
 
 export type OtpType = "signup" | "recovery";

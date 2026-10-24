@@ -57,7 +57,6 @@ export const signupSchema = z.object({
   }),
   password: newPassword,
   terms: z.boolean().refine(Boolean, authErrors.terms),
-  marketing: z.boolean(),
 });
 
 export const loginSchema = z.object({

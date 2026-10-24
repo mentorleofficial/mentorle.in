@@ -7,6 +7,15 @@ const nextConfig: NextConfig = {
   /* config options here */
   cacheComponents: true,
   partialPrefetching: true,
+  // The legacy site's policy URLs (still linked from old emails and search results) point at the new pages.
+  async redirects() {
+    return [
+      { source: "/privacy-policy", destination: "/privacy", permanent: true },
+      { source: "/private-policy", destination: "/privacy", permanent: true },
+      { source: "/dpdp-compliance", destination: "/privacy", permanent: true },
+      { source: "/terms-of-service", destination: "/terms", permanent: true },
+    ];
+  },
   images: {
     remotePatterns: supabaseUrl ? [new URL("/storage/v1/object/public/**", supabaseUrl)] : [],
   },

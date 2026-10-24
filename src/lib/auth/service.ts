@@ -9,8 +9,8 @@ import type { AppRole, AuthErrorCode, AuthUser, MenteeProfile, MenteeProfileUpda
  * mentee screens do (../Mentorle-Version2), so accounts work on both sites:
  *   checkEmailExists      → rpc("check_email_exists")                       (MenteeSignupForm)
  *   signUp                → auth.signUp, role "mentee" in user metadata     (handle_new_user creates users row)
- *   verifyOtp             → auth.verifyOtp(type "signup" | "recovery"); after signup, the phone, date of birth and
- *                           marketing consent go to mentee_profiles
+ *   verifyOtp             → auth.verifyOtp(type "signup" | "recovery"); after signup, the phone and date of birth
+ *                           go to mentee_profiles
  *   signInWithPassword, resetPasswordForEmail, updatePassword (auth.updateUser), signOut
  *   fetch/upsertMenteeProfile, uploadAvatar → features/mentee-onboarding/api.ts (users + mentee_profiles,
  *                           avatars in branding-assets/avatars/<user id>/)
@@ -118,7 +118,6 @@ export const authService = {
           phone: input.phone,
           date_of_birth: input.date_of_birth,
           terms_accepted_at: input.terms_accepted_at,
-          marketing_opt_in: input.marketing_opt_in,
         },
       },
     });
@@ -149,7 +148,6 @@ export const authService = {
             user_id: authUser.id,
             phone: (meta.phone as string | undefined) ?? "",
             date_of_birth: (meta.date_of_birth as string | undefined) || null,
-            marketing_opt_in: Boolean(meta.marketing_opt_in),
           },
           { onConflict: "user_id" },
         );
