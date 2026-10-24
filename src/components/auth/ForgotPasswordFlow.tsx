@@ -14,6 +14,7 @@ import { useZodForm } from "@/lib/forms/useZodForm";
 // Platform flow: email → 8-digit recovery code + new password → signed in. Unlike the platform, the first
 // step never says whether the account exists.
 export function ForgotPasswordFlow() {
+  const { stepBack } = useAuthModal();
   const [step, setStep] = useState<"request" | "reset" | "done">("request");
   const [email, setEmail] = useState("");
   const [userId, setUserId] = useState("");
@@ -23,7 +24,10 @@ export function ForgotPasswordFlow() {
       <ResetStep
         key="reset"
         email={email}
-        onChangeEmail={() => setStep("request")}
+        onChangeEmail={() => {
+          stepBack();
+          setStep("request");
+        }}
         onDone={(id) => {
           setUserId(id);
           setStep("done");

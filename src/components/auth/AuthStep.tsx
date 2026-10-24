@@ -13,10 +13,20 @@ import { authService } from "@/lib/auth/service";
 import { AuthError } from "@/lib/auth/types";
 import type { Session } from "@/lib/auth/types";
 
-// One screen of a flow. Remounts per step (keyed by the flow), fades in, and moves focus to the first field
-// (or the first button on screens without fields) so keyboard and screen-reader users land in the new step.
+// One screen of a flow. Remounts per step (keyed by the flow), slides in (from the right going forward, from
+// the left going back), and moves focus to the first field (or the first button on screens without fields) so
+// keyboard and screen-reader users land in the new step. The dialog's height follows (AnimatedHeight).
+export const stepEnterClass = (direction: "forward" | "back") =>
+  `${direction === "back" ? "animate-[modal-step-back_380ms_cubic-bezier(0.22,1,0.36,1)]" : "animate-[modal-step-forward_380ms_cubic-bezier(0.22,1,0.36,1)]"} motion-reduce:animate-none`;
+
 export function AuthStep({ children }: { children: ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
+  const { direction, stepForward } = useAuthModal();
+  // Captured when the step appears; later direction changes are for the next step.
+  const [enter] = useState(direction);
+  useEffect(() => {
+    stepForward();
+  }, [stepForward]);
   useEffect(() => {
     // Long steps scroll inside the overlay: start each one at the top.
     ref.current?.closest("[data-lenis-prevent]")?.scrollTo({ top: 0 });
@@ -24,7 +34,7 @@ export function AuthStep({ children }: { children: ReactNode }) {
     target?.focus({ preventScroll: true });
   }, []);
   return (
-    <div ref={ref} className="animate-[auth-step-in_300ms_ease-out] text-center motion-reduce:animate-none">
+    <div ref={ref} className={`text-center ${stepEnterClass(enter)}`}>
       {children}
     </div>
   );

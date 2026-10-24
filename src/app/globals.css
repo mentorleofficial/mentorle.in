@@ -131,6 +131,22 @@ button:not(:disabled),
   }
 }
 
+/* Step changes inside the auth, onboarding and booking dialogs: forward slides in from the right, back from
+   the left (AuthStep). The card's height follows with AnimatedHeight. */
+@keyframes modal-step-forward {
+  from {
+    opacity: 0;
+    transform: translateX(1.5rem);
+  }
+}
+
+@keyframes modal-step-back {
+  from {
+    opacity: 0;
+    transform: translateX(-1.5rem);
+  }
+}
+
 @keyframes auth-card-in {
   from {
     opacity: 0;

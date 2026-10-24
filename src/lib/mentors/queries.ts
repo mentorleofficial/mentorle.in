@@ -1,7 +1,7 @@
 import { cacheLife, cacheTag } from "next/cache";
 import { SESSION_TYPES, formatYears, toSessionType } from "@/data/mentors";
 import type { Mentor, SessionType } from "@/data/mentors";
-import type { MentorExperience, MentorOffering, MentorProfile } from "@/data/mentor-details";
+import type { BookingRules, MentorExperience, MentorOffering, MentorProfile } from "@/data/mentor-details";
 import { publicSupabase } from "@/lib/supabase/public";
 
 // Public mentor data from the platform's database, through the same RPCs the platform's public pages use:
@@ -119,16 +119,34 @@ function toExperiences(value: unknown): MentorExperience[] {
   });
 }
 
+// Whether an offering has any open start time in the next 90 days (the mentor set hours and isn't fully booked).
+async function hasOpenTimes(offeringId: string) {
+  const { data, error } = await publicSupabase().rpc("mentor_open_slots", { _offering_id: offeringId, _days: 90 });
+  if (error) throw new Error(`mentor_open_slots failed: ${error.message}`);
+  return (data ?? []).length > 0;
+}
+
 async function getMentorOfferings(mentorId: string): Promise<MentorOffering[]> {
-  return (await listOfferings())
-    .filter((row) => row.mentor_id === mentorId)
-    .map((row) => ({
+  const rows = (await listOfferings()).filter((row) => row.mentor_id === mentorId);
+  return Promise.all(
+    rows.map(async (row) => ({
       id: row.id,
       title: row.title,
       description: clean(row.description) ?? "",
       durationMinutes: row.duration_minutes,
       price: Number(row.price) || 0,
-    }));
+      hasOpenTimes: await hasOpenTimes(row.id),
+    })),
+  );
+}
+
+type RulesRow = { cancellation_notice_hours: number; allow_reschedule: boolean; reschedule_notice_hours: number };
+
+async function getBookingRules(mentorId: string): Promise<BookingRules | null> {
+  const { data, error } = await publicSupabase().rpc("mentor_booking_rules", { _mentor_id: mentorId });
+  if (error) throw new Error(`mentor_booking_rules failed: ${error.message}`);
+  const row = (data as RulesRow[] | null)?.[0];
+  return row ? { cancellationNoticeHours: row.cancellation_notice_hours, allowReschedule: row.allow_reschedule, rescheduleNoticeHours: row.reschedule_notice_hours } : null;
 }
 
 export async function getMentorProfile(slug: string): Promise<MentorProfile | null> {
@@ -140,7 +158,9 @@ export async function getMentorProfile(slug: string): Promise<MentorProfile | nu
   const row = (data as ProfileRow[])[0];
   // Only the canonical slug is a public URL (the RPC also accepts a user id).
   if (!row || !row.is_active || row.slug !== slug) return null;
+  const [offerings, bookingRules] = await Promise.all([getMentorOfferings(row.user_id), getBookingRules(row.user_id)]);
   return {
+    userId: row.user_id,
     slug,
     fullName: clean(row.full_name) ?? "Mentorle mentor",
     avatarUrl: clean(row.avatar_url),
@@ -153,6 +173,7 @@ export async function getMentorProfile(slug: string): Promise<MentorProfile | nu
     linkedinUrl: clean(row.linkedin_url),
     portfolioUrl: clean(row.portfolio_url),
     experiences: toExperiences(row.experiences),
-    offerings: await getMentorOfferings(row.user_id),
+    offerings,
+    bookingRules,
   };
 }

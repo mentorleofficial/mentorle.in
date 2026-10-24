@@ -212,6 +212,26 @@ console.log(`featured ${featured.join(", ")}`);
 const adminId = await ensureUser({ email: "admin@mentorle.local", fullName: "Local Admin", role: "admin" });
 const menteeId = await ensureUser({ email: "mentee@mentorle.local", fullName: "Test Mentee", role: "mentee" });
 
+// The test mentee has finished onboarding, so it can book sessions and register for events straight away.
+await upsert(
+  "mentee_profiles",
+  [{ user_id: menteeId, headline: "Final-year student", goals: "Get ready for product interviews.", interests: ["Product", "Design", "Data"], preferred_mentor_areas: ["Career advice"], onboarded_at: new Date().toISOString() }],
+  "user_id",
+);
+
+// Weekly hours (IST), so the mentors with sessions can be booked. day_of_week: 0 = Sunday.
+const weeklyHours = {
+  "neeru-sood": [1, 2, 3, 4, 5].map((day) => ({ day_of_week: day, start_time: "10:00", end_time: "13:00" })),
+  "arjun-malhotra": [2, 4].map((day) => ({ day_of_week: day, start_time: "18:00", end_time: "21:00" })),
+  "rohan-mehta": [6, 0].map((day) => ({ day_of_week: day, start_time: "11:00", end_time: "14:00" })),
+};
+for (const [slug, rows] of Object.entries(weeklyHours)) {
+  const mentorId = mentorIds[slug];
+  await api(`/rest/v1/mentor_availability?mentor_id=eq.${mentorId}`, { method: "DELETE" });
+  await api("/rest/v1/mentor_availability", { method: "POST", body: rows.map((row) => ({ ...row, mentor_id: mentorId, is_recurring: true })) });
+}
+console.log(`hours    ${Object.keys(weeklyHours).join(", ")}`);
+
 const events = [
   {
     slug: "from-classroom-to-boardroom",

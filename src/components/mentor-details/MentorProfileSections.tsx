@@ -1,11 +1,11 @@
 import Image from "next/image";
-import Link from "next/link";
+import { Suspense } from "react";
 import type { ReactNode } from "react";
+import { BookButton } from "@/components/booking/BookButton";
 import { MaskIcon } from "@/components/ui/MaskIcon";
 import { mentorDetailCopy as copy, formatMonth, formatPrice, mentorView } from "@/data/mentor-details";
 import type { MentorProfile } from "@/data/mentor-details";
 import { initialsOf } from "@/lib/initials";
-import { prefetchFor } from "@/lib/routes";
 
 // Mentor profile page sections (design: figma/mentor-details). The design's rounded corners are squared off
 // and its 88px content inset uses the site's page column, so the page matches the rest of the site. Every
@@ -183,10 +183,22 @@ export function MentorSessions({ mentor }: { mentor: MentorProfile }) {
                   </div>
                 </dl>
                 <div className="mt-auto pt-6">
-                  <Link href={copy.bookHref(mentor.slug)} prefetch={prefetchFor("/signup")} className={bookButton}>
-                    {copy.bookSession} <span aria-hidden>→</span>
-                    <span className="sr-only">: {offering.title}</span>
-                  </Link>
+                  {/* The button reads ?book=&at= (useSearchParams), so the prerendered page shows a look-alike until it hydrates. */}
+                  <Suspense
+                    fallback={
+                      <span className={bookButton} aria-hidden>
+                        {copy.bookSession} <span aria-hidden>→</span>
+                      </span>
+                    }
+                  >
+                    <BookButton
+                      mentor={{ userId: mentor.userId, fullName: mentor.fullName, slug: mentor.slug }}
+                      offering={offering}
+                      rules={mentor.bookingRules}
+                      label={copy.bookSession}
+                      className={bookButton}
+                    />
+                  </Suspense>
                 </div>
               </li>
             ))}

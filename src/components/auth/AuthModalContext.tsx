@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { createContext, useContext } from "react";
+import { createContext, useCallback, useContext, useState } from "react";
 import type { ReactNode } from "react";
 import { prefetchFor } from "@/lib/routes";
 import { authService } from "@/lib/auth/service";
@@ -18,7 +18,14 @@ type AuthModalState = {
   // Call once a session exists: un-onboarded mentees continue to /onboarding (like the platform's
   // MenteeOnboardingGuard), otherwise to ?redirect= or back to the page underneath.
   finish: (userId: string) => Promise<void>;
+  // Which way the next step slides in (AuthStep). Flows call stepBack() before returning to an earlier step;
+  // each step resets it to forward once shown.
+  direction: StepDirection;
+  stepBack: () => void;
+  stepForward: () => void;
 };
+
+export type StepDirection = "forward" | "back";
 
 const AuthModalContext = createContext<AuthModalState | null>(null);
 
@@ -60,7 +67,13 @@ export function AuthModalProvider({ titleId, intercepted, children }: { titleId:
     else close();
   };
 
-  return <AuthModalContext.Provider value={{ titleId, intercepted, close, go, finish }}>{children}</AuthModalContext.Provider>;
+  const [direction, setDirection] = useState<StepDirection>("forward");
+  const stepBack = useCallback(() => setDirection("back"), []);
+  const stepForward = useCallback(() => setDirection("forward"), []);
+
+  return (
+    <AuthModalContext.Provider value={{ titleId, intercepted, close, go, finish, direction, stepBack, stepForward }}>{children}</AuthModalContext.Provider>
+  );
 }
 
 // Links between the modal screens (login ⇄ signup, forgot password). Same navigation rules as `go`; any

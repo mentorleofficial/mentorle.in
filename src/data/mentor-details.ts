@@ -13,6 +13,14 @@ export type MentorOffering = {
   description: string;
   durationMinutes: number;
   price: number; // INR, 0 = free
+  hasOpenTimes: boolean; // any open slot in the next 90 days (mentor_open_slots)
+};
+
+// The mentor's own rules for mentees (platform: Availability → Booking Settings).
+export type BookingRules = {
+  cancellationNoticeHours: number;
+  allowReschedule: boolean;
+  rescheduleNoticeHours: number;
 };
 
 // Platform `experiences` item: start_date / end_date are "YYYY-MM"; no end_date = current role.
@@ -26,6 +34,7 @@ export type MentorExperience = {
 };
 
 export type MentorProfile = {
+  userId: string;
   slug: string;
   fullName: string;
   avatarUrl: string | null;
@@ -39,6 +48,7 @@ export type MentorProfile = {
   portfolioUrl: string | null;
   experiences: MentorExperience[];
   offerings: MentorOffering[];
+  bookingRules: BookingRules | null;
 };
 
 // --- Derived display values: generated from the mentor's own fields, never invented -------------------------
@@ -94,6 +104,4 @@ export const mentorDetailCopy = {
     primaryCta: { label: "Book a Session", href: "#sessions" },
     secondaryCta: { label: "Explore Mentorle Plus", href: "/pricing" },
   },
-  // Until booking exists, a session's button asks visitors to sign up and returns them to the profile.
-  bookHref: (slug: string) => `/signup?redirect=${encodeURIComponent(`/mentors/${slug}`)}`,
 };

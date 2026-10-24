@@ -268,3 +268,18 @@ No Figma. Text copied word for word from the legacy site (`main`: `/privacy-poli
 | L5 | Effective dates | Privacy: September 2, 2026. Terms: September 1, 2026. | — | Kept. Update `effectiveDate` in `src/data/legal.ts` when the text changes. |
 | L6 | Footer label | — | The footer's bottom row said "Terms and Conditions". | Resolved (user, 2026-10-24): "Terms of Service" everywhere. |
 
+## 13. Booking a session (mentor profile → "Book a Session") — built 2026-10-25
+
+No Figma: a dialog over the profile in the auth dialogs' style (user decision). Data and rules come from the platform's database through `mentor_open_slots`, `book_session`, `cancel_session` and `mentor_booking_rules` (platform migration `20261025120000_secure_booking`).
+
+| # | Item | Platform before | What's built | Status |
+|---|---|---|---|---|
+| BK1 | Who sees open times | Signed-in users only (availability tables). | Anyone (user decision): `mentor_open_slots` is public. Booking still needs an account and a finished profile. | Built |
+| BK2 | Flow | `/book/<mentorId>` page + dialog. | Book on a session card → pick a day (calendar, IST) and time → confirm (optional note, the mentor's cancel/reschedule rules) → "You're booked" with the meeting link, copy, Add to Google Calendar. Signed out → signup, then back to the chosen time (`?book=&at=`); unfinished profile → onboarding, then back. | Built |
+| BK3 | Security | Mentees inserted sessions themselves: paid offerings could be booked free, any time/length/status/meeting link. | Only `book_session` can create a mentee's session: checks offering (active, the mentor's, free unless rescheduling), the time (an open slot), onboarding, reschedule rules; sets length, title and link itself. Applied to the platform's dialog too. | Built (platform migration) |
+| BK4 | Mentor rules | Notice and buffer only. | Mentors set (platform: Availability → Booking Settings) how close to the start mentees can cancel and reschedule, whether rescheduling is allowed (once per booking), and an optional own meeting link (default: an automatic Jitsi room). | Built; mentee cancel/reschedule screens on mentorle.in are Phase 2 ("My sessions") |
+| BK5 | Paid sessions | Cashfree checkout on the platform. | Paid offerings show "Paid booking opens soon" (placeholder). | Deferred until the Mentorle Plus decisions |
+| BK6 | Mentors with no hours | — | "Not taking bookings yet" instead of Book (no open time in the next 90 days). | Built |
+| BK7 | Confirmation email | Browser sent any addresses to an unauthenticated function. | `send-booking-email` takes only a session id, needs the mentee or mentor signed in, looks people up itself, sends once. | Built (platform) |
+| BK8 | After booking | Platform: "My sessions". | mentorle.in has no sessions list yet: the dialog and the email carry the link. | Open: Phase 2 |
+

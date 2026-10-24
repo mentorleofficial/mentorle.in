@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Private working files (local Supabase copy, plans); not part of the site.
+    "local-docs/**",
   ]),
 ]);
 

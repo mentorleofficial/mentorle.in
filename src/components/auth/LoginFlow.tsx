@@ -16,7 +16,7 @@ const copy = authCopy.login;
 // Login (Figma) → if the account was never verified, the platform's email-code step, then finish().
 // Mentor and admin accounts get the "use the platform" step instead.
 export function LoginFlow() {
-  const { finish } = useAuthModal();
+  const { finish, stepBack } = useAuthModal();
   const [step, setStep] = useState<"form" | "verify" | "platform">("form");
   const [platformRole, setPlatformRole] = useState<"mentor" | "admin">("mentor");
   const [submitting, setSubmitting] = useState(false);
@@ -49,10 +49,10 @@ export function LoginFlow() {
   };
 
   if (step === "verify") {
-    return <VerifyEmailStep key="verify" email={form.values.email.trim()} onVerified={(session) => void done(session.user)} onEdit={() => setStep("form")} />;
+    return <VerifyEmailStep key="verify" email={form.values.email.trim()} onVerified={(session) => void done(session.user)} onEdit={() => { stepBack(); setStep("form"); }} />;
   }
   if (step === "platform") {
-    return <PlatformAccountStep key="platform" role={platformRole} onBack={() => setStep("form")} />;
+    return <PlatformAccountStep key="platform" role={platformRole} onBack={() => { stepBack(); setStep("form"); }} />;
   }
 
   return (

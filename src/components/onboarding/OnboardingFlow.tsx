@@ -8,6 +8,7 @@ import { ChipInput } from "@/components/forms/ChipInput";
 import { FormAlert, Spinner, SubmitButton, TextAreaField, TextField, outlineButtonClasses } from "@/components/forms/fields";
 import { Avatar } from "@/components/layout/AccountMenu";
 import { buttonClasses } from "@/components/ui/ButtonLink";
+import { StickyActions } from "@/components/ui/StickyActions";
 import { areaSuggestions, interestSuggestions, onboardingCopy, onboardingLimits, onboardingSteps } from "@/data/onboarding";
 import { useAuth } from "@/lib/auth/AuthProvider";
 import { fieldErrors, normaliseUrl, onboardingSchema, onboardingStepFields } from "@/lib/auth/schema";
@@ -79,7 +80,7 @@ const fromProfile = (profile: MenteeProfile): OnboardingValues => ({
 
 function Wizard({ profile }: { profile: MenteeProfile }) {
   const { user, refresh } = useAuth();
-  const { close, go } = useAuthModal();
+  const { close, go, stepBack } = useAuthModal();
   const [step, setStep] = useState(0);
   const [values, setValues] = useState<OnboardingValues>(() => fromProfile(profile));
   const [touched, setTouched] = useState<Partial<Record<OnboardingField, boolean>>>({});
@@ -114,7 +115,11 @@ function Wizard({ profile }: { profile: MenteeProfile }) {
     setFormError("");
   };
   const blur = (name: OnboardingField) => setTouched((current) => ({ ...current, [name]: true }));
-  const field = (name: OnboardingField) => ({ id: `onboarding-${name}`, error: error(name), onBlur: () => blur(name) });
+  const field = (name: OnboardingField) => ({
+    id: `onboarding-${name}`,
+    error: error(name),
+    onBlur: () => blur(name),
+  });
 
   const draft = () => {
     dirty.current = false;
@@ -123,6 +128,8 @@ function Wizard({ profile }: { profile: MenteeProfile }) {
 
   const goTo = (next: number) => {
     setFormError("");
+    // Back (and "Edit" on the review step) slides in from the left.
+    if (next < step) stepBack();
     setStep(next);
   };
 
@@ -131,7 +138,10 @@ function Wizard({ profile }: { profile: MenteeProfile }) {
     const fields = isLast ? (Object.keys(values) as OnboardingField[]) : onboardingStepFields[step];
     const invalid = fields.filter((name) => errors[name]);
     if (invalid.length) {
-      setTouched((current) => ({ ...current, ...Object.fromEntries(fields.map((name) => [name, true])) }));
+      setTouched((current) => ({
+        ...current,
+        ...Object.fromEntries(fields.map((name) => [name, true])),
+      }));
       if (isLast) goTo(onboardingStepFields.findIndex((stepFields) => stepFields.some((name) => errors[name])));
       else document.getElementById(`onboarding-${invalid[0]}`)?.focus();
       return;
@@ -140,7 +150,9 @@ function Wizard({ profile }: { profile: MenteeProfile }) {
     try {
       if (isLast && parsed.success) {
         dirty.current = false;
-        await authService.upsertMenteeProfile(user.id, parsed.data, { markOnboarded: true });
+        await authService.upsertMenteeProfile(user.id, parsed.data, {
+          markOnboarded: true,
+        });
         await refresh();
         go(safeRedirect() ?? "/mentors");
         return;
@@ -191,7 +203,7 @@ function Wizard({ profile }: { profile: MenteeProfile }) {
             event.preventDefault();
             void next();
           }}
-          className="mt-8 flex flex-col gap-5 text-left"
+          className="mt-8 flex flex-col gap-5 text-left [@media(max-height:1000px)]:mt-5 [@media(max-height:1000px)]:gap-4"
         >
           {step === 0 && <StepWelcome profile={profile} values={values} set={set} field={field} />}
           {step === 1 && (
@@ -281,46 +293,53 @@ function Wizard({ profile }: { profile: MenteeProfile }) {
                 error={error("preferred_mentor_areas")}
                 copy={copy.chips}
               />
-              {(["linkedin_url", "github_url", "portfolio_url"] as const).map((name) => {
-                const fieldCopy = copy.fields[name === "linkedin_url" ? "linkedin" : name === "github_url" ? "github" : "portfolio"];
-                return (
-                  <TextField
-                    key={name}
-                    {...field(name)}
-                    onBlur={() => {
-                      set(name, normaliseUrl(values[name]));
-                      blur(name);
-                    }}
-                    type="url"
-                    inputMode="url"
-                    autoComplete="url"
-                    label={fieldCopy.label}
-                    labelSuffix={copy.optional}
-                    placeholder={fieldCopy.placeholder}
-                    value={values[name]}
-                    onChange={(event) => set(name, event.target.value)}
-                  />
-                );
-              })}
+              {/* LinkedIn full width, GitHub and Portfolio side by side (keeps the step on one screen). */}
+              <div className="grid gap-5 sm:grid-cols-2 sm:gap-x-4 [@media(max-height:1000px)]:gap-4">
+                {(["linkedin_url", "github_url", "portfolio_url"] as const).map((name) => {
+                  const fieldCopy = copy.fields[name === "linkedin_url" ? "linkedin" : name === "github_url" ? "github" : "portfolio"];
+                  return (
+                    <div key={name} className={`min-w-0 ${name === "linkedin_url" ? "sm:col-span-2" : ""}`}>
+                      <TextField
+                        {...field(name)}
+                        onBlur={() => {
+                          set(name, normaliseUrl(values[name]));
+                          blur(name);
+                        }}
+                        type="url"
+                        inputMode="url"
+                        autoComplete="url"
+                        label={fieldCopy.label}
+                        labelSuffix={copy.optional}
+                        placeholder={fieldCopy.placeholder}
+                        value={values[name]}
+                        onChange={(event) => set(name, event.target.value)}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
             </>
           )}
           {step === 5 && <StepReview values={values} onEdit={goTo} />}
 
           <FormAlert>{formError}</FormAlert>
 
-          <div className="mt-1 flex gap-3">
-            {step > 0 && (
-              <button type="button" onClick={() => goTo(step - 1)} disabled={saving !== null} className={outlineButtonClasses()}>
-                ← {copy.back}
-              </button>
-            )}
-            <SubmitButton loading={saving === "next"} loadingLabel={copy.saving} disabled={saving !== null} className="flex-1">
-              {isLast ? copy.finish : `${copy.next} →`}
-            </SubmitButton>
-          </div>
+          {/* Pinned to the bottom of the screen when a step is taller than it (Review, links). */}
+          <StickyActions className="-mt-2">
+            <div className="flex gap-3">
+              {step > 0 && (
+                <button type="button" onClick={() => goTo(step - 1)} disabled={saving !== null} className={outlineButtonClasses()}>
+                  ← {copy.back}
+                </button>
+              )}
+              <SubmitButton loading={saving === "next"} loadingLabel={copy.saving} disabled={saving !== null} className="flex-1">
+                {isLast ? copy.finish : `${copy.next} →`}
+              </SubmitButton>
+            </div>
+          </StickyActions>
         </form>
 
-        <p className="mt-6 text-sm">
+        <p className="mt-3 text-sm [@media(max-height:1000px)]:mt-1">
           <button
             type="button"
             onClick={saveAndExit}
@@ -338,7 +357,11 @@ function Wizard({ profile }: { profile: MenteeProfile }) {
 type StepProps = {
   values: OnboardingValues;
   set: <K extends OnboardingField>(name: K, value: OnboardingValues[K]) => void;
-  field: (name: OnboardingField) => { id: string; error?: string; onBlur: () => void };
+  field: (name: OnboardingField) => {
+    id: string;
+    error?: string;
+    onBlur: () => void;
+  };
 };
 
 function StepWelcome({ profile, values, set, field }: StepProps & { profile: MenteeProfile }) {
@@ -410,25 +433,85 @@ function StepWelcome({ profile, values, set, field }: StepProps & { profile: Men
 
 function StepReview({ values, onEdit }: { values: OnboardingValues; onEdit: (step: number) => void }) {
   const { review } = copy;
-  const rows: { label: string; value: ReactNode; step: number; show: boolean }[] = [
+  const rows: {
+    label: string;
+    value: ReactNode;
+    step: number;
+    show: boolean;
+    wide?: boolean;
+  }[] = [
     { label: review.name, value: values.full_name, step: 0, show: true },
-    { label: review.headline, value: values.headline, step: 1, show: Boolean(values.headline) },
-    { label: review.organization, value: values.organization_unit, step: 1, show: Boolean(values.organization_unit) },
-    { label: review.bio, value: values.bio, step: 1, show: Boolean(values.bio) },
-    { label: review.goals, value: values.goals, step: 2, show: true },
-    { label: review.academic, value: values.academic_details, step: 2, show: Boolean(values.academic_details) },
-    { label: review.interests, value: <Chips items={values.interests} />, step: 3, show: true },
-    { label: review.areas, value: <Chips items={values.preferred_mentor_areas} />, step: 4, show: true },
-    { label: review.linkedin, value: normaliseUrl(values.linkedin_url), step: 4, show: Boolean(values.linkedin_url) },
-    { label: review.github, value: normaliseUrl(values.github_url), step: 4, show: Boolean(values.github_url) },
-    { label: review.portfolio, value: normaliseUrl(values.portfolio_url), step: 4, show: Boolean(values.portfolio_url) },
+    {
+      label: review.headline,
+      value: values.headline,
+      step: 1,
+      show: Boolean(values.headline),
+    },
+    {
+      label: review.organization,
+      value: values.organization_unit,
+      step: 1,
+      show: Boolean(values.organization_unit),
+    },
+    {
+      label: review.bio,
+      value: values.bio,
+      step: 1,
+      show: Boolean(values.bio),
+      wide: true,
+    },
+    {
+      label: review.goals,
+      value: values.goals,
+      step: 2,
+      show: true,
+      wide: true,
+    },
+    {
+      label: review.academic,
+      value: values.academic_details,
+      step: 2,
+      show: Boolean(values.academic_details),
+    },
+    {
+      label: review.interests,
+      value: <Chips items={values.interests} />,
+      step: 3,
+      show: true,
+    },
+    {
+      label: review.areas,
+      value: <Chips items={values.preferred_mentor_areas} />,
+      step: 4,
+      show: true,
+    },
+    {
+      label: review.linkedin,
+      value: normaliseUrl(values.linkedin_url),
+      step: 4,
+      show: Boolean(values.linkedin_url),
+    },
+    {
+      label: review.github,
+      value: normaliseUrl(values.github_url),
+      step: 4,
+      show: Boolean(values.github_url),
+    },
+    {
+      label: review.portfolio,
+      value: normaliseUrl(values.portfolio_url),
+      step: 4,
+      show: Boolean(values.portfolio_url),
+    },
   ];
   return (
-    <dl className="divide-y divide-line border-y border-line">
+    <dl className="grid border-t border-line sm:grid-cols-2 sm:gap-x-6">
+      {/* Short answers pair up two per row; the long ones (bio, goals) follow at full width, so the grid has no gaps. */}
       {rows
         .filter((row) => row.show)
+        .sort((a, b) => Number(Boolean(a.wide)) - Number(Boolean(b.wide)))
         .map((row) => (
-          <div key={row.label} className="py-3.5">
+          <div key={row.label} className={`min-w-0 border-b border-line py-3 ${row.wide ? "sm:col-span-2" : ""}`}>
             <div className="flex items-baseline justify-between gap-4">
               <dt className="text-xs tracking-wide text-muted uppercase">{row.label}</dt>
               <dd>
@@ -442,7 +525,8 @@ function StepReview({ values, onEdit }: { values: OnboardingValues; onEdit: (ste
                 </button>
               </dd>
             </div>
-            <dd className="mt-1 text-sm leading-relaxed break-words whitespace-pre-wrap text-ink">{row.value}</dd>
+            {/* Long answers are previews here (3 lines); Edit opens the full text. */}
+            <dd className={`mt-1 text-sm leading-relaxed break-words whitespace-pre-wrap text-ink ${row.wide ? "line-clamp-3" : ""}`}>{row.value}</dd>
           </div>
         ))}
     </dl>

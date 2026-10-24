@@ -19,6 +19,7 @@ const thisYear = new Date().getFullYear();
 
 // Signup (Figma + spec's DOB gate and consent) → 8-digit email code (platform) → "You're in!" → /onboarding.
 export function SignupFlow() {
+  const { stepBack } = useAuthModal();
   const [step, setStep] = useState<"form" | "verify" | "welcome">("form");
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState("");
@@ -59,7 +60,7 @@ export function SignupFlow() {
   };
 
   if (step === "verify") {
-    return <VerifyEmailStep key="verify" email={form.values.email.trim()} onVerified={() => setStep("welcome")} onEdit={() => setStep("form")} />;
+    return <VerifyEmailStep key="verify" email={form.values.email.trim()} onVerified={() => setStep("welcome")} onEdit={() => { stepBack(); setStep("form"); }} />;
   }
   if (step === "welcome") return <WelcomeStep key="welcome" />;
 

@@ -6,6 +6,7 @@ import { ForgotPasswordFlow } from "@/components/auth/ForgotPasswordFlow";
 import { LoginFlow } from "@/components/auth/LoginFlow";
 import { ResetLinkFlow } from "@/components/auth/ResetLinkFlow";
 import { SignupFlow } from "@/components/auth/SignupFlow";
+import { AnimatedHeight } from "@/components/ui/AnimatedHeight";
 import { OnboardingFlow } from "@/components/onboarding/OnboardingFlow";
 import { authCopy } from "@/data/auth";
 import type { AuthMode } from "@/data/auth";
@@ -118,7 +119,7 @@ function DialogShell({ mode, onSubmitCapture }: { mode: AuthMode; onSubmitCaptur
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex animate-[auth-backdrop-in_300ms_ease-out] overflow-y-auto overscroll-contain bg-black/45 px-4 py-6 backdrop-blur-xl sm:py-10"
+      className="fixed inset-0 z-[100] flex animate-[auth-backdrop-in_300ms_ease-out] overflow-y-auto overscroll-contain bg-black/45 px-4 py-6 backdrop-blur-xl sm:py-10 [@media(max-height:1000px)]:py-3"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) close();
       }}
@@ -132,7 +133,7 @@ function DialogShell({ mode, onSubmitCapture }: { mode: AuthMode; onSubmitCaptur
         aria-modal="true"
         aria-labelledby={titleId}
         onSubmitCapture={onSubmitCapture}
-        className="relative m-auto w-full max-w-[34.4375rem] animate-[auth-card-in_400ms_cubic-bezier(0.22,1,0.36,1)] bg-white px-5 pt-12 pb-9 motion-reduce:animate-none sm:px-10 md:pt-[3.125rem] md:pb-[3.25rem]"
+        className="relative m-auto w-full max-w-[34.4375rem] animate-[auth-card-in_400ms_cubic-bezier(0.22,1,0.36,1)] bg-white px-5 pt-12 pb-9 motion-reduce:animate-none sm:px-10 md:pt-[3.125rem] md:pb-[3.25rem] [@media(max-height:1000px)]:pt-10 [@media(max-height:1000px)]:pb-6 [@media(max-height:1000px)]:md:pt-10 [@media(max-height:1000px)]:md:pb-7"
       >
         <button
           type="button"
@@ -144,7 +145,9 @@ function DialogShell({ mode, onSubmitCapture }: { mode: AuthMode; onSubmitCaptur
             <path d="M3 3l18 18M21 3L3 21" />
           </svg>
         </button>
-        <Flow key={openId} />
+        <AnimatedHeight>
+          <Flow key={openId} />
+        </AnimatedHeight>
       </div>
     </div>
   );

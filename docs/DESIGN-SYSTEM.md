@@ -183,7 +183,18 @@ Form state uses `useZodForm` (`src/lib/forms/`). Errors show after blur or submi
 - **Mobile:** the menu panel shows the same items.
 - **First render:** the static HTML can't know who is signed in, so the account area stays transparent (`opacity-0`) until the session is read after hydration, then fades in. Signed-in users never see Login flash before their avatar.
 
-**Legal pages** (`/privacy`, `/terms`, `components/legal/LegalPage.tsx`, text in `src/data/legal.ts`; no Figma):
+**Booking dialog** (`components/booking/`, copy in `src/data/booking.ts`; no Figma): the auth dialogs' overlay and card (same backdrop, close button, focus trap, Escape, scroll lock), rendered in a portal. The pick step widens the card to `max-w-[46rem]`; confirm and done use the auth width.
+- **Calendar:** Monday-first 7-column grid of 40px-tall day cells. Open days: `border-ink/25`, medium weight, hover `border-ink`; selected `bg-ink text-white`; closed days `text-ink/30`. Month name + 36px square arrow buttons (`border-[#dadada]`). "All times are in IST" in 12px `ink-soft`.
+- **Times:** 37px buttons like the filter tabs (`border-[#dadada]`, selected `bg-ink text-white`), a column beside the calendar from `md`, two per row on phones.
+- **Summary box:** `bg-surface` + `border-line`, 14px `ink-soft` labels over 16px values (as on the legal pages). Rules as the event pages' square-bullet list at 14px `ink-soft`.
+- Primary actions are the auth `SubmitButton` (brand, full width of the 330px column). Session cards that can't be booked show a muted bordered note instead of the brand button.
+
+**Dialogs on short screens** (auth, onboarding, booking): every step should fit without scrolling on a 1080p display (about 950px of browser viewport, 740px at 125% Windows scaling).
+- Below 1000px of viewport height (`[@media(max-height:1000px)]`) the overlay padding drops to `py-3`, the card to `pt-10 pb-6` (`md:pb-7`) and form gaps by one step (onboarding `mt-5 gap-4`, booking `mt-4 gap-6`). Taller screens keep the full spacing.
+- **`StickyActions`** (`components/ui/StickyActions.tsx`) wraps a step's action row. When a step is still taller than the screen (phones, the onboarding review), the row stays pinned to the bottom of the scrolling overlay on white, with a hairline above that shows only while it's pinned.
+- The onboarding review lists short answers two per row from `sm` and long ones (bio, goals) at full width after them, clamped to 3 lines. Step 5 puts GitHub and Portfolio side by side under a full-width LinkedIn.
+
+`/privacy`, `/terms`, `components/legal/LegalPage.tsx`, text in `src/data/legal.ts`; no Figma):
 - **Header:** a `bg-ink` band (the event hero without a photo): 14px uppercase "LEGAL" at `white/75`, the hero headline scale (34 → 48px), an 16/18px subtitle at `white/90`, and "Effective <date>" at 14px. Same top padding as the event hero so it clears the header.
 - **Body:** `bg-white`, `container-page`. From `lg` a 15rem sticky "On this page" list (left hairline, links turn their left border `brand` on hover) beside a `max-w-[48rem]` text column; below `lg` one column, no list.
 - **Facts box:** `bg-surface` + `border-line`, 2 columns from `sm` (long values span both): 14px `ink-soft` label over a 16px `ink` value.
@@ -245,6 +256,7 @@ Other motion rules:
 - **Carousels loop** and autoplay (5–6s), pause on hover/focus/touch, and support swipe and arrow keys. Pattern: clone slides with `useCarouselLoop`, stack them in one grid cell, and position each by its offset from the active slide with `gsap.to(x)`. A slide that wraps from one end to the other is `gsap.set` while off-screen. See `GatheringsCarousel.tsx` (centred) and `SuccessStoriesCarousel.tsx` (left-aligned; on wide screens the previous card peeks in on the left).
 - **Hover states**: images zoom to `scale-105` over 700ms; cards lift `-translate-y-1` and darken their border; arrow icons nudge 4px. All buttons get `cursor: pointer` globally.
 - Durations: entrances 1–1.2s `power3.out`; carousel moves 0.9s `power3.inOut`; hovers 300–700ms.
+- **Dialog steps** (auth, onboarding, booking): each step slides in over 380ms (`cubic-bezier(0.22,1,0.36,1)`), from 1.5rem right when moving forward and from the left when going back (keyframes `modal-step-forward` / `modal-step-back`, via `stepEnterClass` in `AuthStep.tsx`; flows call `stepBack()` from the auth dialog context before returning to an earlier step). The card's height glides to the new step with `AnimatedHeight` (`components/ui/AnimatedHeight.tsx`, a CSS height transition driven by a ResizeObserver; changes under 40px, like an error line or a resized textarea, apply instantly). The booking card's width change between steps glides too.
 - **Reduced motion** is respected everywhere: GSAP work sits inside `gsap.matchMedia("(prefers-reduced-motion: no-preference)")`, Lenis disables itself, and CSS fallbacks (`motion-reduce:`) show final states.
 
 ## 7. Responsive rules

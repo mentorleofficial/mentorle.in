@@ -18,3 +18,9 @@ export const formatEventDay = (iso: string) => dayFormat.format(new Date(iso)); 
 // "7:00 PM – 10:00 PM IST"; a single time when the event has no separate end.
 export const formatEventTimeRange = (startIso: string, endIso: string) =>
   endIso && endIso !== startIso ? `${clock(startIso)} – ${clock(endIso)} IST` : `${clock(startIso)} IST`;
+
+const dayKeyFormat = new Intl.DateTimeFormat("en-CA", { timeZone: TIME_ZONE, year: "numeric", month: "2-digit", day: "2-digit" });
+// "2026-10-26": the IST calendar day of an instant (groups booking slots by day).
+export const istDayKey = (iso: string | Date) => dayKeyFormat.format(typeof iso === "string" ? new Date(iso) : iso);
+// "10:00 AM" (IST, no suffix).
+export const formatClock = clock;
