@@ -14,8 +14,7 @@ type BookButtonProps = {
 };
 
 // "Book a Session" on a session card: opens the booking dialog. ?book=<offering>&at=<time> (set when signup or
-// onboarding sends someone back here) reopens it at that time. Paid offerings and mentors without open times
-// get a disabled note instead.
+// onboarding sends someone back here) reopens it at that time. Mentors without open times get a note instead.
 export function BookButton({ mentor, offering, label, className }: BookButtonProps) {
   const params = useSearchParams();
   const router = useRouter();
@@ -30,12 +29,8 @@ export function BookButton({ mentor, offering, label, className }: BookButtonPro
     if (resume !== null) router.replace(pathname, { scroll: false });
   };
 
-  if (offering.price > 0 || !offering.hasOpenTimes) {
-    return (
-      <p className="inline-flex h-11 items-center border border-[#dadada] px-5 text-sm text-ink-soft">
-        {offering.price > 0 ? bookingCopy.card.paidSoon : bookingCopy.card.unavailable}
-      </p>
-    );
+  if (!offering.hasOpenTimes) {
+    return <p className="inline-flex h-11 items-center border border-[#dadada] px-5 text-sm text-ink-soft">{bookingCopy.card.unavailable}</p>;
   }
 
   return (

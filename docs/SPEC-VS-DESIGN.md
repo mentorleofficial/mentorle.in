@@ -71,6 +71,10 @@ The plan cards now **match the spec**: Free ₹0, Pro Pass ₹2,500/yr (anchored
 | P4 | Free plan button says "Current Plan" | — | Shown to everyone, including signed-out visitors who have no plan. | Open |
 | P5 | Missing Pro Pass details | Referral rewards: ₹200 wallet cash and a 20% boost when a referred peer buys Pro (PP §3); weekly Saturday demo masterclass (PP §4). | Only "Re-boost to 15–20% through referrals" is shown. | Open |
 | P6 | All-Access EMI fallback | If cardless EMI is declined: parent debit-card EMI or a 2-part split, ₹2,999 + ₹3,000 (BP §9 Fix 2). | Only "or 6 EMIs of ₹999/month". | Open |
+| P7 | Plans (2026-10-24 update) | Design: Free / Pro Pass ₹2,500 / All-Access ₹5,999. | **Plans now come from the database and are managed by admins** (platform → Settings → Payments → Plans: add, edit, reorder, hide, delete; price, months of access, session / event discount, free sessions per month or year, card copy). Seeded from the new plan document: **Free Community** (₹0 forever, "Join the Free Community") and **Pro Pass** (₹4,999 / year, one-time payment, 15% off 1:1 sessions, no free sessions, "Most Popular"). The cards keep the design (badge bar, price, star intro line, check list; `**bold**` leads in benefits) and centre as a pair when there are two. | Built |
+| P8 | Plan buttons | Design: "Current Plan" / "Get Pro Pass" links to signup. | Signed out → sign up, then back to `/pricing?plan=…`; unfinished profile → onboarding; a pass you hold shows "Your current plan" + valid until (Renew in its last 30 days); otherwise Cashfree checkout. The free tier shows "You’re in the community" once signed in (fixes P4). | Built |
+| P9 | Terms line under the plans | "Tokens expire 365 days from purchase. Refunds within 7 days, provided no token has been redeemed." | "Passes last 12 months… Refunds within 7 days of purchase, provided no member benefit has been used." **Placeholder** until the Cancellation & Refund Policy is written. | Open |
+| P10 | "What you actually get" section | Still the old Plus perks (free sessions…). | Unchanged; no longer matches Pro Pass. | Open: needs new copy |
 
 **Content and design gaps**
 
@@ -302,3 +306,19 @@ No Figma: built from the site's patterns (the legal pages' dark header band, the
 | NB2 | Live updates | Subscribed to realtime, but `notifications` wasn't in the realtime publication, so nothing arrived live. | Platform migration `20261027120000_notifications_realtime` publishes the table (fixes the platform's bell too). The bell also refreshes every minute and when the tab comes back into view. | Built (needs `db push`) |
 | NB3 | Notification wording | Written by the platform's database triggers. | Shown as written (e.g. "Session Confirmed", "Session Cancelled by Mentor"). | As platform |
 | NB4 | Database fixes found on the way | — | Platform migration `20261027130000_mentee_ratings_tasks_resumes`: ratings only for completed sessions; mentees can only tick items and manage their own files (they could rewrite the mentor's text); mentee file uploads on action items were refused by storage since `20261025120000` (fixed). | Built (needs `db push`) |
+
+## 15. Payments: passes, paid sessions and paid events — built 2026-10-24
+
+Through the platform's Cashfree integration (sandbox until `CASHFREE_ENV=production`). One-time payments only (user decision); the legacy auto-renewing Plus subscriptions keep working for their members on the platform. Platform migration `20261028120000_configurable_plans_and_checkout`.
+
+| # | Item | Platform before | What's built | Status |
+|---|---|---|---|---|
+| PY1 | Buying a pass | Cashfree subscription mandate (Plus monthly / yearly). | One-time Cashfree checkout from the pricing page; the pass lasts the plan's months and ends by itself (renewing in the last 30 days adds the time to the end). | Built |
+| PY2 | Paid 1:1 sessions | Booking dialog → Cashfree; the server trusted the browser's time and length. | The booking dialog shows the price, the member discount and the total, then "Pay ₹X & book". The server checks the slot is open, takes the length from the offering, holds the time 15 minutes, and books it (with the confirmation email) when paid. If the time was taken while paying, nothing is double-booked: the payment is flagged for a refund and admins and the buyer are told. | Built |
+| PY3 | Free sessions from a plan | 2 per month on Plus, booked with the browser's time. | When a plan includes free sessions (none on Pro Pass today) and the offering is "Plus eligible", the dialog offers "Use a free session (n left)" or paying. Booked through the database like any booking. | Built |
+| PY4 | Paid events | Cashfree checkout on the platform. | "Pay ₹X & register" on the event page (member event discount applies; Pro Pass has 0%). Paid registrations can't be cancelled from the page. | Built |
+| PY5 | After paying | Platform return route. | `/pay-return` → `/payments/status`, which confirms the order with Cashfree (works even if the webhook is late) and shows what was bought. | Built |
+| PY6 | Account | Platform Go Plus page. | Account → "Your plan": pass, valid until, discounts, free sessions left, Renew / See plans, and the last payments. | Built |
+| PY7 | Refunds | — | Flagged automatically (slot clash) and listed for admins; refunding is done in Cashfree's dashboard for now. | Open |
+| PY8 | Before taking live payments | — | Publish the Cancellation & Refund Policy (Cashfree requires it), whitelist mentorle.in in Cashfree's dashboard, and switch `CASHFREE_ENV` to production. | Open |
+

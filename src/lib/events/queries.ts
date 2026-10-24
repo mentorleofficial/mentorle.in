@@ -115,7 +115,7 @@ function toDetail(row: EventRow, now: number): EventDetail {
   const deadline = row.registration_deadline ?? row.start_date;
   const price = Number(row.price) || 0;
   const full = row.max_participants != null && (row.participant_count ?? 0) >= row.max_participants;
-  const closedReason = status !== "upcoming" ? undefined : price > 0 ? "paid" : Date.parse(deadline) < now ? "deadline" : full ? "full" : undefined;
+  const closedReason = status !== "upcoming" ? undefined : Date.parse(deadline) < now ? "deadline" : full ? "full" : undefined;
 
   const speakers: EventSpeaker[] = clean(row.speaker_name)
     ? [
@@ -154,7 +154,7 @@ function toDetail(row: EventRow, now: number): EventDetail {
     speakers,
     registration:
       status === "upcoming" && !closedReason
-        ? { label: eventDetailCopy.registration.register, maxParticipants: row.max_participants ?? undefined, externalLink: clean(row.registration_link) ?? undefined }
+        ? { label: eventDetailCopy.registration.register, maxParticipants: row.max_participants ?? undefined, externalLink: clean(row.registration_link) ?? undefined, price }
         : undefined,
     closedReason,
   };

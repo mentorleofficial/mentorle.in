@@ -14,6 +14,8 @@ import { useAuth } from "@/lib/auth/AuthProvider";
 import { SlotTakenError, bookingService } from "@/lib/booking/service";
 import { googleCalendarUrl } from "@/lib/calendar";
 import { formatClock, formatEventDay, istDayKey } from "@/lib/dates";
+import { CheckoutError, startCheckout } from "@/lib/payments/checkout";
+import { discounted, useMyPlan } from "@/lib/payments/membership";
 import { prefetchFor } from "@/lib/routes";
 
 // Booking overlay over a mentor profile, in the auth dialogs' style: pick a day and time (open slots from the
@@ -134,12 +136,44 @@ export function BookingDialog({ mentor, offering, initialStartsAt, onClose }: Bo
     router.push(`${path}?redirect=${encodeURIComponent(here)}`);
   };
 
-  const confirm = async () => {
+  // Paid offerings: the member's discount, and a free session when their plan has one left for it.
+  const plan = useMyPlan();
+  const paid = offering.price > 0;
+  const memberPercent = plan?.active ? plan.sessionDiscount : 0;
+  const payable = discounted(offering.price, memberPercent);
+  const freeLeft = paid && offering.plusEligible && plan?.active ? plan.freeLeft : 0;
+  const [payWith, setPayWith] = useState<"free" | "pay" | null>(null);
+  const useFree = freeLeft > 0 && payWith !== "pay";
+
+  const pay = async () => {
     if (!startsAt) return;
     setSubmitting(true);
     setError("");
     try {
-      const result = await bookingService.book({ offeringId: offering.id, startsAt, notes });
+      await startCheckout({ kind: "session", offeringId: offering.id, startsAt, notes });
+      // Cashfree takes over the page; the status page confirms the booking.
+    } catch (caught) {
+      setSubmitting(false);
+      if (caught instanceof CheckoutError && caught.code === "23P01") {
+        setError(copy.errors.taken);
+        setStartsAt(null);
+        setStep("pick");
+        void load();
+      } else {
+        setError(caught instanceof Error && caught.message ? caught.message : copy.errors.generic);
+      }
+    }
+  };
+
+  const confirm = async () => {
+    if (!startsAt) return;
+    if (paid && !useFree) return pay();
+    setSubmitting(true);
+    setError("");
+    try {
+      const result = paid
+        ? await bookingService.bookFree({ offeringId: offering.id, startsAt, notes })
+        : await bookingService.book({ offeringId: offering.id, startsAt, notes });
       void bookingService.sendEmails(result.sessionId);
       setBooked({ meetingUrl: result.meetingUrl });
       setStep("done");
@@ -170,9 +204,36 @@ export function BookingDialog({ mentor, offering, initialStartsAt, onClose }: Bo
       <div>
         <dt className="text-sm text-ink-soft">Time</dt>
         <dd className="mt-1 text-base text-ink">
-          {formatClock(startsAt)} IST · {offering.durationMinutes} min · {formatPrice(offering.price)}
+          {formatClock(startsAt)} IST · {offering.durationMinutes} min{paid ? "" : ` · ${formatPrice(offering.price)}`}
         </dd>
       </div>
+      {paid && (
+        <div className="border-t border-line pt-4 sm:col-span-2">
+          {useFree ? (
+            <p className="flex items-baseline justify-between gap-4 text-base text-ink">
+              <span>{copy.confirm.freeNote(plan!.planName)}</span>
+              <span className="text-ink-soft line-through">{formatPrice(offering.price)}</span>
+            </p>
+          ) : (
+            <dl className="grid gap-1.5 text-sm">
+              <div className="flex justify-between gap-4 text-ink-soft">
+                <dt>{copy.confirm.price}</dt>
+                <dd className={memberPercent ? "line-through" : ""}>{formatPrice(offering.price)}</dd>
+              </div>
+              {memberPercent > 0 && (
+                <div className="flex justify-between gap-4 text-ink-soft">
+                  <dt>{copy.confirm.memberPrice(plan!.planName, memberPercent)}</dt>
+                  <dd>−{formatPrice(offering.price - payable)}</dd>
+                </div>
+              )}
+              <div className="flex justify-between gap-4 text-base font-medium text-ink">
+                <dt>{copy.confirm.total}</dt>
+                <dd>{formatPrice(payable)}</dd>
+              </div>
+            </dl>
+          )}
+        </div>
+      )}
     </dl>
   );
 
@@ -214,7 +275,10 @@ export function BookingDialog({ mentor, offering, initialStartsAt, onClose }: Bo
                   rel="noopener noreferrer"
                   className="inline-flex h-[2.3125rem] items-center border border-[#dadada] px-4 text-sm text-ink transition-colors hover:border-ink"
                 >
-                  {copy.done.calendar} <span aria-hidden className="ml-1.5">↗</span>
+                  {copy.done.calendar}{" "}
+                  <span aria-hidden className="ml-1.5">
+                    ↗
+                  </span>
                 </a>
               </div>
             </div>
@@ -247,6 +311,28 @@ export function BookingDialog({ mentor, offering, initialStartsAt, onClose }: Bo
                 </li>
               ))}
             </ul>
+            {status === "signed-in" && onboarded && freeLeft > 0 && (
+              <fieldset>
+                <legend className="text-sm font-medium text-ink">{copy.confirm.howToPay}</legend>
+                <div className="mt-2 grid gap-2 sm:grid-cols-2" role="radiogroup">
+                  {(["free", "pay"] as const).map((option) => {
+                    const selected = option === "free" ? useFree : !useFree;
+                    return (
+                      <button
+                        key={option}
+                        type="button"
+                        role="radio"
+                        aria-checked={selected}
+                        onClick={() => setPayWith(option)}
+                        className={`h-[2.3125rem] border px-3 text-sm transition-colors ${selected ? "border-ink bg-ink text-white" : "border-[#dadada] text-ink hover:border-ink"}`}
+                      >
+                        {option === "free" ? copy.confirm.useFree(freeLeft) : copy.confirm.payInstead(formatPrice(payable))}
+                      </button>
+                    );
+                  })}
+                </div>
+              </fieldset>
+            )}
             {status === "signed-in" && onboarded && user?.role === "mentee" && (
               <TextAreaField
                 id={`${titleId}-notes`}
@@ -282,9 +368,17 @@ export function BookingDialog({ mentor, offering, initialStartsAt, onClose }: Bo
                 </SubmitButton>
               </>
             ) : (
-              <SubmitButton type="button" loading={submitting} loadingLabel={copy.confirm.submitting} onClick={() => void confirm()}>
-                {copy.confirm.submit}
-              </SubmitButton>
+              <>
+                <SubmitButton
+                  type="button"
+                  loading={submitting}
+                  loadingLabel={paid && !useFree ? copy.confirm.paying : copy.confirm.submitting}
+                  onClick={() => void confirm()}
+                >
+                  {!paid ? copy.confirm.submit : useFree ? copy.confirm.bookFree : copy.confirm.pay(formatPrice(payable))}
+                </SubmitButton>
+                {paid && !useFree && <p className="text-xs leading-snug text-ink-soft">{copy.confirm.payNote}</p>}
+              </>
             )}
             <button
               type="button"
@@ -309,7 +403,10 @@ export function BookingDialog({ mentor, offering, initialStartsAt, onClose }: Bo
             {copy.pick.title}
           </h2>
           <p className="mx-auto mt-3 max-w-[28rem] text-base leading-snug text-ink">
-            {copy.pick.subtitle(mentor.fullName)} <span className="text-ink-soft">{offering.title} · {offering.durationMinutes} min · {formatPrice(offering.price)}</span>
+            {copy.pick.subtitle(mentor.fullName)}{" "}
+            <span className="text-ink-soft">
+              {offering.title} · {offering.durationMinutes} min · {formatPrice(offering.price)}
+            </span>
           </p>
         </div>
         <div className="mt-6">
@@ -433,7 +530,13 @@ export function BookingDialog({ mentor, offering, initialStartsAt, onClose }: Bo
   })();
 
   return (
-    <SiteDialog titleId={titleId} closeLabel={copy.close} onClose={onClose} stepKey={step} widthClass={step === "pick" ? "max-w-[46rem]" : "max-w-[34.4375rem]"}>
+    <SiteDialog
+      titleId={titleId}
+      closeLabel={copy.close}
+      onClose={onClose}
+      stepKey={step}
+      widthClass={step === "pick" ? "max-w-[46rem]" : "max-w-[34.4375rem]"}
+    >
       <div key={step} className={stepEnterClass(direction)}>
         {content}
       </div>

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import type { ChangeEvent, FormEvent, ReactNode } from "react";
 import { AccountGate, AccountNotice } from "@/components/account/AccountGate";
+import { AccountPlanCard } from "@/components/account/PlanCard";
 import { ChipInput } from "@/components/forms/ChipInput";
 import { FormAlert, PasswordField, Spinner, TextAreaField, TextField, outlineButtonClasses } from "@/components/forms/fields";
 import { PhoneField } from "@/components/forms/PhoneField";
@@ -23,6 +24,7 @@ import type { MenteeProfile } from "@/lib/auth/types";
 
 const fields = onboardingCopy.fields;
 const sections = [
+  { id: "plan", label: copy.nav.plan },
   { id: "profile", label: copy.nav.profile },
   { id: "resume", label: copy.nav.resume },
   { id: "password", label: copy.nav.password },
@@ -70,6 +72,7 @@ function Settings() {
         </ol>
       </nav>
       <div className="flex max-w-[48rem] min-w-0 flex-col gap-6">
+        <AccountPlanCard userId={user.id} />
         {onboarded ? (
           <ProfileForm key={user.id} profile={profile}>
             <ResumeCard userId={user.id} url={profile.resume_url} />

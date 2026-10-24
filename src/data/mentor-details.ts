@@ -14,6 +14,7 @@ export type MentorOffering = {
   durationMinutes: number;
   price: number; // INR, 0 = free
   hasOpenTimes: boolean; // any open slot in the next 90 days (mentor_open_slots)
+  plusEligible: boolean; // a plan's free session can book it (mentorship_offerings.plus_eligible)
 };
 
 // Platform `experiences` item: start_date / end_date are "YYYY-MM"; no end_date = current role.

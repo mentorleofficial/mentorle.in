@@ -39,9 +39,10 @@ export type EventDetail = {
   speakers: EventSpeaker[];
   // Present when mentees can register on Mentorle (the platform's free RSVP into `event_participants`).
   // `label` is the button text; `externalLink` mirrors the platform's `registration_link`, opened after RSVP.
-  registration?: { label: string; maxParticipants?: number; externalLink?: string };
+  // `price` > 0: a paid event, registered through Cashfree checkout.
+  registration?: { label: string; maxParticipants?: number; externalLink?: string; price: number };
   // Why an upcoming event isn't taking registrations.
-  closedReason?: "deadline" | "full" | "paid";
+  closedReason?: "deadline" | "full";
 };
 
 // Every event page shares the design's pre-blurred hero background; event banners are bright photos that
@@ -63,6 +64,10 @@ export const eventDetailCopy = {
     join: "Join the meeting",
     registeredNote: "We’ll email you the details before the event.",
     cancel: "Cancel registration",
+    pay: (amount: string) => `Pay ${amount} & register`,
+    paying: "Opening checkout…",
+    memberPrice: (plan: string, percent: number) => `${plan} price: ${percent}% off.`,
+    paidRegisteredNote: "We’ll email you the details before the event. Paid registrations can’t be cancelled here; contact the Mentorle team if you can’t attend.",
     cancelling: "Cancelling…",
     full: "This event is full.",
     failed: "Couldn’t register. Please try again.",
@@ -72,8 +77,6 @@ export const eventDetailCopy = {
       upcoming: (deadline: string) => `Registration closes ${deadline}.`,
       deadline: (deadline: string) => `Registration closed ${deadline}.`,
       full: "This event is full.",
-      // Placeholder: paid events (events_programs.price > 0) need checkout, which isn't built yet.
-      paid: "Registration for this event opens soon.",
       live: "This event is happening now.",
       completed: "This event has been completed.",
       cancelled: "This event has been cancelled.",

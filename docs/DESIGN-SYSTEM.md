@@ -124,15 +124,15 @@ Pairs on photos are always `ghost` + `light`, 8px apart (`gap-2`), centred.
 - Below `lg` tab-only rows scroll horizontally (`no-scrollbar`, bleeding to the screen edges); rows with dropdowns wrap. The search box takes a full-width row underneath.
 - Filtering announces the result count in a visually hidden `aria-live` region. New results fade and rise in (0.6s, 0.06s stagger). The empty state is a muted line plus a "Clear filters" link.
 
-**Pricing card pattern** (Mentorle Plus):
-- **Grid:** the standard 3 × 433px grid. Below `lg` the cards stack in one centred column (max 34rem).
+**Pricing card pattern** (Mentorle Plus; plans come from the database via `src/lib/plans/queries.ts`, managed by admins on the platform):
+- **Grid:** the standard 3 × 433px grid. Two plans: 2 columns centred at `max-w-[57rem]`. Below `lg` the cards stack in one centred column (max 34rem).
 - **Featured plan:** a 42px `bg-brand` banner ("Most Popular", 15px, 24px left padding) sits on top, and the card gets a `border-brand` border with no top border. Non-featured cards get `lg:pt-[2.625rem]` so all cards start level, and all three stretch to equal height.
 - **Card content** (24px padding):
   - title `text-2xl`, tagline `text-base`;
   - price at 84px at 1440 (`xl:text-[clamp(4.5rem,5.85vw,5.25rem)]`, `lg` 52px, mobile 60px), weight 500, `ink` for the featured plan and `muted` for the others, followed by the period in `text-base`;
   - a note line (always reserves 24px so features align across cards);
-  - features `text-base`, 10px apart, with a check / star (bold row) / cross (muted row) icon;
-  - a full-width button pinned to the bottom (`dark` or `brand`).
+  - the plan's intro line ("Everything in Free, plus:") as a medium star row, then benefits `text-base`, 10px apart, with a check icon; a `**lead**` in a benefit renders medium weight;
+  - a full-width button pinned to the bottom (`brand` for the featured plan, `dark` otherwise): `PlanCta` turns it into sign up / finish profile / checkout / "Your current plan" (muted, with "Valid until …" under it) depending on who's looking.
 - **Terms line:** centred `text-base` 48px below the cards, with the key phrase in `font-semibold`.
 - **Section:** `bg-dots`, 136px top padding (the banner sits 136px below the hero) and 130px bottom.
 
@@ -203,6 +203,12 @@ Form state uses `useZodForm` (`src/lib/forms/`). Errors show after blur or submi
 - **Times:** 37px buttons like the filter tabs (`border-[#dadada]`, selected `bg-ink text-white`), a column beside the calendar from `md`, two per row on phones.
 - **Summary box:** `bg-surface` + `border-line`, 14px `ink-soft` labels over 16px values (as on the legal pages). Rules as the event pages' square-bullet list at 14px `ink-soft`.
 - Primary actions are the auth `SubmitButton` (brand, full width of the 330px column). Session cards that can't be booked show a muted bordered note instead of the brand button.
+
+**Paid booking** (booking dialog confirm step): the summary box gains a hairline-separated price block, Price (struck through when discounted), "<Plan> price (n% off)" with the saving, and a 16px medium "You pay" total. When a free session is available, a "How would you like to book?" pair of 37px choice buttons (`border-[#dadada]`, selected `bg-ink text-white`) sits above the note field. The button reads "Pay ₹X & book" with a 12px `ink-soft` Cashfree note under it.
+
+**Payment status** (`/payments/status`): the account pages' band, then an `AccountNotice` per outcome (booked, registered, welcome to the plan, failed, refund due) with brand + outline actions; while confirming, the spinner line, then a 14px note if it takes over 20s.
+
+**Account → Your plan** (`components/account/PlanCard.tsx`): a settings card with the plan on a `surface` box (18px name, 14px `ink-soft` facts, Renew / See plans button on the right) and a hairline list of payments (item + date left; status and amount right, refunds due in `brand-dark`).
 
 **Dialogs on short screens** (auth, onboarding, booking): every step should fit without scrolling on a 1080p display (about 950px of browser viewport, 740px at 125% Windows scaling).
 - Below 1000px of viewport height (`[@media(max-height:1000px)]`) the overlay padding drops to `py-3`, the card to `pt-10 pb-6` (`md:pb-7`) and form gaps by one step (onboarding `mt-5 gap-4`, booking `mt-4 gap-6`). Taller screens keep the full spacing.

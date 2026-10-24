@@ -6,7 +6,10 @@ import { Spinner } from "@/components/forms/fields";
 import { eventDetailCopy } from "@/data/event-details";
 import type { EventDetail } from "@/data/event-details";
 import { useAuth } from "@/lib/auth/AuthProvider";
+import { formatPrice } from "@/data/mentor-details";
 import { EventFullError, eventsService } from "@/lib/events/service";
+import { CheckoutError, startCheckout } from "@/lib/payments/checkout";
+import { discounted, useMyPlan } from "@/lib/payments/membership";
 
 const copy = eventDetailCopy.registration;
 
@@ -32,7 +35,12 @@ export function JoinLink({ eventId }: { eventId: string }) {
   }, [eventId, status]);
   if (!link) return null;
   return (
-    <a href={link} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-brand underline-offset-4 hover:underline">
+    <a
+      href={link}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-brand underline-offset-4 hover:underline"
+    >
       {copy.join}
       <span aria-hidden>↗</span>
     </a>
@@ -40,9 +48,16 @@ export function JoinLink({ eventId }: { eventId: string }) {
 }
 
 // Registration for an open event, following the platform's mentee rules: you need an account and a finished
-// profile (MenteeOnboardingGuard), then it's a free RSVP into event_participants. Signed-out visitors and
+// profile (MenteeOnboardingGuard), then it's a free RSVP into event_participants, or for a paid event a
+// Cashfree checkout (with the member's event discount) that registers them once paid. Signed-out visitors and
 // unfinished profiles are sent through the signup / onboarding modals with ?redirect= back to this page.
-export function RegisterAction({ event, deadlineNote }: { event: EventDetail & { registration: NonNullable<EventDetail["registration"]> }; deadlineNote: string }) {
+export function RegisterAction({
+  event,
+  deadlineNote,
+}: {
+  event: EventDetail & { registration: NonNullable<EventDetail["registration"]> };
+  deadlineNote: string;
+}) {
   const { status, user, onboarded } = useAuth();
   // The answer is stored with the user and event it belongs to; until it matches, it's still being checked.
   const key = user ? `${event.id}:${user.id}` : null;
@@ -64,12 +79,26 @@ export function RegisterAction({ event, deadlineNote }: { event: EventDetail & {
   const [working, setWorking] = useState<"register" | "cancel" | null>(null);
   const [error, setError] = useState("");
   const here = `/events/${event.slug}`;
-  const label = event.registration.label;
+  const plan = useMyPlan();
+  const price = event.registration.price;
+  const memberPercent = price > 0 && plan?.active ? plan.eventDiscount : 0;
+  const payable = discounted(price, memberPercent);
+  const label = price > 0 ? copy.pay(formatPrice(payable)) : event.registration.label;
 
   const register = async () => {
     if (!user) return;
     setWorking("register");
     setError("");
+    if (price > 0) {
+      try {
+        await startCheckout({ kind: "event", eventId: event.id });
+        // Cashfree takes over the page; the status page confirms the registration.
+      } catch (caught) {
+        setError(caught instanceof CheckoutError ? caught.message : copy.failed);
+        setWorking(null);
+      }
+      return;
+    }
     try {
       await eventsService.registerForEvent(event.id, user.id);
       setRegistered(true);
@@ -104,17 +133,21 @@ export function RegisterAction({ event, deadlineNote }: { event: EventDetail & {
           {copy.registered}
         </p>
         <JoinLink eventId={event.id} />
-        <p className={noteClasses}>
-          {copy.registeredNote}{" "}
-          <button
-            type="button"
-            onClick={cancel}
-            disabled={working !== null}
-            className="text-ink underline underline-offset-4 transition-colors hover:text-brand-dark disabled:text-ink-soft disabled:no-underline"
-          >
-            {working === "cancel" ? copy.cancelling : copy.cancel}
-          </button>
-        </p>
+        {price > 0 ? (
+          <p className={noteClasses}>{copy.paidRegisteredNote}</p>
+        ) : (
+          <p className={noteClasses}>
+            {copy.registeredNote}{" "}
+            <button
+              type="button"
+              onClick={cancel}
+              disabled={working !== null}
+              className="text-ink underline underline-offset-4 transition-colors hover:text-brand-dark disabled:text-ink-soft disabled:no-underline"
+            >
+              {working === "cancel" ? copy.cancelling : copy.cancel}
+            </button>
+          </p>
+        )}
       </>
     );
   }
@@ -149,7 +182,7 @@ export function RegisterAction({ event, deadlineNote }: { event: EventDetail & {
           {working === "register" ? (
             <>
               <Spinner />
-              {copy.working}
+              {price > 0 ? copy.paying : copy.working}
             </>
           ) : (
             label
@@ -160,7 +193,10 @@ export function RegisterAction({ event, deadlineNote }: { event: EventDetail & {
             {error}
           </p>
         ) : (
-          <p className={noteClasses}>{deadlineNote}</p>
+          <p className={noteClasses}>
+            {memberPercent > 0 && `${copy.memberPrice(plan!.planName, memberPercent)} `}
+            {deadlineNote}
+          </p>
         )}
       </>
     );

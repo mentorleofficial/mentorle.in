@@ -40,6 +40,7 @@ type OfferingRow = {
   price: number | string;
   category: string | null;
   mentor_id: string;
+  plus_eligible: boolean | null;
 };
 
 const clean = (value: string | null | undefined) => value?.trim() || null;
@@ -136,6 +137,7 @@ async function getMentorOfferings(mentorId: string): Promise<MentorOffering[]> {
       durationMinutes: row.duration_minutes,
       price: Number(row.price) || 0,
       hasOpenTimes: await hasOpenTimes(row.id),
+      plusEligible: Boolean(row.plus_eligible),
     })),
   );
 }

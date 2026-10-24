@@ -30,6 +30,18 @@ export const bookingCopy = {
     finishProfile: "Finish your profile to book. It takes about two minutes.",
     finishProfileCta: "Finish your profile",
     mentorAccount: "Mentor and admin accounts can’t book sessions.",
+    // Paid offerings
+    price: "Price",
+    memberPrice: (plan: string, percent: number) => `${plan} price (${percent}% off)`,
+    total: "You pay",
+    pay: (amount: string) => `Pay ${amount} & book`,
+    paying: "Opening checkout…",
+    payNote: "You’ll pay securely on Cashfree. We hold this time for 15 minutes while you pay.",
+    howToPay: "How would you like to book?",
+    useFree: (left: number) => `Use a free session (${left} left)`,
+    payInstead: (amount: string) => `Pay ${amount}`,
+    freeNote: (plan: string) => `Included with your ${plan}.`,
+    bookFree: "Book with a free session",
   },
   done: {
     title: "You’re booked",
@@ -50,7 +62,5 @@ export const bookingCopy = {
   // Session cards
   card: {
     unavailable: "Not taking bookings yet",
-    // Placeholder: paid sessions need checkout (after the Mentorle Plus decisions).
-    paidSoon: "Paid booking opens soon",
   },
 };
