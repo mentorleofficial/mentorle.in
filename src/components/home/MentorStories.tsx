@@ -4,13 +4,14 @@ import { mentorQuotes } from "@/data/home";
 
 export function MentorStories() {
   return (
-    <section aria-labelledby="mentor-stories-title" className="bg-dots py-16 md:py-24 lg:py-[8.125rem]">
+    <section aria-labelledby="mentor-stories-title" className="bg-dots py-[3.6rem] md:py-[5.4rem] lg:py-[7.3125rem]">
       <div className="container-page">
         <SectionHeader
           id="mentor-stories-title"
-          eyebrow="Mentor Stories"
-          title="Why they give back"
-          description="Hear directly from our top operators on why they dedicate their time to Mentorle."
+          eyebrow="Mentor Notes"
+          title="Great guidance can change your direction."
+          description="Experienced professionals share what they’ve learned, the challenges they’ve faced, and why they believe the next generation deserves better guidance.
+"
         />
         <div data-animate="stagger" className="mt-12 grid gap-5 md:mt-16 md:grid-cols-3">
           {mentorQuotes.map((item, index) => (

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { PlusBenefits } from "@/components/home/PlusBenefits";
+import { Suspense } from "react";
+import { PlansFallback } from "@/components/pricing/PlansFallback";
 import { PricingPlans } from "@/components/pricing/PricingPlans";
 import { PageHero } from "@/components/ui/PageHero";
 import { pricingPage } from "@/data/pricing";
@@ -11,7 +12,7 @@ export const metadata: Metadata = {
 };
 
 export default function PricingPage() {
-  const { hero, benefits } = pricingPage;
+  const { hero } = pricingPage;
 
   return (
     <>
@@ -24,8 +25,9 @@ export default function PricingPage() {
         subtitleSize="base"
         contentOffset="md:pt-[3.75rem]"
       />
-      <PricingPlans />
-      <PlusBenefits eyebrow={benefits.eyebrow} title={benefits.title} description={benefits.description} action={null} />
+      <Suspense fallback={<PlansFallback />}>
+        <PricingPlans />
+      </Suspense>
     </>
   );
 }

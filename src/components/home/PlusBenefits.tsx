@@ -9,6 +9,7 @@ type PlusBenefitsProps = {
   title?: string;
   description?: string;
   action?: ReactNode;
+  className?: string;
 };
 
 export function PlusBenefits({
@@ -20,9 +21,10 @@ export function PlusBenefits({
       See Plus Pricing
     </ButtonLink>
   ),
+  className = "py-16 md:py-24 lg:pt-[8.125rem] lg:pb-[10.1875rem]",
 }: PlusBenefitsProps) {
   return (
-    <section aria-labelledby="plus-title" className="bg-surface py-16 md:py-24 lg:pt-[8.125rem] lg:pb-[10.1875rem]">
+    <section aria-labelledby="plus-title" className={`bg-surface ${className}`}>
       <div className="container-page">
         <SectionHeader id="plus-title" eyebrow={eyebrow} title={title} description={description} action={action} />
         <div data-animate="stagger" className={`mt-12 grid gap-5 md:mt-16 md:grid-cols-3 ${action ? "" : "lg:mt-[4.75rem]"}`}>

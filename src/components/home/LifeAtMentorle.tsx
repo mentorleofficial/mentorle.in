@@ -19,13 +19,13 @@ export function LifeAtMentorle() {
   const { leadershipSummit, workshop, beyondTheAlgorithm, connections } = lifeAtMentorle;
 
   return (
-    <section aria-labelledby="life-title" className="bg-dots py-16 md:py-24 lg:py-[8.125rem]">
+    <section aria-labelledby="life-title" className="bg-dots py-[3.6rem] md:py-[5.4rem] lg:py-[7.3125rem]">
       <div className="container-page">
         <SectionHeader
           id="life-title"
-          eyebrow="Mentor Stories"
-          title="Life at Mentorle"
-          description="Catch up on our offline summits, university guest lectures, and founder mixers across the region."
+          eyebrow="Life at Mentorle"
+          title="Where Connections Turn Into Possibilities"
+          description="From university sessions and hands-on workshops to founder meetups and community gatherings, discover the people, ideas and experiences shaping the Mentorle journey."
         />
 
         <div className="mt-12 grid gap-5 md:mt-16 md:grid-cols-2 lg:grid-cols-3">

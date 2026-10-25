@@ -6,7 +6,7 @@ import { getFeaturedMentors } from "@/lib/mentors/queries";
 export async function MentorCommunity() {
   const featuredMentors = await getFeaturedMentors();
   return (
-    <section aria-labelledby="community-title" className="bg-surface py-16 md:py-24 lg:py-[8.125rem]">
+    <section aria-labelledby="community-title" className="bg-surface py-[3.6rem] md:py-[5.4rem] lg:py-[7.3125rem]">
       <div className="container-page">
         <SectionHeader
           id="community-title"

@@ -21,20 +21,25 @@ export function PartnerStrip() {
     <section
       aria-label="Partners and domains"
       data-animate="fade-up"
-      className="mt-5 flex flex-col lg:h-[4.5rem] lg:flex-row"
+      className="mt-[1.125rem] flex flex-col lg:h-[4.5rem] lg:flex-row"
     >
       <div className="flex h-[4.5rem] min-w-0 items-center bg-surface lg:w-[53.6%]">
-        <p className="shrink-0 pr-6 pl-[var(--gutter)] text-base font-medium text-ink lg:pr-[4.375rem]">Partnered with</p>
+        <p className="shrink-0 pr-2 pl-[var(--gutter)] text-base font-medium text-ink lg:pr-[2.375rem]">Ecosystem Network</p>
         <Marquee duration="30s">
           {partnerLoop.map((partner, index) => (
-            <Image
+            <span
               key={`${partner.name}-${index}`}
-              src={partner.src}
-              alt={index < partners.length ? partner.name : ""}
-              width={partner.width}
-              height={partner.height}
-              className="mr-9 h-8 w-auto"
-            />
+              className="mr-9 inline-flex h-8 items-center"
+            >
+              <Image
+                src={partner.src}
+                alt={index < partners.length ? partner.name : ""}
+                width={partner.width}
+                height={partner.height}
+                className="h-8 w-auto object-contain grayscale"
+                style={{ width: "auto" }}
+              />
+            </span>
           ))}
         </Marquee>
       </div>
@@ -45,7 +50,7 @@ export function PartnerStrip() {
               key={`${domain.label}-${index}`}
               className="flex items-center gap-2 pl-6 text-lg font-medium whitespace-nowrap text-white"
             >
-              <Image src={domain.src} alt="" width={domain.width} height={domain.height} className="h-[1.1875rem] w-auto" />
+              <Image src={domain.src} alt="" width={domain.width} height={domain.height} className="h-[1.1875rem] w-auto" style={{ width: "auto" }} />
               {domain.label}
             </span>
           ))}

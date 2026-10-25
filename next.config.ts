@@ -18,6 +18,10 @@ const nextConfig: NextConfig = {
   },
   images: {
     remotePatterns: supabaseUrl ? [new URL("/storage/v1/object/public/**", supabaseUrl)] : [],
+    // Mentor avatars are on Supabase (Cloudflare). On some local networks that host resolves to
+    // NAT64 addresses (64:ff9b::…), which Next 16's SSRF guard treats as private and blocks.
+    // remotePatterns already limits fetches to this project's public storage.
+    dangerouslyAllowLocalIP: true,
   },
   turbopack: {
     rules: {

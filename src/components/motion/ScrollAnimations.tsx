@@ -7,7 +7,7 @@ import { usePathname } from "next/navigation";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
-const INK = "#2b2b2b";
+const BRAND = "#e8501b";
 // Play once and never reverse. Deliberately not `once: true`: a `once` trigger kills itself, and if that happens
 // while ScrollTrigger is refreshing (e.g. the page is already scrolled when animations are set up), the trigger
 // list shrinks mid-loop and GSAP throws "Cannot read properties of undefined (reading 'end')".
@@ -133,7 +133,7 @@ export function ScrollAnimations() {
 
           gsap.utils.toArray<HTMLElement>('[data-animate="words"]').forEach((element) => {
             gsap.to(element.querySelectorAll("[data-word]"), {
-              color: INK,
+              color: BRAND,
               ease: "none",
               stagger: 0.1,
               scrollTrigger: { trigger: element, start: "top 85%", end: "bottom 40%", scrub: 0.4 },

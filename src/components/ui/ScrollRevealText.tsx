@@ -5,13 +5,12 @@ type ScrollRevealTextProps = {
 };
 
 export function ScrollRevealText({ lead, text, className = "" }: ScrollRevealTextProps) {
-  const words = text.split(" ");
+  const words = [lead, text].filter(Boolean).join(" ").split(/\s+/).filter(Boolean);
 
   return (
     <p data-animate="words" className={className}>
-      {lead && <span className="text-ink">{lead} </span>}
       {words.map((word, index) => (
-        <span key={index} data-word className="text-subtle motion-reduce:text-ink">
+        <span key={index} data-word className="text-subtle motion-reduce:text-brand">
           {word}
           {index < words.length - 1 ? " " : ""}
         </span>

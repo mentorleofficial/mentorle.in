@@ -13,7 +13,7 @@ export const BECOME_A_MENTOR_PATH = "/become-a-mentor";
 export const primaryNav: NavLink[] = [
   { label: "Mentors", href: "/mentors" },
   { label: "Community", href: "/community" },
-  { label: "About Us", href: "/about" },
+  { label: "Events", href: "/events" },
   { label: "Pricing", href: "/pricing" },
 ];
 

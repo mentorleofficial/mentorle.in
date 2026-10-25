@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { prefetchFor } from "@/lib/routes";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { buttonClasses } from "@/components/ui/ButtonLink";
 import { AccountLinks, AccountMenu, Avatar } from "@/components/layout/AccountMenu";
 import { NotificationBell } from "@/components/layout/NotificationBell";
@@ -12,12 +12,40 @@ import { useAuth } from "@/lib/auth/AuthProvider";
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
+  const [hidden, setHidden] = useState(false);
+  const lastY = useRef(0);
   const close = () => setOpen(false);
   const { status, user, onboarded, signOut } = useAuth();
   const signedIn = status === "signed-in" && user;
 
+  useEffect(() => {
+    lastY.current = window.scrollY;
+
+    const onScroll = () => {
+      const y = window.scrollY;
+      const delta = y - lastY.current;
+
+      if (open || y < 48) {
+        setHidden(false);
+      } else if (delta > 6) {
+        setHidden(true);
+      } else if (delta < -6) {
+        setHidden(false);
+      }
+
+      lastY.current = y;
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [open]);
+
   return (
-    <header className="absolute inset-x-0 top-0 z-50 pt-4 md:pt-8 xl:pt-[3.125rem]">
+    <header
+      className={`fixed inset-x-0 top-0 z-50 pt-2 transition-transform duration-300 ease-out md:pt-4 xl:pt-6 motion-reduce:transition-none ${
+        hidden ? "-translate-y-full" : "translate-y-0"
+      }`}
+    >
       <div className="container-page">
         {/* Animate the bar itself: fading an ancestor would disable its backdrop blur until the fade completes. */}
         <div data-hero="0" className="relative flex h-16 items-center justify-between border border-white/5 bg-black/20 px-4 backdrop-blur-[6px] md:h-[5.4375rem] md:px-[1.875rem]">
@@ -46,7 +74,7 @@ export function SiteHeader() {
             className="lg:absolute lg:left-1/2 lg:-translate-x-1/2"
             onClick={close}
           >
-            <Image src="/homepage/logo.svg" alt="Mentorle" width={187} height={48} loading="eager" className="h-9 w-auto md:h-12" />
+            <Image src="/homepage/logo.svg" alt="Mentorle" width={187} height={48} loading="eager" className="h-9 w-auto md:h-12" style={{ width: "auto" }} />
           </Link>
 
           <nav aria-label="Primary" className="hidden lg:block">

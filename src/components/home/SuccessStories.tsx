@@ -4,7 +4,7 @@ import { successStories } from "@/data/home";
 
 export function SuccessStories() {
   return (
-    <section aria-labelledby="success-title" className="overflow-hidden bg-dots py-16 md:py-24 lg:py-[8.125rem]">
+    <section aria-labelledby="success-title" className="overflow-hidden bg-dots pt-[1.8rem] pb-[3.6rem] md:pt-[2.7rem] md:pb-[5.4rem] lg:pt-[3.5rem] lg:pb-[7.3125rem]">
       <div className="container-page">
         <SectionHeader
           id="success-title"

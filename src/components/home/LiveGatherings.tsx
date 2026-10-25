@@ -6,13 +6,13 @@ import { getGatherings } from "@/lib/events/queries";
 export async function LiveGatherings() {
   const gatherings = await getGatherings();
   return (
-    <section aria-labelledby="gatherings-title" className="bg-dots py-16 md:py-24 lg:pt-[8.125rem] lg:pb-[7.3125rem]">
+    <section aria-labelledby="gatherings-title" className="bg-dots py-[3.6rem] md:py-[5.4rem] lg:pt-[7.3125rem] lg:pb-[6.58125rem]">
       <div className="container-page">
         <SectionHeader
           id="gatherings-title"
           eyebrow="Live Gatherings"
-          title="Upcoming Events & Summits"
-          description="Connect online and offline through leadership dinners, tech sprints, and university bootcamps designed to inspire learning and meaningful connections."
+          title="Events That Brings People Together"
+          description="Explore Mentorle's workshops, universities events and builder meetups."
         />
       </div>
       {gatherings.length > 0 && (

@@ -26,7 +26,9 @@ type Row = {
 
 export async function getPlans(): Promise<PricingPlan[]> {
   "use cache";
-  cacheLife("minutes");
+  // Hours (not "minutes"): Cache Components treats caches that expire under 5 minutes as runtime
+  // data, which blocks prerender on /pricing unless every caller is inside Suspense.
+  cacheLife("hours");
   cacheTag("plans");
   const { data, error } = await publicSupabase().rpc("list_active_plans");
   if (error) throw new Error(`list_active_plans failed: ${error.message}`);

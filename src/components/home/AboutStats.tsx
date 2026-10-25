@@ -5,7 +5,7 @@ import { about } from "@/data/home";
 export function AboutStats() {
   return (
     <section aria-labelledby="about-title" className="bg-dots">
-      <div className="container-page grid gap-8 py-16 md:py-24 lg:grid-cols-[37.5%_1fr] lg:gap-0 lg:py-[8.125rem]">
+      <div className="container-page grid gap-8 py-[3.6rem] md:py-[5.4rem] lg:grid-cols-[37.5%_1fr] lg:gap-0 lg:py-[7.3125rem]">
         <div data-animate="stagger" className="flex flex-col justify-between gap-6 lg:gap-0">
           <p className="text-xl tracking-[-0.02em] text-ink md:text-2xl">{about.eyebrow}</p>
           <h2 id="about-title" className="max-w-[23.75rem] text-[1.75rem] leading-[1.3] font-medium text-ink md:text-[2rem]">

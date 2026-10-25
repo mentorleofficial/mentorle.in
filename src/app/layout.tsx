@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Manrope } from "next/font/google";
+import Script from "next/script";
 import { Suspense } from "react";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
@@ -25,16 +26,12 @@ export const metadata: Metadata = {
   },
 };
 
-// Hides animated elements before hydration so GSAP can reveal them without a flash; skipped for reduced motion.
-const motionBootstrap = `if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){document.documentElement.classList.add('js-motion')}`;
-
 export default function RootLayout({ children, auth }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${manrope.variable} h-full antialiased`} suppressHydrationWarning>
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: motionBootstrap }} />
-      </head>
       <body className="flex min-h-full flex-col font-sans">
+        {/* Adds .js-motion before paint so GSAP can reveal without a flash (skipped for reduced motion). */}
+        <Script src="/motion-bootstrap.js" strategy="beforeInteractive" />
         <AuthProvider>
           <SiteHeader />
           <main className="flex-1">{children}</main>

@@ -18,7 +18,7 @@ export function Hero() {
         >
           {hero.title}
         </h1>
-        <p data-hero="2" className="mx-auto mt-3 max-w-[27.5rem] text-[0.9375rem] leading-[1.375rem] text-white/85">
+        <p data-hero="2" className="mx-auto mt-3 max-w-[27.5rem] text-[0.9375rem] leading-[1.375rem] text-white/85 md:max-w-[40rem]">
           {hero.subtitle}
         </p>
         <div data-hero="3" className="mt-8 flex flex-wrap items-center justify-center gap-2 md:mt-[2.375rem]">

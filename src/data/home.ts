@@ -18,43 +18,49 @@ export type HeroSlide = ImageAsset & {
 export const hero = {
   // The line break is part of the design ("The Right Connections / Real opportunities.").
   title: "The Right Connections\nReal opportunities.",
-  subtitle: "Meet mentors, find opportunities, build projects, and connect with people who can help you move forward.",
+  subtitle: "Learn from experienced professionals, connect with ambitious people, build meaningful projects, and discover opportunities to grow your skills and career.",
   primaryCta: { label: "Find a Mentor", href: "/mentors" },
-  secondaryCta: { label: "Explore Mentorle Plus", href: "/pricing" },
+  secondaryCta: { label: "Join Mentorle", href: "/pricing" },
   autoplayMs: 2100,
-  // Rotates as the hero background; the small card previews the next slide. Add more slides here.
+  // Rotates as the hero background; the small card previews the next slide.
+  // Full-bleed slides use /homepage/hero-thumbs/. Root /homepage/ copies are only for the card
+  // preview (separate URLs so Next's LCP check stays clean).
   slides: [
     {
-      src: "/homepage/hero-section-2.webp",
-      thumb: "/homepage/hero-thumbs/hero-section-2.webp",
-      width: 1672,
-      height: 941,
+      src: "/homepage/hero-thumbs/hero-section-2.webp",
+      thumb: "/homepage/hero-section-2.webp",
+      width: 660,
+      height: 371,
       alt: "Students filling a university auditorium for a Mentorle session",
       position: "object-center",
     },
     {
-      src: "/homepage/hero-background.webp",
-      thumb: "/homepage/hero-thumbs/hero-background.webp",
-      width: 1280,
-      height: 720,
+      src: "/homepage/hero-thumbs/hero-background.webp",
+      thumb: "/homepage/hero-background.webp",
+      width: 1200,
+      height: 1600,
       alt: "A mentor and a mentee reviewing a résumé together at a café table",
-      position: "object-[62%_30%] md:object-top",
+      position: "object-[50%_28%]",
     },
     {
-      src: "/homepage/hero-section-image.webp",
-      thumb: "/homepage/hero-thumbs/hero-section-image.webp",
-      width: 2880,
-      height: 1882,
+      src: "/homepage/hero-thumbs/hero-section-image.webp",
+      thumb: "/homepage/hero-section-image.webp",
+      width: 1600,
+      height: 1281,
       alt: "A mentor walking a group of mentees through a plan on a whiteboard",
-      position: "object-[65%_40%] md:object-top",
+      position: "object-center md:object-[50%_35%]",
     },
   ] satisfies HeroSlide[],
 };
 
 export const partners: (ImageAsset & { name: string })[] = [
-  { name: "upGrad", src: "/homepage/partners/upgrad.svg", width: 111, height: 32 },
+  { name: "Logo Black", src: "/homepage/partners/Logo_Black.svg", width: 128, height: 32 },
+  { name: "CT", src: "/homepage/partners/ct.svg", width: 32, height: 32 },
+  { name: "Success Brew", src: "/homepage/partners/success-brew.svg", width: 183, height: 32 },
+  { name: "GNDU", src: "/homepage/partners/GNDU.svg", width: 30, height: 32 },
+  { name: "Welzin", src: "/homepage/partners/welzin.svg", width: 101, height: 32 },
+  { name: "CGC", src: "/homepage/partners/cgc.svg", width: 77, height: 32 },
   { name: "Huptle", src: "/homepage/partners/huptle.svg", width: 109, height: 32 },
-  { name: "EduBridge", src: "/homepage/partners/edubridge.svg", width: 83, height: 38 },
 ];
 
 export const domains: (ImageAsset & { label: string })[] = [
@@ -67,13 +73,13 @@ export const domains: (ImageAsset & { label: string })[] = [
 export const about = {
   eyebrow: "Who we’re",
   highlight: "Punjab’s #1",
-  title: "Mentorship & Events Network",
+  title: "Platform for Network & Opportunities",
   lead: "Degrees teach you the theory.",
   body: "But the industry demands the practical. The game has unwritten rules, and we’re handing you the playbook.",
   stats: [
-    { target: 25, decimals: 0, suffix: "K+", label: "Ambitious Mentees" },
-    { target: 1200, decimals: 0, suffix: "+", label: "Vetted Experts" },
-    { target: 4.9, decimals: 1, suffix: "/5", label: "Quality Rating" },
+    { target: 350, decimals: 0, suffix: "+", label: "Ambitious Mentees" },
+    { target: 50, decimals: 0, suffix: "+", label: "Vetted Experts" },
+    { target: 2, decimals: 0, suffix: "", label: "Institutionals Partners" },
   ],
 };
 
@@ -101,21 +107,21 @@ export type Quote = {
 export const mentorQuotes: Quote[] = [
   {
     quote:
-      "I remember struggling for years trying to figure out product management, Mentoring on Mentorle allows me to hand down the exact playbook I wish I had 10 years ago. It’s incredibly fulfilling.",
-    name: "Sarah Jenkins",
-    title: "VP of Product @ Google",
+      "Looking back, I realise how valuable the right guidance would have been at the beginning of my career. I want to help others navigate those decisions with more clarity.",
+    name: "Sourabh Goyal",
+    title: "Founder & CEO @ Successbrew",
   },
   {
     quote:
-      "The talent coming out of universities today is raw and brilliant, but they often lack the tactical networking skills to land the interview. I’m here to bridge that exact gap.",
-    name: "Sarah Jenkins",
-    title: "VP of Product @ Google",
+      "I’ve learned that career growth isn't just about what you know. It’s also about the questions you ask, the people you learn from, and the work you put into practice.",
+    name: "Neeru Sood",
+    title: "Business Consultant @ Prep4Success",
   },
   {
     quote:
-      "Building a startup is a lonely journey. Being able to review pitches and provide unfiltered, honest feedback to early-stage founders is how we elevate the entire ecosystem.",
-    name: "Sarah Jenkins",
-    title: "VP of Product @ Google",
+      "Sometimes, one honest conversation can help someone see a problem differently. I enjoy sharing what I’ve learned and helping people take their next step with confidence.",
+    name: "Sourabh Mhaisekar",
+    title: "Senior Software Engineer",
   },
 ];
 
@@ -127,16 +133,16 @@ export const mentorBanner = {
 
 export const careerComparison = {
   hardWay: [
-    "Applying to hundreds of jobs and hearing nothing back.",
-    "Relying on generic, outdated advice from YouTube or blogs.",
-    "Pitching your startup without knowing what investors actually want.",
-    "Feeling isolated and stuck when you hit a major career roadblock.",
+    "Unsure which career step to take next.",
+    "Getting stuck on resumes, interviews, or projects.",
+    "Following scattered advice without knowing what applies to you.",
+    "Trying to solve every challenge through trial and error.",
   ],
   mentorleWay: [
-    "Get your resume reviewed by your dream company’s hiring manager.",
-    "Unlocking exclusive referrals that skip the resume screening pile entirely.",
-    "Pitch your story to founders before meeting investors.",
-    "Having an industry insider in your corner, exactly when you need them.",
+    "Get guidance from people with relevant experience.",
+    "Improve your resume, projects, and interview preparation.",
+    "Explore career paths and gain practical industry insights.",
+    "Build connections and discover relevant opportunities.",
   ],
 };
 
@@ -183,12 +189,12 @@ export const lifeAtMentorle = {
     title: "Leadership Summit ’26",
     description:
       "When our top mentors addressed students, they highlighted the power of building a resilient career. We championed hands-on learning, transitioning from rote memorization to real-world adaptability in the AI age.",
-    image: { src: "/homepage/mentor-stories/leadership-summit-26.webp", width: 866, height: 672 },
-    alt: "Students in the audience at the Mentorle Leadership Summit",
+    image: { src: "/homepage/mentor-stories/leadership-summit.webp", width: 1280, height: 960 },
+    alt: "Mentorle session with students filling a university classroom",
   },
   workshop: {
-    image: { src: "/homepage/mentor-stories/beyond-the-algorithm.webp", width: 866, height: 720 },
-    alt: "Students collaborating around a table during a Mentorle workshop",
+    image: { src: "/homepage/mentor-stories/workshop.webp", width: 1512, height: 1008 },
+    alt: "Students and mentors collaborating around a table during a Mentorle workshop",
   },
   beyondTheAlgorithm: {
     title: "Beyond the Algorithm",
@@ -199,8 +205,8 @@ export const lifeAtMentorle = {
     title: "Connections That Matter",
     description:
       "Great opportunities often begin with the right conversation. Connect with ambitious individuals, startup founders, and industry leaders who share ideas, exchange experiences, and create meaningful opportunities for long-term growth.",
-    image: { src: "/homepage/mentor-stories/connections-that-matter.webp", width: 866, height: 672 },
-    alt: "Professionals in conversation around a café table",
+    image: { src: "/homepage/mentor-stories/connections.webp", width: 1280, height: 853 },
+    alt: "Mentors and partners together at a Mentorle campus event",
   },
 };
 
@@ -254,20 +260,48 @@ export const successStories: SuccessStory[] = [
 
 // Heading for the pricing plans on the homepage (between Career Growth and How it works).
 export const homePlans = {
-  eyebrow: "Choose your access",
+  eyebrow: "Choose Your Membership",
   // Line break as in the design.
-  title: "Start free. Choose more\nsupport when you need it.",
-  description: "Join for free, get expert learning with Pro Pass, or choose All-Access if you want four one-to-one mock sessions included.",
+  title: "Start free. Get more support when you're ready..",
+  description: "Join Mentorle to discover opportunities, connect with builders, and learn from experts. Upgrade for mentorship and career support.",
+};
+
+export const homeFaq = {
+  eyebrow: "FAQ",
+  title: "Good to know.",
+  description: "Common questions about joining Mentorle, who it’s for, and what to expect.",
+  items: [
+    {
+      question: "Who can join Mentorle?",
+      answer:
+        "Students, graduates, working professionals, builders, founders and mentors can explore Mentorle, depending on the available programmes and services.",
+    },
+    {
+      question: "Do I need to be from a particular college or city?",
+      answer:
+        "Mentorle's goal is to make useful guidance and connections more accessible. Check the eligibility requirements for any specific programme before registering.",
+    },
+    {
+      question: "Is Mentorle free?",
+      answer:
+        "Check the current membership and programme details on our Pricing page for the latest information about free access, paid memberships and individual services.",
+    },
+    {
+      question: "Does joining Mentorle guarantee a job or internship?",
+      answer:
+        "No. Joining a community or using mentorship services does not guarantee a job, internship, funding or a particular career outcome. Mentorle can help you explore guidance and opportunities that may support your progress.",
+    },
+  ],
 };
 
 const goalIcon = (name: string, width: number, height: number): ImageAsset => ({ src: `/homepage/start-with-your-goal/${name}.svg`, width, height });
 
-// "Start with your goal" (after Live Gatherings). The cards aren't links in the design; the button opens the
-// mentor directory.
+// "Start with your goal" (after Live Gatherings). Domain cards aren't links; the header button and the CTA
+// tile (request-tile pattern) send people into signup / the mentor directory.
 export const helpWith = {
-  eyebrow: "Start with your goal",
+  eyebrow: "Find Your Next Step",
   title: "What would you like help with?",
-  description: "Choose the area you care about. We’ll help you find people who can share useful advice and real experience.",
+  description: "Whether you're building a startup, learning new skills, or exploring careers, connect with experts who can guide you forward.",
   action: { label: "Explore all domains", href: "/mentors" },
   cards: [
     { icon: goalIcon("IT", 76, 41), title: "IT & Software", description: "Build coding skills, explore emerging technologies, and learn from experienced developers." },
@@ -275,6 +309,10 @@ export const helpWith = {
     { icon: goalIcon("academic-counselling", 69, 52), title: "Academic Counseling", description: "Make informed study choices, explore opportunities, and plan your academic confidently." },
     { icon: goalIcon("product-management", 69, 69), title: "Product Management", description: "Master product strategy, understand user needs, and learn to build successful products." },
     { icon: goalIcon("design", 69, 69), title: "Design & UI/UX", description: "Improve your design skills through user research, wireframing, prototyping, and visual design." },
-    { icon: goalIcon("career-transitions", 69, 69), title: "Career Transitions", description: "Navigate career changes, develop new skills, and prepare for your next professional opportunity." },
   ] satisfies IconCardContent[],
+  // Replaces the old Career Transitions card (request-tile pattern from Speaker Hub).
+  ctaTile: {
+    title: "Not sure where you fit?",
+    cta: { label: "Join for free and Explore", href: "/signup" },
+  },
 };
