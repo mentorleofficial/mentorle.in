@@ -44,6 +44,9 @@ export const livePreviewCopy = {
   ],
 } as const;
 
+// Header link to /live, shown only to people in the current draw while event mode is on.
+export const luckyDrawNav = { label: "Lucky draw", href: "/live", live: "Live now" };
+
 export const liveCopy = {
   metaTitle: "Live",
   eyebrow: "Lucky draw",

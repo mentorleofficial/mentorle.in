@@ -7,8 +7,10 @@ import { useEffect, useRef, useState } from "react";
 import { buttonClasses } from "@/components/ui/ButtonLink";
 import { AccountLinks, AccountMenu, Avatar } from "@/components/layout/AccountMenu";
 import { NotificationBell } from "@/components/layout/NotificationBell";
+import { luckyDrawNav } from "@/data/event";
 import { accountNav, primaryNav } from "@/data/site";
 import { useAuth } from "@/lib/auth/AuthProvider";
+import { useLuckyDraw } from "@/lib/event/useLuckyDraw";
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
@@ -17,6 +19,8 @@ export function SiteHeader() {
   const close = () => setOpen(false);
   const { status, user, onboarded, signOut } = useAuth();
   const signedIn = status === "signed-in" && user;
+  // Only for people in the running event's lucky draw.
+  const luckyDraw = useLuckyDraw();
 
   useEffect(() => {
     lastY.current = window.scrollY;
@@ -79,6 +83,18 @@ export function SiteHeader() {
 
           <nav aria-label="Primary" className="hidden lg:block">
             <ul className="flex items-center gap-6">
+              {luckyDraw && (
+                <li>
+                  <Link
+                    href={luckyDrawNav.href}
+                    prefetch={prefetchFor(luckyDrawNav.href)}
+                    className="relative flex items-center gap-2 text-[0.9375rem] text-white after:absolute after:inset-x-0 after:-bottom-1 after:h-px after:origin-left after:scale-x-0 after:bg-white after:transition-transform after:duration-300 hover:after:scale-x-100"
+                  >
+                    <span className="size-2 animate-pulse bg-brand motion-reduce:animate-none" aria-hidden />
+                    {luckyDrawNav.label}
+                  </Link>
+                </li>
+              )}
               {primaryNav.map((item) => (
                 <li key={item.href}>
                   <Link
@@ -121,6 +137,20 @@ export function SiteHeader() {
             <div className="px-4 pt-2 pb-5 md:px-[1.875rem]">
               <nav aria-label="Mobile">
                 <ul className="flex flex-col">
+                  {luckyDraw && (
+                    <li>
+                      <Link
+                        href={luckyDrawNav.href}
+                        prefetch={prefetchFor(luckyDrawNav.href)}
+                        onClick={close}
+                        className="flex items-center gap-2.5 border-b border-white/10 py-3 text-base text-white"
+                      >
+                        <span className="size-2 animate-pulse bg-brand motion-reduce:animate-none" aria-hidden />
+                        {luckyDrawNav.label}
+                        <span className="ml-auto text-xs tracking-[0.08em] text-brand uppercase">{luckyDrawNav.live}</span>
+                      </Link>
+                    </li>
+                  )}
                   {primaryNav.map((item) => (
                     <li key={item.href}>
                       <Link
