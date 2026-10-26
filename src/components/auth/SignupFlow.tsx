@@ -201,7 +201,7 @@ function QuickSignupForm({ onEventOver }: { onEventOver: () => void }) {
       else if (code === "event_off") {
         setFormError(quick.errors.eventOff);
         setTimeout(onEventOver, 2500);
-      } else setFormError(code === "rate_limited" ? quick.errors.rateLimited : authErrors.generic);
+      } else setFormError(code === "rate_limited" ? quick.errors.rateLimited : code === "busy" ? quick.errors.busy : authErrors.generic);
       setSubmitting(false);
     }
   };

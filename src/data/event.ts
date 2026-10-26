@@ -13,6 +13,7 @@ export const quickSignupCopy = {
     phoneTaken: "This phone number is already registered for the event.",
     eventOff: "Quick signup has just ended. Please sign up the usual way.",
     rateLimited: "Too many signups from this network. Please try again in a few minutes.",
+    busy: "Lots of people are signing up right now. Please try again in a moment.",
   },
 };
 

@@ -5,12 +5,13 @@ import { browserSupabase } from "@/lib/supabase/browser";
 // Event mode, set up by admins on the platform (Admin → Event mode):
 //   status        rpc("event_mode_status")       is quick signup on right now (public)
 //   quickSignup   functions/event-quick-signup   creates a confirmed mentee account; refused unless an event is on
-//   liveFeed      rpc("event_live_feed")         the event and the draw countdown (public; no names, counts or winner)
+//   liveFeed      rpc("event_live_feed")         the event, the draw's timing and (signed in) whether the viewer is in the
+//                                                draw (public; no names, counts or winner)
 //   myDrawResult  rpc("my_event_draw_result")    whether the viewer is in the draw; won / lost / not entered only once
 //                                                the countdown has ended
 
 export type QuickSignupInput = { fullName: string; email: string; phone: string; password: string; terms: boolean };
-export type QuickSignupCode = "email_taken" | "phone_taken" | "event_off" | "rate_limited" | "weak_password" | "invalid_phone" | "invalid_email" | "invalid_name" | "terms" | "unknown";
+export type QuickSignupCode = "email_taken" | "phone_taken" | "event_off" | "busy" | "rate_limited" | "weak_password" | "invalid_phone" | "invalid_email" | "invalid_name" | "terms" | "unknown";
 
 export class QuickSignupError extends Error {
   constructor(public code: QuickSignupCode) {
@@ -18,9 +19,12 @@ export class QuickSignupError extends Error {
   }
 }
 
+// `draw.reveal_in_ms`: until the result may be shown (lead-in + countdown); `countdown_ms`: the countdown's length.
+// `me`: only for a signed-in viewer.
 export type LiveFeed = {
   event: { id: string; name: string; active: boolean } | null;
-  draw: { id: string; number: number; reveal_in_ms: number } | null;
+  draw: { id: string; number: number; reveal_in_ms: number; countdown_ms?: number } | null;
+  me?: { entered: boolean } | null;
 };
 // `entered`: the viewer is in the draw (signed in, joined during the event, not disqualified).
 export type DrawResult = { status: "none" | "pending" | "won" | "lost" | "not_entered"; entered?: boolean; draw_id?: string; reveal_in_ms?: number };
@@ -52,7 +56,7 @@ export const eventService = {
     const { data, error } = await browserSupabase().rpc("event_live_feed");
     if (error) throw error;
     const feed = data as Partial<LiveFeed> | null;
-    return { event: feed?.event ?? null, draw: feed?.draw ?? null };
+    return { event: feed?.event ?? null, draw: feed?.draw ?? null, me: feed?.me ?? null };
   },
 
   async myDrawResult(): Promise<DrawResult> {

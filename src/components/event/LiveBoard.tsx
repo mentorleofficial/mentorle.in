@@ -9,24 +9,35 @@ import { useAuth } from "@/lib/auth/AuthProvider";
 import { eventService } from "@/lib/event/service";
 import type { DrawResult, LiveFeed } from "@/lib/event/service";
 
-const POLL_MS = 4000;
+// One request per check. Every phone hears about a spin during the server's lead-in (6s before the 12-second
+// countdown starts), so ~5s between checks keeps every countdown in sync at a quarter of the old load.
+const POLL_MS = 5000;
+const POLL_JITTER_MS = 600; // spreads thousands of phones out instead of hitting at the same instant
+const RESULT_SPREAD_MS = 1500; // at the reveal, results are asked for over 1.5s, not all at once
 const RESULT_RETRY_MS = 800;
 
 export type Outcome = "won" | "lost" | "notEntered" | "signedOut";
 
-// The public live page (/live): one dark stage with "the winner will be revealed soon" while the event is on (checked
-// every few seconds). When an admin spins the wheel on the presenter screen, every phone shows the same countdown (to
-// the server's reveal time) and then the viewer's own result. No names or counts here; the server only says who won
-// once the countdown is over.
+type Armed = { drawId: string; revealAt: number; countdownMs: number };
+
+// The public live page (/live): one dark stage with "the winner will be revealed soon" while the event is on, checked
+// every ~5 seconds (paused while the phone's screen is off). When an admin spins the wheel, the server sets the reveal
+// 18 seconds ahead; each phone works out that moment on its own clock (allowing for the request's travel time), shows
+// the same 12-second countdown and then the viewer's own result. No names or counts here; the server only says who
+// won once the countdown is over.
 export function LiveBoard() {
   const { status, user } = useAuth();
   const [feed, setFeed] = useState<LiveFeed | null>(null);
   const [failed, setFailed] = useState(false);
-  const [entered, setEntered] = useState(false);
-  const [countdown, setCountdown] = useState<{ drawId: string; endsAt: number; total: number } | null>(null);
+  const [armed, setArmed] = useState<Armed | null>(null);
+  const [counting, setCounting] = useState(false);
   const [overlay, setOverlay] = useState<{ drawId: string; outcome: Outcome | null } | null>(null);
   const [latest, setLatest] = useState<{ drawId: string; outcome: Outcome } | null>(null);
   const seenDraw = useRef<string | null>(null);
+  const armedRef = useRef<Armed | null>(null);
+  useEffect(() => {
+    armedRef.current = armed;
+  }, [armed]);
 
   const outcomeFor = useCallback(
     async (drawId: string): Promise<Outcome> => {
@@ -43,75 +54,90 @@ export function LiveBoard() {
     [status],
   );
 
-  // Polling: the event and the draw countdown, and whether the signed-in viewer is in the draw.
+  // Polling. Skipped while a countdown is armed (nothing can change before the reveal) or the page is hidden.
   useEffect(() => {
     let live = true;
     let timer: ReturnType<typeof setTimeout> | undefined;
-    const signedIn = status === "signed-in";
+    const schedule = () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => void tick(), POLL_MS + (Math.random() * 2 - 1) * POLL_JITTER_MS);
+    };
     const tick = async () => {
+      if (!live) return;
+      if (document.hidden || armedRef.current) return schedule();
+      const sent = Date.now();
       try {
-        const [next, mine] = await Promise.all([eventService.liveFeed(), signedIn ? eventService.myDrawResult().catch(() => null) : Promise.resolve(null)]);
+        const next = await eventService.liveFeed();
         if (!live) return;
+        // The server measured "reveal in" around the middle of the round trip.
+        const serverNow = (sent + Date.now()) / 2;
         setFeed(next);
         setFailed(false);
-        setEntered(Boolean(mine?.entered));
         const draw = next.draw;
         if (draw && draw.id !== seenDraw.current) {
           seenDraw.current = draw.id;
-          if (draw.reveal_in_ms > 0) {
-            const started = Date.now();
-            setCountdown({ drawId: draw.id, endsAt: started + draw.reveal_in_ms, total: draw.reveal_in_ms });
-          }
+          if (draw.reveal_in_ms > 0) setArmed({ drawId: draw.id, revealAt: serverNow + draw.reveal_in_ms, countdownMs: draw.countdown_ms || 12_000 });
         }
       } catch {
         if (live) setFailed(true);
       }
-      if (live) timer = setTimeout(() => void tick(), POLL_MS);
+      schedule();
+    };
+    const onVisible = () => {
+      if (!document.hidden) void tick();
     };
     void tick();
+    document.addEventListener("visibilitychange", onVisible);
     return () => {
       live = false;
       clearTimeout(timer);
+      document.removeEventListener("visibilitychange", onVisible);
     };
   }, [status]);
+
+  // An armed draw: the countdown appears exactly countdownMs before the reveal (or straight away if the phone heard
+  // late), then at the reveal the viewer's result is fetched, spread over a moment so phones don't all ask at once.
+  useEffect(() => {
+    if (!armed) return;
+    const now = Date.now();
+    const showIn = Math.max(0, armed.revealAt - armed.countdownMs - now);
+    const show = setTimeout(() => setCounting(true), showIn);
+    const reveal = setTimeout(() => {
+      setCounting(false);
+      setArmed(null);
+      setOverlay({ drawId: armed.drawId, outcome: null });
+      setTimeout(() => {
+        void outcomeFor(armed.drawId).then((outcome) => {
+          setOverlay((current) => (current?.drawId === armed.drawId ? { drawId: armed.drawId, outcome } : current));
+          setLatest({ drawId: armed.drawId, outcome });
+        });
+      }, Math.random() * RESULT_SPREAD_MS);
+    }, Math.max(0, armed.revealAt - now));
+    return () => {
+      clearTimeout(show);
+      clearTimeout(reveal);
+    };
+  }, [armed, outcomeFor]);
 
   // A draw that was already over when the page opened: the viewer's result replaces the waiting message.
   const drawId = feed?.draw?.id;
   const drawOver = feed?.draw ? feed.draw.reveal_in_ms === 0 : false;
   useEffect(() => {
-    if (!drawId || !drawOver || status === "loading" || countdown?.drawId === drawId || overlay?.drawId === drawId || latest?.drawId === drawId) return;
+    if (!drawId || !drawOver || status === "loading" || armed?.drawId === drawId || overlay?.drawId === drawId || latest?.drawId === drawId) return;
     let live = true;
     void outcomeFor(drawId).then((outcome) => live && setLatest({ drawId, outcome }));
     return () => {
       live = false;
     };
-  }, [drawId, drawOver, status, countdown, overlay, latest, outcomeFor]);
-
-  // Countdown ticking, then the full-screen result.
-  useEffect(() => {
-    if (!countdown) return;
-    const timer = setInterval(() => {
-      if (Date.now() >= countdown.endsAt) {
-        clearInterval(timer);
-        const id = countdown.drawId;
-        setCountdown(null);
-        setOverlay({ drawId: id, outcome: null });
-        void outcomeFor(id).then((outcome) => {
-          setOverlay((current) => (current?.drawId === id ? { drawId: id, outcome } : current));
-          setLatest({ drawId: id, outcome });
-        });
-      }
-    }, 100);
-    return () => clearInterval(timer);
-  }, [countdown, outcomeFor]);
+  }, [drawId, drawOver, status, armed, overlay, latest, outcomeFor]);
 
   const firstName = (user?.full_name ?? "").trim().split(/\s+/)[0] ?? "";
 
   return (
     <>
-      <LiveStage feed={feed} failed={failed} status={status} entered={entered} firstName={firstName} latest={latest?.outcome ?? null} />
+      <LiveStage feed={feed} failed={failed} status={status} entered={Boolean(feed?.me?.entered)} firstName={firstName} latest={latest?.outcome ?? null} />
 
-      {countdown && <Countdown key={countdown.drawId} endsAt={countdown.endsAt} total={countdown.total} />}
+      {armed && counting && <Countdown key={armed.drawId} endsAt={armed.revealAt} total={armed.countdownMs} />}
       {overlay && <ResultOverlay outcome={overlay.outcome} onClose={() => setOverlay(null)} />}
     </>
   );
