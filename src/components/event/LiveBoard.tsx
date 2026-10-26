@@ -9,25 +9,31 @@ import { useAuth } from "@/lib/auth/AuthProvider";
 import { eventService } from "@/lib/event/service";
 import type { DrawResult, LiveFeed } from "@/lib/event/service";
 
-// One request per check. Every phone hears about a spin during the server's lead-in (6s before the 12-second
-// countdown starts), so ~5s between checks keeps every countdown in sync at a quarter of the old load.
-const POLL_MS = 5000;
-const POLL_JITTER_MS = 600; // spreads thousands of phones out instead of hitting at the same instant
-const RESULT_SPREAD_MS = 1500; // at the reveal, results are asked for over 1.5s, not all at once
+// Normally one check every ~5s, straight to Supabase. While the presenter screen is open, one check a second through
+// /api/live (cached by Vercel for 1s, so the whole room costs Supabase about one request a second): a spin reaches
+// every phone within ~2s, inside the server's 2.5s lead-in before the 12-second countdown.
+const SLOW_MS = 5000;
+const SLOW_JITTER_MS = 600; // spreads thousands of phones out instead of hitting at the same instant
+const FAST_MS = 1000;
+const OUTCOME_SPREAD_MS = 1500; // phones ask for their own outcome over 1.5s after hearing of a spin, not all at once
 const RESULT_RETRY_MS = 800;
 
 export type Outcome = "won" | "lost" | "notEntered" | "signedOut";
 
 type Armed = { drawId: string; revealAt: number; countdownMs: number };
 
-// The public live page (/live): one dark stage with "the winner will be revealed soon" while the event is on, checked
-// every ~5 seconds (paused while the phone's screen is off). When an admin spins the wheel, the server sets the reveal
-// 18 seconds ahead; each phone works out that moment on its own clock (allowing for the request's travel time), shows
-// the same 12-second countdown and then the viewer's own result. No names or counts here; the server only says who
-// won once the countdown is over.
+const toOutcome = (value: DrawResult["outcome"] | DrawResult["status"] | undefined): Outcome | null =>
+  value === "won" ? "won" : value === "lost" ? "lost" : value === "not_entered" ? "notEntered" : null;
+
+// The public live page (/live): one dark stage with "the winner will be revealed soon" while the event is on (paused
+// while the phone's screen is off). When an admin spins the wheel, the server sets the reveal 14.5 seconds ahead; each
+// phone works out that moment on its own clock (allowing for the request's travel time), fetches its own outcome
+// during the countdown, shows the same 12-second countdown and reveals the outcome exactly when the projector does.
+// No names or counts here, and nobody learns anyone else's result.
 export function LiveBoard() {
   const { status, user } = useAuth();
   const [feed, setFeed] = useState<LiveFeed | null>(null);
+  const [entered, setEntered] = useState(false);
   const [failed, setFailed] = useState(false);
   const [armed, setArmed] = useState<Armed | null>(null);
   const [counting, setCounting] = useState(false);
@@ -35,6 +41,7 @@ export function LiveBoard() {
   const [latest, setLatest] = useState<{ drawId: string; outcome: Outcome } | null>(null);
   const seenDraw = useRef<string | null>(null);
   const armedRef = useRef<Armed | null>(null);
+  const earlyOutcome = useRef<{ drawId: string; outcome: Outcome } | null>(null);
   useEffect(() => {
     armedRef.current = armed;
   }, [armed]);
@@ -44,9 +51,9 @@ export function LiveBoard() {
       if (status !== "signed-in") return "signedOut";
       for (let attempt = 0; attempt < 8; attempt++) {
         const result: DrawResult = await eventService.myDrawResult().catch(() => ({ status: "pending" }) as DrawResult);
-        if (result.status === "won") return "won";
-        if (result.status === "lost") return "lost";
-        if (result.status === "not_entered" || (result.status !== "pending" && result.draw_id !== drawId)) return "notEntered";
+        if (result.draw_id && result.draw_id !== drawId && result.status !== "pending") return "notEntered";
+        const outcome = toOutcome(result.status) ?? toOutcome(result.outcome);
+        if (outcome) return outcome;
         await new Promise((resolve) => setTimeout(resolve, RESULT_RETRY_MS));
       }
       return "notEntered";
@@ -58,28 +65,48 @@ export function LiveBoard() {
   useEffect(() => {
     let live = true;
     let timer: ReturnType<typeof setTimeout> | undefined;
+    let fast = false;
+    const signedIn = status === "signed-in";
     const schedule = () => {
       clearTimeout(timer);
-      timer = setTimeout(() => void tick(), POLL_MS + (Math.random() * 2 - 1) * POLL_JITTER_MS);
+      const wait = fast ? FAST_MS : SLOW_MS + (Math.random() * 2 - 1) * SLOW_JITTER_MS;
+      timer = setTimeout(() => void tick(), wait);
     };
     const tick = async () => {
       if (!live) return;
       if (document.hidden || armedRef.current) return schedule();
       const sent = Date.now();
       try {
-        const next = await eventService.liveFeed();
+        // Fast checks don't carry the viewer's part; "in the draw" is refreshed by the slow checks.
+        const next = fast ? await eventService.fastFeed() : await eventService.liveFeed();
         if (!live) return;
         // The server measured "reveal in" around the middle of the round trip.
         const serverNow = (sent + Date.now()) / 2;
         setFeed(next);
+        if (next.me) setEntered(next.me.entered);
         setFailed(false);
+        fast = Boolean(next.event?.active && next.event.presenting);
         const draw = next.draw;
         if (draw && draw.id !== seenDraw.current) {
           seenDraw.current = draw.id;
-          if (draw.reveal_in_ms > 0) setArmed({ drawId: draw.id, revealAt: serverNow + draw.reveal_in_ms, countdownMs: draw.countdown_ms || 12_000 });
+          if (draw.reveal_in_ms > 0) {
+            setArmed({ drawId: draw.id, revealAt: serverNow + draw.reveal_in_ms, countdownMs: draw.countdown_ms || 12_000 });
+            // The viewer's own outcome now, so it can be shown at the reveal without asking then.
+            if (signedIn)
+              setTimeout(() => {
+                void eventService
+                  .myDrawResult()
+                  .then((result) => {
+                    const outcome = result.draw_id === draw.id ? toOutcome(result.outcome) ?? toOutcome(result.status) : null;
+                    if (outcome) earlyOutcome.current = { drawId: draw.id, outcome };
+                  })
+                  .catch(() => undefined);
+              }, Math.random() * OUTCOME_SPREAD_MS);
+          }
         }
       } catch {
         if (live) setFailed(true);
+        if (fast) fast = false; // fall back to Supabase directly
       }
       schedule();
     };
@@ -96,7 +123,7 @@ export function LiveBoard() {
   }, [status]);
 
   // An armed draw: the countdown appears exactly countdownMs before the reveal (or straight away if the phone heard
-  // late), then at the reveal the viewer's result is fetched, spread over a moment so phones don't all ask at once.
+  // late), and at the reveal the outcome fetched during the countdown is shown at once (asked for only if it's missing).
   useEffect(() => {
     if (!armed) return;
     const now = Date.now();
@@ -105,19 +132,23 @@ export function LiveBoard() {
     const reveal = setTimeout(() => {
       setCounting(false);
       setArmed(null);
+      const known = status !== "signed-in" ? "signedOut" : earlyOutcome.current?.drawId === armed.drawId ? earlyOutcome.current.outcome : null;
+      if (known) {
+        setOverlay({ drawId: armed.drawId, outcome: known });
+        setLatest({ drawId: armed.drawId, outcome: known });
+        return;
+      }
       setOverlay({ drawId: armed.drawId, outcome: null });
-      setTimeout(() => {
-        void outcomeFor(armed.drawId).then((outcome) => {
-          setOverlay((current) => (current?.drawId === armed.drawId ? { drawId: armed.drawId, outcome } : current));
-          setLatest({ drawId: armed.drawId, outcome });
-        });
-      }, Math.random() * RESULT_SPREAD_MS);
+      void outcomeFor(armed.drawId).then((outcome) => {
+        setOverlay((current) => (current?.drawId === armed.drawId ? { drawId: armed.drawId, outcome } : current));
+        setLatest({ drawId: armed.drawId, outcome });
+      });
     }, Math.max(0, armed.revealAt - now));
     return () => {
       clearTimeout(show);
       clearTimeout(reveal);
     };
-  }, [armed, outcomeFor]);
+  }, [armed, outcomeFor, status]);
 
   // A draw that was already over when the page opened: the viewer's result replaces the waiting message.
   const drawId = feed?.draw?.id;
@@ -135,7 +166,7 @@ export function LiveBoard() {
 
   return (
     <>
-      <LiveStage feed={feed} failed={failed} status={status} entered={Boolean(feed?.me?.entered)} firstName={firstName} latest={latest?.outcome ?? null} />
+      <LiveStage feed={feed} failed={failed} status={status} entered={entered} firstName={firstName} latest={latest?.outcome ?? null} />
 
       {armed && counting && <Countdown key={armed.drawId} endsAt={armed.revealAt} total={armed.countdownMs} />}
       {overlay && <ResultOverlay outcome={overlay.outcome} onClose={() => setOverlay(null)} />}
