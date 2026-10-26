@@ -175,7 +175,7 @@ function QuickSignupForm({ onEventOver }: { onEventOver: () => void }) {
   const { go } = useAuthModal();
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState("");
-  const form = useZodForm(quickSignupSchema, { fullName: "", email: "", phone: "", password: "", terms: false }, "quick-signup");
+  const form = useZodForm(quickSignupSchema, { fullName: "", email: "", phone: "", password: "", confirmPassword: "", terms: false }, "quick-signup");
   const quick = quickSignupCopy;
 
   const onSubmit = async (event: React.FormEvent) => {
@@ -185,7 +185,7 @@ function QuickSignupForm({ onEventOver }: { onEventOver: () => void }) {
     if (!values) return;
     setSubmitting(true);
     try {
-      await eventService.quickSignup({ ...values, email: values.email.trim(), fullName: values.fullName.trim() });
+      await eventService.quickSignup({ fullName: values.fullName.trim(), email: values.email.trim(), phone: values.phone, password: values.password, terms: values.terms });
       await authService.signInWithPassword({ email: values.email, password: values.password });
       markProfilePrompt();
       go(safeRedirect() ?? "/");
@@ -246,6 +246,16 @@ function QuickSignupForm({ onEventOver }: { onEventOver: () => void }) {
           hint={copy.passwordHint}
           value={form.values.password}
           onChange={(event) => form.setValue("password", event.target.value)}
+        />
+        <PasswordField
+          {...form.field("confirmPassword")}
+          label={fields.confirmPassword}
+          labelHidden
+          autoComplete="new-password"
+          showLabel={fields.showPassword}
+          hideLabel={fields.hidePassword}
+          value={form.values.confirmPassword}
+          onChange={(event) => form.setValue("confirmPassword", event.target.value)}
         />
         <Checkbox
           {...form.field("terms")}
