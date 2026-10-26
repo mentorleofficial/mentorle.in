@@ -11,7 +11,7 @@ export async function LiveGatherings() {
         <SectionHeader
           id="gatherings-title"
           eyebrow="Live Gatherings"
-          title="Events That Brings People Together"
+          title="Events That Bring People Together"
           description="Explore Mentorle's workshops, universities events and builder meetups."
         />
       </div>

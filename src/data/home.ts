@@ -23,14 +23,14 @@ export const hero = {
   secondaryCta: { label: "Join Mentorle", href: "/pricing" },
   autoplayMs: 2100,
   // Rotates as the hero background; the small card previews the next slide.
-  // Full-bleed slides use /homepage/hero-thumbs/. Root /homepage/ copies are only for the card
-  // preview (separate URLs so Next's LCP check stays clean).
+  // Full-bleed slides use the full-size files in /homepage/hero-thumbs/; the root /homepage/ copies are
+  // 660px-wide previews for the card (separate URLs so Next's LCP check stays clean).
   slides: [
     {
       src: "/homepage/hero-thumbs/hero-section-2.webp",
       thumb: "/homepage/hero-section-2.webp",
-      width: 660,
-      height: 371,
+      width: 1672,
+      height: 941,
       alt: "Students filling a university auditorium for a Mentorle session",
       position: "object-center",
     },
@@ -79,7 +79,7 @@ export const about = {
   stats: [
     { target: 350, decimals: 0, suffix: "+", label: "Ambitious Mentees" },
     { target: 50, decimals: 0, suffix: "+", label: "Vetted Experts" },
-    { target: 2, decimals: 0, suffix: "", label: "Institutionals Partners" },
+    { target: 2, decimals: 0, suffix: "", label: "Institutional Partners" },
   ],
 };
 
