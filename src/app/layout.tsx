@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Manrope } from "next/font/google";
 import Script from "next/script";
 import { Suspense } from "react";
+import { ProfilePrompt } from "@/components/event/ProfilePrompt";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { ScrollAnimations } from "@/components/motion/ScrollAnimations";
@@ -37,6 +38,10 @@ export default function RootLayout({ children, auth }: LayoutProps<"/">) {
           <main className="flex-1">{children}</main>
           <SiteFooter />
           {auth}
+          {/* After an event-mode quick signup only; uses usePathname(), hence Suspense. */}
+          <Suspense fallback={null}>
+            <ProfilePrompt />
+          </Suspense>
         </AuthProvider>
         {/* usePathname() is URL data on dynamic routes (/events/[slug]); Cache Components needs it inside Suspense.
             It renders nothing, so the fallback is empty. */}

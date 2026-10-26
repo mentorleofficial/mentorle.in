@@ -59,6 +59,9 @@ export const signupSchema = z.object({
   terms: z.boolean().refine(Boolean, authErrors.terms),
 });
 
+// Event mode's quick signup: the same fields and rules without the date of birth (asked in the profile later).
+export const quickSignupSchema = signupSchema.omit({ dateOfBirth: true });
+
 export const loginSchema = z.object({
   email,
   password: z.string().min(1, authErrors.passwordRequired),

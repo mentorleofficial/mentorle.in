@@ -322,3 +322,17 @@ Through the platform's Cashfree integration (sandbox until `CASHFREE_ENV=product
 | PY7 | Refunds | — | Flagged automatically (slot clash) and listed for admins; refunding is done in Cashfree's dashboard for now. | Open |
 | PY8 | Before taking live payments | — | Publish the Cancellation & Refund Policy (Cashfree requires it), whitelist mentorle.in in Cashfree's dashboard, and switch `CASHFREE_ENV` to production. | Open |
 
+
+## 16. Event mode: quick signup, live page and lucky draw — built 2026-10-26
+
+For live events (client brief, no Figma). An admin turns event mode on in the platform (Admin → Event mode); while it's on, signup needs no email code and every new mentee is entered into the lucky draw. Platform migration `20261030120000_event_mode`, edge function `event-quick-signup`. Pages use the account pages' dark band, bordered cards and the auth dialog.
+
+| # | Item | Brief | What's built | Status |
+|---|---|---|---|---|
+| EV1 | Quick signup | OTP-free signup with name, phone, email, password, only during the event. | While event mode is on, the signup dialog shows "Join Mentorle" with those fields plus the Terms/Privacy consent (kept for the DPDP Act). No date of birth, so the 18+ check moves to the profile. The server refuses quick signup once the event is off, and signup goes back to the code. | Built |
+| EV2 | After signup | Straight to the dashboard; onboarding prompt that can be skipped. | Lands on the homepage (user decision: mentorle.in has no dashboard) with a one-time "Complete your profile / Later" dialog. Booking a session still asks for the profile. | Built |
+| EV3 | Who's in the draw | People who registered during the event; each counted once. | Every new mentee confirmed while the event is on, by quick or normal signup; one entry per account and per phone number. The first spin closes the list (later signups are listed but not in the draw). Admins can disqualify entries. | Built |
+| EV4 | Live page | Names and random avatars of people signing up. | Changed by the user: attendees don't see names or counts. `/live` shows the event name and "The winner will be revealed soon" (checked every 4 seconds), then the countdown and their own result. Names, counts and contact details stay in the admin panel; the public feed doesn't return them at all. | Built |
+| EV5 | The draw | Wheel spin when the admin clicks a button; random, fair winner. | The wheel is on the admin page (projected; full-screen button). The server picks the winner at random before anything animates and records it. Phones on `/live` show a 12-second countdown that ends as the wheel stops, then "In a Crowd of 1000s we found you" for the winner and "Better luck next time!" for everyone else in the draw (client's lines). People not in the draw see "The winner has been picked". "Draw again" excludes earlier winners. | Built |
+| EV6 | Stats afterwards | Signups, names, etc. | Admin → Event mode keeps every event: signups, quick signups, profiles completed, signups per hour, the full list (name, email, phone, time, profile) with search and CSV export, and every draw's winner. | Built |
+| EV7 | Risks to know | — | Without the email code, someone could sign up with an email that isn't theirs during the event. Mitigations: one entry per phone, a per-network rate limit (generous, since a venue shares one Wi-Fi), disqualify, and the details admins see. Nothing about entrants is public. | Accepted |
