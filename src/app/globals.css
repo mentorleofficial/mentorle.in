@@ -154,6 +154,34 @@ button:not(:disabled),
   }
 }
 
+/* Event mode's live page (/live): the waiting screen's ripple, the winner's confetti and the countdown number. */
+@keyframes live-ripple {
+  from {
+    opacity: 0.55;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.9);
+  }
+}
+
+@keyframes live-confetti {
+  from {
+    transform: translate3d(0, -10vh, 0) rotate(0deg);
+  }
+  to {
+    transform: translate3d(var(--drift, 0), 110vh, 0) rotate(var(--spin, 540deg));
+  }
+}
+
+@keyframes live-tick {
+  from {
+    opacity: 0;
+    transform: scale(1.35);
+  }
+}
+
 .rate-slider {
   appearance: none;
   height: 0.5rem;

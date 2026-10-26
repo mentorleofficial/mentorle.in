@@ -24,16 +24,37 @@ export const profilePromptCopy = {
   close: "Close",
 };
 
+// /live?preview=… (local or test sites only): made-up data for checking every screen.
+export const livePreviewCopy = {
+  label: "Preview",
+  exit: "Exit preview",
+  eventName: "Mentorle Meetup (preview)",
+  firstName: "Riya",
+  states: [
+    ["waiting", "Waiting (signed out)"],
+    ["entered", "Waiting (in the draw)"],
+    ["countdown", "Countdown"],
+    ["won", "Winner"],
+    ["lost", "Better luck next time"],
+    ["not-entered", "Not in the draw"],
+    ["signed-out-result", "Result, signed out"],
+    ["ended", "Event ended"],
+    ["no-event", "No event on"],
+  ],
+} as const;
+
 export const liveCopy = {
   metaTitle: "Live",
   eyebrow: "Lucky draw",
+  live: "Live",
   fallbackTitle: "Mentorle Live",
-  subtitle: "Keep this page open. When the draw starts, a countdown appears here and then your result.",
-  waiting: { title: "The winner will be revealed soon", body: "Stay on this page: everyone who joined at the event is in the draw." },
+  waiting: { title: "The winner will be revealed soon", body: "Keep this page open. When the draw starts you’ll see a countdown here, then your result." },
+  entered: (firstName: string) => (firstName ? `You’re in the draw, ${firstName}` : "You’re in the draw"),
+  notEntered: "Only people who joined Mentorle at the event are in this draw.",
   loading: "One moment…",
-  noEvent: { title: "Nothing live right now", body: "This page comes alive during Mentorle events." },
+  noEvent: { title: "Nothing live right now", body: "This page comes alive during Mentorle events.", cta: "Find a mentor" },
   ended: "Signups for this event have closed.",
-  join: { prompt: "Not in the draw yet? Join Mentorle now to take part.", cta: "Join Mentorle" },
+  join: { prompt: "Join Mentorle now to take part.", cta: "Join Mentorle", login: "Log in" },
   error: "Can’t reach Mentorle right now. Retrying…",
   countdown: { label: "The lucky draw is on", sub: "Is it you?" },
   result: {
@@ -42,7 +63,7 @@ export const liveCopy = {
     notEntered: { title: "The winner has been picked", body: "Only people who joined during the event were in the draw." },
     signedOut: { title: "The winner has been picked", body: "Log in to see if it’s you.", cta: "Log in" },
     checking: "Checking…",
-    close: "Back to the live list",
+    close: "Close",
     explore: "Find a mentor",
   },
 };

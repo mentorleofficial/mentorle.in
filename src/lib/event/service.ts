@@ -6,7 +6,8 @@ import { browserSupabase } from "@/lib/supabase/browser";
 //   status        rpc("event_mode_status")       is quick signup on right now (public)
 //   quickSignup   functions/event-quick-signup   creates a confirmed mentee account; refused unless an event is on
 //   liveFeed      rpc("event_live_feed")         the event and the draw countdown (public; no names, counts or winner)
-//   myDrawResult  rpc("my_event_draw_result")    won / lost / not entered, only once the countdown has ended
+//   myDrawResult  rpc("my_event_draw_result")    whether the viewer is in the draw; won / lost / not entered only once
+//                                                the countdown has ended
 
 export type QuickSignupInput = { fullName: string; email: string; phone: string; password: string; terms: boolean };
 export type QuickSignupCode = "email_taken" | "phone_taken" | "event_off" | "rate_limited" | "weak_password" | "invalid_phone" | "invalid_email" | "invalid_name" | "terms" | "unknown";
@@ -21,7 +22,8 @@ export type LiveFeed = {
   event: { id: string; name: string; active: boolean } | null;
   draw: { id: string; number: number; reveal_in_ms: number } | null;
 };
-export type DrawResult = { status: "none" | "pending" | "won" | "lost" | "not_entered"; draw_id?: string; reveal_in_ms?: number };
+// `entered`: the viewer is in the draw (signed in, joined during the event, not disqualified).
+export type DrawResult = { status: "none" | "pending" | "won" | "lost" | "not_entered"; entered?: boolean; draw_id?: string; reveal_in_ms?: number };
 
 export const eventService = {
   async status(): Promise<{ active: boolean; name?: string }> {
