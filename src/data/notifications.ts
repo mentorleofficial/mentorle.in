@@ -15,8 +15,12 @@ export const notificationsCopy = {
   unreadDot: "Unread",
 };
 
-// Session notifications open "My sessions"; anything else just marks itself read.
+// Session notifications open "My sessions", plan ones the plan card (or pricing, once it has ended); anything else
+// just marks itself read.
 export const notificationLinks: Record<string, string> = {
+  membership_activated: "/account#plan",
+  membership_ending: "/account#plan",
+  membership_ended: "/pricing",
   session_booked: "/sessions",
   session_cancelled_by_mentor: "/sessions",
   session_cancelled_by_mentee: "/sessions",

@@ -40,6 +40,13 @@ function KindIcon({ type }: { type: string }) {
         <path d="M12 13.5V15l1 1" />
       </svg>
     );
+  if (type.startsWith("membership_"))
+    return (
+      <svg {...common}>
+        <path d="M4 7.5h16v3a2 2 0 0 0 0 3v3H4v-3a2 2 0 0 0 0-3z" />
+        <path d="M14 7.5v9" strokeDasharray="1.5 1.5" />
+      </svg>
+    );
   if (type === "action_item_assigned")
     return (
       <svg {...common}>
