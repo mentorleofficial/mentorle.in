@@ -1,8 +1,9 @@
 import { company } from "@/data/site";
 
-// Privacy Policy (/privacy) and Terms of Service (/terms). The text is copied word for word from the legacy
-// site's /privacy-policy (DPDP notice) and /terms-of-service on the `main` branch; legal wording isn't edited
-// here. Differences from the rest of the site (grievance email and SLA) are logged in SPEC-VS-DESIGN (L1).
+// Privacy Policy (/privacy) and Terms of Service (/terms), word for word from the client's documents
+// (Mentorle_Privacy_Policy_DPDP.pdf, effective September 2, 2026, and Mentorle_Terms_of_Service.pdf, effective
+// September 1, 2026; received 2026-10-27). Legal wording isn't edited here. Differences from the rest of the site
+// (grievance email and SLA) are logged in SPEC-VS-DESIGN (L1).
 
 export type LegalTable = { columns: string[]; rows: string[][] };
 
@@ -25,7 +26,7 @@ export type LegalDocument = {
   closing?: string;
 };
 
-const REGISTERED_OFFICE = "MOH. Sukhiabad, Near Baba Balak Nath Mandir, Hoshiarpur, Punjab — 146001, India";
+const REGISTERED_OFFICE = "MOH. Sukhiabad, Near Baba Balak Nath Mandir, Hoshiarpur, Punjab - 146001, India";
 const PLATFORM_BRAND = "Mentorle (mentorle.in / platform.mentorle.in)";
 
 export const legalCopy = {
@@ -43,7 +44,7 @@ export const privacyPolicy: LegalDocument = {
     { label: "Data Fiduciary", value: company.legalName },
     { label: "CIN", value: company.cin },
     { label: "Platform Brand", value: PLATFORM_BRAND },
-    { label: "Data Grievance Officer", value: company.grievance.officer },
+    { label: "Grievance Officer", value: company.grievance.officer },
     { label: "Grievance Contact", value: "support@mentorle.in | +91 9888409232" },
     { label: "Registered Office", value: REGISTERED_OFFICE },
   ],
@@ -105,7 +106,7 @@ export const privacyPolicy: LegalDocument = {
       paragraphs: [
         "Designated Data Protection / Grievance Officer: Rachit Jain, AltioraEdtech Learning (OPC) Pvt. Ltd.",
         "Official Email: support@mentorle.in | rachitjain@mentorle.in",
-        "Operating Address: MOH. Sukhiabad, Near Baba Balak Nath Mandir, Hoshiarpur, Punjab — 146001",
+        "Operating Address: MOH. Sukhiabad, Near Baba Balak Nath Mandir, Hoshiarpur, Punjab - 146001",
         "Statutory Redressal SLA: All formal data privacy inquiries and erasure requests are addressed within 7 working days.",
       ],
     },
@@ -168,9 +169,8 @@ export const termsOfService: LegalDocument = {
     {
       id: "privacy",
       title: "Privacy",
-      // The legacy page also linked a separate "DPDP Compliance Notice"; that notice is the Privacy Policy here.
-      paragraphs: ["We are committed to protecting your privacy. Please review our {link} for details on how personal data is collected, processed, and protected."],
-      link: { label: "Privacy Policy (DPDP Compliance Notice)", href: "/privacy" },
+      paragraphs: ["We are committed to protecting your privacy. Please review our Privacy Policy (DPDP Compliance Notice) at {link} for details on how personal data is collected, processed, and protected."],
+      link: { label: "mentorle.in/privacy", href: "/privacy" },
     },
     {
       id: "governing-law",
