@@ -3,7 +3,7 @@
 export const BUILT_ROUTES = new Set(["/", "/mentors", "/pricing", "/speaker-hub", "/become-a-mentor", "/events", "/enterprise", "/community", "/login", "/signup", "/forgot-password", "/reset-password", "/onboarding", "/privacy", "/terms", "/sessions", "/account", "/payments/status", "/live"]);
 
 // Dynamic routes whose pages exist for every slug (/events/<slug>, /mentors/<slug>).
-const BUILT_PREFIXES = ["/events/", "/mentors/"];
+const BUILT_PREFIXES = ["/events/", "/mentors/", "/jobs/"];
 
 export const isBuiltRoute = (href: string) => {
   if (!href.startsWith("/")) return true;

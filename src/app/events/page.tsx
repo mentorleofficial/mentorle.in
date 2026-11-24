@@ -6,8 +6,9 @@ import { MentorBanner } from "@/components/home/MentorBanner";
 import { IconCardSection } from "@/components/ui/IconCardSection";
 import { PageHero } from "@/components/ui/PageHero";
 import { SectionHeader } from "@/components/ui/SectionHeader";
-import { eventsPage, opportunities, opportunityCta, opportunityFilters } from "@/data/events";
+import { eventsPage, opportunityCta, opportunityFilters } from "@/data/events";
 import { getGatherings } from "@/lib/events/queries";
+import { getOpportunities } from "@/lib/opportunities";
 
 export const metadata: Metadata = {
   title: "Events & Summits",
@@ -15,10 +16,10 @@ export const metadata: Metadata = {
     "Mentorle's own leadership dinners, campus summits and pitch circles, plus a curated feed of hackathons, meetups, jobs and freelance gigs.",
 };
 
-// Hosted events come from the platform (cached, so still part of the prerendered page).
+// Hosted events come from the platform and jobs from Huptle (both cached, so still part of the prerendered page).
 export default async function EventsPage() {
   const { hero, hosted, opportunities: feed, howItWorks, banner } = eventsPage;
-  const gatherings = await getGatherings();
+  const [gatherings, opportunities] = await Promise.all([getGatherings(), getOpportunities()]);
 
   return (
     <>
@@ -53,6 +54,7 @@ export default async function EventsPage() {
             ctaLabels={opportunityCta}
             searchPlaceholder={feed.searchPlaceholder}
             emptyState={feed.emptyState}
+            noneState={feed.none}
           />
         </div>
       </section>

@@ -14,19 +14,23 @@ type OpportunityFeedProps = {
   ctaLabels: Record<OpportunityType, string>;
   searchPlaceholder: string;
   emptyState: string;
+  // Shown instead of the feed when there's nothing at all.
+  noneState: string;
 };
 
 const matches = (item: Opportunity, query: string) => {
   if (!query) return true;
-  const haystack = [item.title, item.source, item.organiser, item.location, item.reward, ...item.categories].join(" ").toLowerCase();
+  const haystack = [item.title, item.source, item.organiser ?? "", item.location ?? "", item.reward ?? "", ...item.categories].join(" ").toLowerCase();
   return query
     .toLowerCase()
     .split(/\s+/)
     .every((term) => haystack.includes(term));
 };
 
-export function OpportunityFeed({ opportunities, filters, ctaLabels, searchPlaceholder, emptyState }: OpportunityFeedProps) {
+export function OpportunityFeed({ opportunities, filters: allFilters, ctaLabels, searchPlaceholder, emptyState, noneState }: OpportunityFeedProps) {
   const [type, setType] = useState<OpportunityFilter["value"]>("all");
+  // Only the types that have something in the feed get a filter.
+  const filters = useMemo(() => allFilters.filter((filter) => filter.value === "all" || opportunities.some((item) => item.type === filter.value)), [allFilters, opportunities]);
   const [query, setQuery] = useState("");
   const listRef = useRef<HTMLUListElement>(null);
   const hasFiltered = useRef(false);
@@ -49,6 +53,8 @@ export function OpportunityFeed({ opportunities, filters, ctaLabels, searchPlace
     },
     { dependencies: [type, trimmed], scope: listRef },
   );
+
+  if (opportunities.length === 0) return <p className="mt-12 text-base text-muted md:mt-16">{noneState}</p>;
 
   return (
     <div>
@@ -109,13 +115,19 @@ export function OpportunityFeed({ opportunities, filters, ctaLabels, searchPlace
             // Photo, a 14px gap of section grey, then the white details block (updated design, 2026-10-22).
             <li key={item.id} className="group flex flex-col gap-3.5">
               <div className="relative aspect-[433/311] overflow-hidden">
-                <Image
-                  src={item.image.src}
-                  alt={item.image.alt}
-                  fill
-                  sizes="(min-width: 1024px) 27rem, (min-width: 640px) 50vw, 100vw"
-                  className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                />
+                {item.media.kind === "image" ? (
+                  <Image
+                    src={item.media.src}
+                    alt={item.media.alt}
+                    fill
+                    sizes="(min-width: 1024px) 27rem, (min-width: 640px) 50vw, 100vw"
+                    // Event banners come from many hosts, so they skip the image optimizer (like the event page).
+                    unoptimized={/^https?:/.test(item.media.src)}
+                    className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                  />
+                ) : (
+                  <Poster brand={item.media.brand} corner={item.media.corner} title={item.title} />
+                )}
               </div>
               <div className="flex flex-1 flex-col items-start bg-white p-4">
                 <div className="w-full min-w-0 flex-1">
@@ -124,28 +136,40 @@ export function OpportunityFeed({ opportunities, filters, ctaLabels, searchPlace
                     <span className="text-sm text-ink md:text-base">{item.categories.join(", ")}</span>
                   </div>
                   <h3 className="mt-4 text-xl font-medium text-ink md:mt-5 md:text-2xl">{item.title}</h3>
-                  <ul className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-base text-ink md:text-lg">
-                    <li className="flex items-center gap-2">
-                      <PeopleIcon />
-                      <span className="sr-only">Organiser: </span>
-                      {item.organiser}
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <PinIcon />
-                      <span className="sr-only">Location: </span>
-                      {item.location}
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <WalletIcon />
-                      <span className="sr-only">Pay or prize: </span>
-                      {item.reward}
-                    </li>
-                  </ul>
+                  {(item.organiser || item.location || item.reward) && (
+                    <ul className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-base text-ink md:text-lg">
+                      {item.organiser && (
+                        <li className="flex items-center gap-2">
+                          <PeopleIcon />
+                          <span className="sr-only">Organiser: </span>
+                          {item.organiser}
+                        </li>
+                      )}
+                      {item.location && (
+                        <li className="flex items-center gap-2">
+                          <PinIcon />
+                          <span className="sr-only">Location: </span>
+                          {item.location}
+                        </li>
+                      )}
+                      {item.reward && (
+                        <li className="flex items-center gap-2">
+                          <WalletIcon />
+                          <span className="sr-only">Pay or prize: </span>
+                          {item.reward}
+                        </li>
+                      )}
+                    </ul>
+                  )}
                 </div>
-                <ButtonLink href={item.url} external variant="dark" className="mt-5 min-w-[7.5rem]">
-                  {ctaLabels[item.type]}
-                  <span className="sr-only">: {item.title} on {item.source}</span>
+                <ButtonLink href={item.url} external={item.external} variant="dark" className="mt-5 min-w-[7.5rem]">
+                  {item.cta ?? ctaLabels[item.type]}
+                  <span className="sr-only">
+                    : {item.title} on {item.source}
+                    {item.external ? " (opens in a new tab)" : ""}
+                  </span>
                 </ButtonLink>
+                {item.note && <p className="mt-2.5 text-xs leading-snug text-ink-soft">{item.note}</p>}
               </div>
             </li>
           ))}
@@ -165,6 +189,21 @@ export function OpportunityFeed({ opportunities, filters, ctaLabels, searchPlace
           </button>
         </div>
       )}
+    </div>
+  );
+}
+
+// The card's picture for items without a photo: the event cover's dark poster style (brand, a corner label, a brand
+// rule and the title in caps). It repeats the card's text, so it's hidden from screen readers.
+function Poster({ brand, corner, title }: { brand: string; corner: string; title: string }) {
+  return (
+    <div aria-hidden className="flex h-full flex-col bg-ink p-5 text-white transition-transform duration-700 ease-out group-hover:scale-105 md:p-6">
+      <div className="flex items-baseline justify-between gap-4">
+        <span className="text-base font-semibold">{brand}</span>
+        <span className="text-right text-sm text-white/80">{corner}</span>
+      </div>
+      <span className="mt-auto block h-[3px] w-10 bg-brand" />
+      <p className="mt-3 line-clamp-3 text-[1.375rem] leading-[1.15] font-medium uppercase md:text-[1.625rem]">{title}</p>
     </div>
   );
 }

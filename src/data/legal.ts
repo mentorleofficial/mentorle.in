@@ -74,6 +74,8 @@ export const privacyPolicy: LegalDocument = {
       title: "3. Consent Framework & Purpose Limitation",
       paragraphs: [
         "Personal data is collected exclusively upon obtaining clear, informed, and affirmative consent from the Data Principal. Processing is strictly limited to the operational fulfillment of mentorship sessions, bootcamps, and platform features. AltioraEdtech Learning does not sell, rent, or trade personal data to third parties for commercial advertising.",
+        // Added with the Huptle integration (2026-10-26); placeholder until legal review (SPEC-VS-DESIGN HU rows).
+        "Hiring partner: when you choose “Apply on Huptle” on a job listing, we share your name and verified email address with Huptle HR Technologies so you can apply for that role on their portal. This happens only when you click, once per application.",
       ],
     },
     {
