@@ -38,7 +38,16 @@ export function useZodForm<Values extends Record<string, unknown>, Output>(schem
     return null;
   };
 
+  // Validates some fields (one step of a multi-step form): shows their errors, focuses the first invalid one and
+  // returns whether they're all valid.
+  const validate = (names: Name[]) => {
+    setTouched((current) => ({ ...current, ...Object.fromEntries(names.map((name) => [name, true])) }));
+    const first = names.find((name) => serverErrors[name] || name in validationErrors);
+    if (first) document.getElementById(`${idPrefix}-${first}`)?.focus();
+    return !first;
+  };
+
   const field = (name: Name) => ({ id: `${idPrefix}-${name}`, error: error(name), onBlur: () => blur(name) });
 
-  return { values, setValue, error, setError, submit, field };
+  return { values, setValue, error, setError, submit, validate, field };
 }

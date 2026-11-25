@@ -32,6 +32,7 @@ _Last updated: 2026-10-13 — Homepage, Find a Mentor, Mentorle Plus, Speaker Hu
 | H8 | **"Become a Mentor" visibility** | Shown **only to signed-out visitors** (IC §2). | The homepage banner shows it to everyone. With no auth yet it currently always shows; this will be wired up when login exists. | Open |
 | H9 | **Events as a core pillar** | BP §1 says "pure 1:1"; the PP adds group masterclasses and offline Builder Meetups (PP §1–2). | Events are a headline feature: "Mentorship **& Events** Network", Live Gatherings (summits, mixers) and Life at Mentorle. It's broadly consistent with the PP, but the scope isn't specified: who runs them, ticketing, pricing. | Open |
 | H10 | **"I'm new here ?" button** | No spec target. | Header button for new visitors. Where should it go: signup, an onboarding page, or the free Saturday demo masterclass (PP §4)? Currently links to `/signup`. | Open |
+| H11 | **Footer social icons** | — | Figma shows Instagram, Facebook, LinkedIn, X and YouTube. User (2026-11-25): Facebook and YouTube aren't used, so they're removed. Instagram (mentorleofficial), LinkedIn (company/mentorlee) and X (TheMentorle) link to the real profiles (URLs from the user). | Built |
 
 ### 1b. Content and design gaps (for the designer)
 
@@ -265,7 +266,7 @@ No Figma. Text copied word for word from the legacy site (`main`: `/privacy-poli
 
 | # | Item | What the legacy pages say | Rest of the site | Status |
 |---|---|---|---|---|
-| L1 | **Grievance contact and SLA** | Privacy §7: support@mentorle.in / rachitjain@mentorle.in (+91 9888409232); "addressed within 7 working days". | Footer: grievance@mentorle.in, "Resolution SLA: 30 days". | **Deferred (user, 2026-10-24):** left as is for now. Pick one email and one SLA later; the footer and the policy should match (the policy is the legal document). |
+| L1 | **Grievance contact and SLA** | Privacy §7: support@mentorle.in / rachitjain@mentorle.in (+91 9888409232); "addressed within 7 working days". | Resolved 2026-11-25 (user): the site's contact data (`company.grievance` in `src/data/site.ts`) now uses support@mentorle.in, +91 9888409232 and "7 working days", matching the policy. | Built |
 | L2 | Separate "DPDP Compliance Notice" | Terms linked `/privacy-policy` and `/dpdp-compliance`. | The privacy page *is* the DPDP notice. | The Terms link reads "Privacy Policy (DPDP Compliance Notice)" and goes to `/privacy`. |
 | L3 | Old addresses | `/privacy-policy`, `/private-policy` (an older privacy text), `/terms-of-service`, `/dpdp-compliance`. | New: `/privacy`, `/terms`. | Permanent redirects in `next.config.ts`, so old links keep working after launch. The older `/private-policy` text isn't carried over. |
 | L4 | Cancellation & Refund Policy | Exists on the legacy site (`/cancellation-refund-policy`). | Not linked anywhere on the new site. | **Waiting for content (user will share):** not ported yet; same for the Community Guidelines page. Payment gateways (Cashfree) usually require the refund policy to be public before going live. |
@@ -356,3 +357,25 @@ From Huptle's partner spec (no Figma). Jobs come from Huptle's partner API; "App
 | HU7 | Privacy | — | A line under each job's button and on the apply page ("We share your name and email with Huptle…"), and a "Hiring partner" sentence in the Privacy Policy (placeholder until legal review). | Needs review |
 | HU8 | Credentials | — | The API key and SSO secret are the same value and were shared in plain text. Ask Huptle for separate, rotated values. | Raise with Huptle |
 | HU9 | Pro Pass block | Events page: "Mentorle × Huptle, Exclusive for Pro Pass members". | Unchanged; one-click apply itself is for every mentee (user decision). | Check copy |
+
+## 18. System screens, SEO and analytics — built 2026-11-25
+
+No Figma. 404 (`not-found.tsx`), error (`error.tsx`, `global-error.tsx`), `robots.txt`, `sitemap.xml`, social preview image and Vercel Analytics.
+
+| # | Item | Spec / decision | What's built | Status |
+|---|---|---|---|---|
+| SY1 | 404 and error pages | No design. | `StatusScreen`: a centred `bg-ink` block (eyebrow with brand square, large title, body, brand + ghost buttons; buttons stack full width on phones). As tall as its content on phones and tablets, full screen (capped) on desktops. 404 links to the homepage, Find a mentor, Events, Mentorle Plus and Become a Mentor; the error page offers "Try again", the homepage and support@mentorle.in. | Needs design review |
+| SY2 | Social preview image | No design. | 1200×630 JPEG (`src/app/opengraph-image.jpg`, also used for Twitter/X) on the dark brand background with the logo and tagline. | Needs design review |
+| SY3 | Sitemap and robots | — | Generated: every page in `src/app` (listed by `scripts/generate-routes.mjs` before each dev/build) minus the private ones in `src/lib/seo/routes.ts` (also robots' Disallow list), plus every mentor and event live from the database (events with their last-changed date), refreshed within minutes. Includes /login and /signup; leaves out signed-in, payment, password-reset, live and job-apply pages. Base URL from `NEXT_PUBLIC_SITE_URL` (default https://mentorle.in). | Built |
+| SY4 | Analytics | — | Vercel Web Analytics (`@vercel/analytics`), page views only. Turn it on in the Vercel project (Analytics tab). Cookie-free; mention in the Privacy Policy at the next legal review. | Built |
+
+## 19. Speaker request (`/speaker-hub/request`) — built 2026-11-25
+
+No Figma or spec beyond the Speaker Hub's "Request a speaker" links. Platform migration `20261125120000_speaker_requests`; admins see requests on the platform at Admin → Speaker requests and get a notification for each.
+
+| # | Item | Spec / decision | What's built | Status |
+|---|---|---|---|---|
+| SR1 | Layout | No design. | User: a modal like the signup flow, with few steps. It's the auth modal's card (same backdrop, ✕, progress bar along the top as in onboarding): 1. the event (speaker, name, type, audience, format, date, city), 2. contact details and message, then "Request sent". Opens over the page it was clicked on; a direct visit opens it over the Speaker Hub. | Built |
+| SR2 | Fields | No spec. | Speaker (pre-selected from `?speaker=`, or "Match me with the right speaker"), name, work email, optional phone, organisation, event name, type, optional date, audience size, format, city (not for online events), optional message (2,000 characters). | Check with senior |
+| SR3 | Reply time | — | No reply time is promised ("The Mentorle team will reply by email"). | Check copy |
+| SR4 | Abuse limits | — | 3 requests per email per hour, 30 per hour overall (checked in the database). | Built |

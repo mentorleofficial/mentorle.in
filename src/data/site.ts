@@ -5,6 +5,10 @@ export type NavLink = {
 };
 
 // Where mentors actually apply (the mentor platform). The /become-a-mentor page on this site explains the programme.
+// The live site's address, for absolute URLs (sitemap, robots, social previews). A preview deployment can set
+// NEXT_PUBLIC_SITE_URL to its own address.
+export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "https://mentorle.in").replace(/\/$/, "");
+
 export const MENTOR_APPLY_URL = "https://platform.mentorle.in/become-a-mentor";
 // Mentor and admin accounts sign in here.
 export const PLATFORM_LOGIN_URL = "https://platform.mentorle.in/login";
@@ -56,13 +60,13 @@ export const legalLinks: NavLink[] = [
   { label: "Terms of Service", href: "/terms" },
 ];
 
-export const socialLinks = [
-  { label: "Instagram", icon: "/homepage/footer/instagram.svg", href: "#", width: 35, height: 35 },
-  { label: "Facebook", icon: "/homepage/footer/facebook.svg", href: "#", width: 33, height: 33 },
-  { label: "LinkedIn", icon: "/homepage/footer/linkedin.svg", href: "#", width: 33, height: 33 },
-  { label: "X", icon: "/homepage/footer/twitter.svg", href: "#", width: 30, height: 30 },
-  { label: "YouTube", icon: "/homepage/footer/youtube.svg", href: "#", width: 35, height: 28 },
+// Mentorle's social profiles (footer). Facebook and YouTube aren't used. A profile without a URL is hidden.
+const SOCIAL_PROFILES = [
+  { label: "Instagram", icon: "/homepage/footer/instagram.svg", href: "https://www.instagram.com/mentorleofficial/", width: 35, height: 35 },
+  { label: "LinkedIn", icon: "/homepage/footer/linkedin.svg", href: "https://in.linkedin.com/company/mentorlee", width: 33, height: 33 },
+  { label: "X", icon: "/homepage/footer/twitter.svg", href: "https://x.com/TheMentorle", width: 30, height: 30 },
 ];
+export const socialLinks = SOCIAL_PROFILES.filter((profile) => profile.href);
 
 export const company = {
   legalName: "AltioraEdtech Learning (OPC) Pvt. Ltd.",
@@ -70,9 +74,12 @@ export const company = {
   location: "Hoshiarpur, Punjab, India",
   copyrightYear: 2026,
   tagline: "A global community of mentors and leaders shaping the future of how the world builds and learns.",
+  // As in the Privacy Policy (DPDP notice, effective September 2, 2026).
+  support: "support@mentorle.in",
   grievance: {
     officer: "Rachit Jain",
-    email: "grievance@mentorle.in",
-    slaDays: 30,
+    email: "support@mentorle.in",
+    phone: "+91 9888409232",
+    sla: "7 working days",
   },
 };

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import type { InputHTMLAttributes, ReactNode, TextareaHTMLAttributes } from "react";
+import type { InputHTMLAttributes, ReactNode, SelectHTMLAttributes, TextareaHTMLAttributes } from "react";
 
 // Form primitives shared by the auth modal and the onboarding wizard. Sizes follow the login/signup Figma:
 // square 36px fields with a `line` border, 14px text; errors turn the border brand with a 12px message.
@@ -139,6 +139,55 @@ export function TextAreaField({ id, label, labelSuffix, error, hint, className =
         {...textarea}
         className={inputClasses(error, "h-auto resize-y py-2 leading-relaxed")}
       />
+      <FieldMessage id={id} error={error} hint={hint} />
+    </div>
+  );
+}
+
+type SelectFieldProps = Omit<SelectHTMLAttributes<HTMLSelectElement>, "id" | "onChange" | "value"> & {
+  id: string;
+  label: string;
+  labelSuffix?: ReactNode;
+  value: string;
+  onChange: (value: string) => void;
+  options: readonly { value: string; label: string }[];
+  // Shown while nothing is chosen (an empty, disabled first option).
+  placeholder?: string;
+  error?: string;
+  hint?: ReactNode;
+};
+
+// A native select styled like the text fields (square, `line` border, a small chevron), so it works with the
+// keyboard and the phone's own picker.
+export function SelectField({ id, label, labelSuffix, value, onChange, options, placeholder, error, hint, className = "", ...select }: SelectFieldProps) {
+  return (
+    <div className={className}>
+      <FieldLabel id={id} label={label} suffix={labelSuffix} />
+      <div className="relative">
+        <select
+          id={id}
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+          aria-invalid={Boolean(error)}
+          aria-describedby={error ? errorId(id) : undefined}
+          {...select}
+          className={inputClasses(error, `cursor-pointer appearance-none pr-8 ${value ? "" : "text-ink/55"}`)}
+        >
+          {placeholder !== undefined && (
+            <option value="" disabled>
+              {placeholder}
+            </option>
+          )}
+          {options.map((option) => (
+            <option key={option.value} value={option.value} className="text-ink">
+              {option.label}
+            </option>
+          ))}
+        </select>
+        <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.4" className="pointer-events-none absolute top-1/2 right-2.5 size-3 -translate-y-1/2 text-muted" aria-hidden>
+          <path d="M2.5 4.5L6 8l3.5-3.5" />
+        </svg>
+      </div>
       <FieldMessage id={id} error={error} hint={hint} />
     </div>
   );

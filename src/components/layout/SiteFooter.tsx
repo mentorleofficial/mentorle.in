@@ -36,7 +36,9 @@ export function SiteFooter() {
                 <li key={social.label}>
                   <a
                     href={social.href}
-                    aria-label={social.label}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`Mentorle on ${social.label}`}
                     className="block opacity-90 transition duration-300 hover:-translate-y-0.5 hover:opacity-100"
                   >
                     <Image src={social.icon} alt="" width={social.width} height={social.height} className="h-7 w-auto" style={{ width: "auto" }} />

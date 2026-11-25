@@ -2,8 +2,8 @@ import { company } from "@/data/site";
 
 // Privacy Policy (/privacy) and Terms of Service (/terms), word for word from the client's documents
 // (Mentorle_Privacy_Policy_DPDP.pdf, effective September 2, 2026, and Mentorle_Terms_of_Service.pdf, effective
-// September 1, 2026; received 2026-10-27). Legal wording isn't edited here. Differences from the rest of the site
-// (grievance email and SLA) are logged in SPEC-VS-DESIGN (L1).
+// September 1, 2026; received 2026-10-27). Legal wording isn't edited here. The site's grievance contact
+// (src/data/site.ts) matches the policy (SPEC-VS-DESIGN L1).
 
 export type LegalTable = { columns: string[]; rows: string[][] };
 

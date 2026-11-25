@@ -8,24 +8,30 @@ import { ResetLinkFlow } from "@/components/auth/ResetLinkFlow";
 import { SignupFlow } from "@/components/auth/SignupFlow";
 import { AnimatedHeight } from "@/components/ui/AnimatedHeight";
 import { OnboardingFlow } from "@/components/onboarding/OnboardingFlow";
+import { SpeakerRequestFlow } from "@/components/speakers/SpeakerRequestFlow";
 import { authCopy } from "@/data/auth";
 import type { AuthMode } from "@/data/auth";
 import { useAuth } from "@/lib/auth/AuthProvider";
 
+// The auth screens, plus other short public flows that share this card (the speaker request).
+export type ModalMode = AuthMode | "speaker";
+
 type AuthModalProps = {
-  mode: AuthMode;
+  mode: ModalMode;
   // True when opened over another page via an intercepted route; false on a direct visit.
   intercepted: boolean;
+  // Where closing goes on a direct visit (the page rendered underneath); the homepage by default.
+  closeHref?: string;
 };
 
 const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
-const flows = { login: LoginFlow, signup: SignupFlow, forgot: ForgotPasswordFlow, reset: ResetLinkFlow, onboarding: OnboardingFlow } satisfies Record<AuthMode, () => React.ReactNode>;
+const flows = { login: LoginFlow, signup: SignupFlow, forgot: ForgotPasswordFlow, reset: ResetLinkFlow, onboarding: OnboardingFlow, speaker: SpeakerRequestFlow } satisfies Record<ModalMode, () => React.ReactNode>;
 
-export function AuthModal({ mode, intercepted }: AuthModalProps) {
+export function AuthModal({ mode, intercepted, closeHref }: AuthModalProps) {
   const titleId = useId();
   return (
-    <AuthModalProvider titleId={titleId} intercepted={intercepted}>
+    <AuthModalProvider titleId={titleId} intercepted={intercepted} closeHref={closeHref}>
       <AuthDialog mode={mode} />
     </AuthModalProvider>
   );
@@ -36,14 +42,14 @@ export function AuthModal({ mode, intercepted }: AuthModalProps) {
 // link…), nothing renders, so no form flashes, and they're sent on like the platform does: to finish onboarding,
 // or back to the page they were on. Once a form in this modal has been submitted, signing in is this flow's own
 // doing (signup → verify → "You're in!"), so the dialog keeps showing.
-function AuthDialog({ mode }: { mode: AuthMode }) {
+function AuthDialog({ mode }: { mode: ModalMode }) {
   const { close, go } = useAuthModal();
   const { status, onboarded } = useAuth();
   const [started, setStarted] = useState(false);
   const redirected = useRef(false);
   const checkedOnboarding = useRef(false);
-  // /reset-password works for anyone holding a valid link, signed in or not.
-  const isAuthForm = mode !== "onboarding" && mode !== "reset";
+  // /reset-password works for anyone holding a valid link, signed in or not; the speaker request is for anyone.
+  const isAuthForm = mode !== "onboarding" && mode !== "reset" && mode !== "speaker";
   const alreadySignedIn = isAuthForm && !started && status === "signed-in";
 
   // Reset when the modal closes (or Next hides it in an <Activity>), so a reopen is judged afresh.
@@ -75,7 +81,7 @@ function AuthDialog({ mode }: { mode: AuthMode }) {
   return <DialogShell mode={mode} onSubmitCapture={() => setStarted(true)} />;
 }
 
-function DialogShell({ mode, onSubmitCapture }: { mode: AuthMode; onSubmitCapture: () => void }) {
+function DialogShell({ mode, onSubmitCapture }: { mode: ModalMode; onSubmitCapture: () => void }) {
   const { titleId, close } = useAuthModal();
   const dialogRef = useRef<HTMLDivElement>(null);
   const Flow = flows[mode];

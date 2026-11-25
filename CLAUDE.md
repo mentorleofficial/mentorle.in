@@ -26,6 +26,7 @@ npm run dev     # dev server
 npm run lint    # ESLint — must pass
 npm run build   # production build — must pass
 npm start       # serve the production build
+npm run routes  # regenerate the sitemap's page list (also runs before dev/build; lint fails if it's stale)
 npm run images  # convert PNG/JPG in public/ to WebP and update references (see the optimize-assets skill)
 ```
 
@@ -47,6 +48,7 @@ public/<page>/            assets for that page (e.g. public/homepage/)
 docs/DESIGN-SYSTEM.md     colours, type scale, spacing, components, motion, responsive rules, gotchas
 docs/SPEC-VS-DESIGN.md    running list of differences between the spec documents and the Figma
 scripts/convert-to-webp.mjs  PNG/JPG → WebP converter (npm run images)
+scripts/generate-routes.mjs  lists the pages in src/app for the sitemap (src/lib/seo/; private pages listed in src/lib/seo/routes.ts)
 .claude/skills/           project skills (optimize-assets)
 ```
 
@@ -81,4 +83,4 @@ scripts/convert-to-webp.mjs  PNG/JPG → WebP converter (npm run images)
 
 ## Routes (planned)
 
-Built: `/`, `/mentors` (Find a Mentor), `/pricing` (Mentorle Plus), `/speaker-hub`, `/become-a-mentor`, `/events` (Events & Summits), `/events/<slug>` (event detail, from the database), `/mentors/<slug>` (mentor profile, from the database), `/enterprise` (Universities & Enterprise), `/community`, `/login`, `/signup`, `/forgot-password`, `/reset-password` (modals over the current page via the `@auth` intercepting routes) and `/onboarding` (mentee profile wizard, also a modal), `/privacy` and `/terms` (legal pages; the legacy `/privacy-policy`, `/terms-of-service` etc. redirect to them), `/sessions` (My sessions), `/account` (signed-in mentee pages) , `/payments/status` (after Cashfree checkout; `/pay-return` is its route handler) `/jobs/<id>/apply` (Huptle one-click apply, see `src/lib/jobs/huptle.ts`; jobs show in the /events opportunity feed) and `/live` (event mode's lucky-draw countdown and result; see "Event mode" above). Linked but not built yet (they 404 for now): `/speaker-hub/request` (speaker requests), `/about`, `/contact`, `/community-guidelines`. Keep these paths when building the pages, since nav and footer links already point at them (`src/data/site.ts`).
+Built: `/`, `/mentors` (Find a Mentor), `/pricing` (Mentorle Plus), `/speaker-hub`, `/speaker-hub/request` (speaker request, a modal over the Speaker Hub via `@auth/(.)speaker-hub/request`; admins handle requests on the platform), `/become-a-mentor`, `/events` (Events & Summits), `/events/<slug>` (event detail, from the database), `/mentors/<slug>` (mentor profile, from the database), `/enterprise` (Universities & Enterprise), `/community`, `/login`, `/signup`, `/forgot-password`, `/reset-password` (modals over the current page via the `@auth` intercepting routes) and `/onboarding` (mentee profile wizard, also a modal), `/privacy` and `/terms` (legal pages; the legacy `/privacy-policy`, `/terms-of-service` etc. redirect to them), `/sessions` (My sessions), `/account` (signed-in mentee pages) , `/payments/status` (after Cashfree checkout; `/pay-return` is its route handler) `/jobs/<id>/apply` (Huptle one-click apply, see `src/lib/jobs/huptle.ts`; jobs show in the /events opportunity feed) and `/live` (event mode's lucky-draw countdown and result; see "Event mode" above). Linked but not built yet (they 404 for now): `/about`, `/contact`, `/community-guidelines`. Keep these paths when building the pages, since nav and footer links already point at them (`src/data/site.ts`).

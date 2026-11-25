@@ -46,12 +46,12 @@ export const withRedirect = (href: string) => {
   return `${href}?redirect=${encodeURIComponent(redirect)}`;
 };
 
-export function AuthModalProvider({ titleId, intercepted, children }: { titleId: string; intercepted: boolean; children: ReactNode }) {
+export function AuthModalProvider({ titleId, intercepted, closeHref = "/", children }: { titleId: string; intercepted: boolean; closeHref?: string; children: ReactNode }) {
   const router = useRouter();
 
   const close = () => {
     if (intercepted) router.back();
-    else router.replace("/");
+    else router.replace(closeHref);
   };
 
   const go = (href: string) => {

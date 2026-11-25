@@ -19,6 +19,7 @@ export type EventSpeaker = {
 export type EventDetail = {
   id: string; // events_programs.id, used for registration
   slug: string;
+  updatedAt: string | null; // events_programs.updated_at (sitemap lastModified)
   kind: string; // label next to the status chip ("Event", "Workshop", "Guest Session"…)
   status: EventStatus;
   title: string;

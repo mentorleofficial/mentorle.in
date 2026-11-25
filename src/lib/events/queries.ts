@@ -34,6 +34,7 @@ const COLUMNS = [
   "highlights",
   "price",
   "registration_link",
+  "updated_at",
 ].join(",");
 
 type EventRow = {
@@ -61,6 +62,7 @@ type EventRow = {
   highlights: string[] | null;
   price: number | string | null;
   registration_link: string | null;
+  updated_at: string | null;
 };
 
 const KINDS: Record<string, string> = {
@@ -135,6 +137,7 @@ function toDetail(row: EventRow, now: number): EventDetail {
   return {
     id: row.id,
     slug: row.slug,
+    updatedAt: row.updated_at,
     kind,
     status,
     title,
@@ -180,6 +183,11 @@ export async function getEvent(slug: string): Promise<EventDetail | null> {
 
 export async function getEventSlugs(): Promise<string[]> {
   return (await getEvents()).map((event) => event.slug);
+}
+
+// For the sitemap: every event page and when it last changed.
+export async function getEventSitemapEntries(): Promise<{ slug: string; updatedAt: string | null }[]> {
+  return (await getEvents()).map((event) => ({ slug: event.slug, updatedAt: event.updatedAt }));
 }
 
 // Stand-in photos for carousel cards of events without a banner (the design's gathering photos).
