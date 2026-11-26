@@ -69,10 +69,13 @@ export default function RootLayout({ children, auth }: LayoutProps<"/">) {
           <ScrollAnimations />
         </Suspense>
         <SmoothScroll />
-        {/* Vercel Web Analytics: page views, cookie-free; does nothing outside Vercel. It reads the route, hence Suspense. */}
-        <Suspense fallback={null}>
-          <Analytics debug={false} />
-        </Suspense>
+        {/* Vercel Web Analytics: page views, cookie-free. Only on Vercel builds (VERCEL is set there), since its script
+            exists only on Vercel and would 404 on every page elsewhere. It reads the route, hence Suspense. */}
+        {process.env.VERCEL && (
+          <Suspense fallback={null}>
+            <Analytics debug={false} />
+          </Suspense>
+        )}
       </body>
     </html>
   );

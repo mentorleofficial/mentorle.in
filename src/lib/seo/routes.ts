@@ -18,6 +18,7 @@ export const ROUTE_RANK: Record<string, Rank> = {
   "/mentors": { priority: 0.9, changeFrequency: "daily" },
   "/events": { priority: 0.9, changeFrequency: "daily" },
   "/pricing": { priority: 0.8, changeFrequency: "monthly" },
+  "/offers": { priority: 0.8, changeFrequency: "weekly" },
   "/become-a-mentor": { priority: 0.7, changeFrequency: "monthly" },
   "/community": { priority: 0.7, changeFrequency: "monthly" },
   "/enterprise": { priority: 0.6, changeFrequency: "monthly" },

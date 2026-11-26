@@ -18,6 +18,7 @@ export const primaryNav: NavLink[] = [
   { label: "Mentors", href: "/mentors" },
   { label: "Community", href: "/community" },
   { label: "Events", href: "/events" },
+  { label: "Offers", href: "/offers" },
   { label: "Pricing", href: "/pricing" },
 ];
 
@@ -33,6 +34,7 @@ export const footerColumns: { title: string; links: NavLink[] }[] = [
       { label: "Find a Mentor", href: "/mentors" },
       { label: "Mentorle Plus", href: "/pricing" },
       { label: "Events & Summits", href: "/events" },
+      { label: "Student Offers", href: "/offers" },
       { label: "Become a Mentor", href: BECOME_A_MENTOR_PATH },
     ],
   },

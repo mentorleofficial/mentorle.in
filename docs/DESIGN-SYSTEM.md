@@ -93,7 +93,7 @@ Pairs on photos are always `ghost` + `light`, 8px apart (`gap-2`), centred.
 
 | Component | File | Notes |
 |---|---|---|
-| `SiteHeader` | `components/layout/SiteHeader.tsx` | Frosted bar over the hero: `bg-black/20` + `backdrop-blur-[6px]` (tuned to match Figma — don't increase). Collapses below `lg`. |
+| `SiteHeader` | `components/layout/SiteHeader.tsx` | Frosted bar over the hero: `bg-black/20` + `backdrop-blur-[6px]` (tuned to match Figma — don't increase). Collapses to the menu button below `xl` (1280px): with five nav links (Offers added 2026-11-25) the right half no longer fits next to the centred logo at 1024. Event mode's "Lucky draw" link sits on the left with the account controls on desktop, in the menu below `xl`. |
 | `SiteFooter` | `components/layout/SiteFooter.tsx` | Identical on every Figma page. Includes the **legally required Grievance Officer block** — never remove. At ≥1440px (`min-[90rem]:`): columns start at x=50 / 647 / 865 / 1130; between `xl` and 1440 the columns size to their content so nothing overflows (`grid-cols-[37.3125rem_1fr]`, then `[13.625rem_16.5625rem_1fr]`); top band 131px above / 53px below; legal band 48px padding; copyright band 47px. Measured on the Find a Mentor export. |
 | `SectionHeader` | `components/ui/SectionHeader.tsx` | Eyebrow + title (left), description + optional `action` (right). Use for every section intro. Titles honour line breaks from the data (`whitespace-pre-line`). `aside` sets the right column from lg: `default` 410px, `wide` 433px, `narrow` 261px. |
 | `ButtonLink` / `buttonClasses` | `components/ui/ButtonLink.tsx` | All CTAs. Pass `external` for off-site links. |
@@ -123,6 +123,18 @@ Pairs on photos are always `ghost` + `light`, 8px apart (`gap-2`), centred.
 - The bar sits directly under the section top padding (130px); the grid follows `mt-16` (64px) below.
 - Below `lg` tab-only rows scroll horizontally (`no-scrollbar`, bleeding to the screen edges); rows with dropdowns wrap. The search box takes a full-width row underneath.
 - Filtering announces the result count in a visually hidden `aria-live` region. New results fade and rise in (0.6s, 0.06s stagger). The empty state is a muted line plus a "Clear filters" link.
+
+**Offer card pattern** (`components/offers/OfferCard.tsx`, /offers and the homepage "Student offers", no Figma):
+- White card, `border-[#cbcbcb]` on `bg-surface` (`border-line` on `bg-dots`), `p-5 lg:p-6`, equal heights in a row; the grid is `grid-cols-1 md:grid-cols-2 lg:grid-cols-3` (an explicit one-column track on phones, so a long brand name truncates instead of widening the page).
+- Top row: a 48px square brand tile (`OfferLogo`: the brand's own logo, fetched from its site by `npm run offers:logos` into `public/offers/logos` as SVG or a 128px WebP, centred on white with a `border-line` hairline and 6px padding; brands without a usable logo get two initials on `bg-ink`), then the 18px brand name and 14px `ink-soft` category, both truncating.
+- The offer in 20/22px medium, a 14/16px description at `ink/85`, then pinned to the bottom: tags (24px tall, `text-xs`: "Free" on `#fff0ea` in `brand-dark`, "Discount" on `surface`, and the verification route in a `border-line` outline), and a row with a `dark` "Claim offer ↗" button (fills the row, opens the official page in a new tab) and an outline "Details" button.
+- Details opens `SiteDialog`: a 56px tile, brand and category, the offer, tags, "Who can claim" and numbered "How to claim" steps (24px ink squares), then a full-width 48px `brand` Claim button and a 12px note. Orange is kept for the dialog so a page of cards isn't a wall of orange.
+
+**Pagination** (`components/ui/Pagination.tsx`; /offers, 12 cards a page): centred under the grid (40/48px gap). Square 37px buttons like the filter tabs: `border-[#dadada]`, the current page `bg-ink text-white` (`aria-current="page"`), ‹ › arrows faded when disabled. First and last page always show, with the pages around the current one and "…" for gaps. A 14px `ink-soft` line under it ("Showing 13–24 of 101", or "Showing all 9"). Changing page scrolls back to the top of the list (`scrollToElement` from `SmoothScroll`, under the fixed header); changing a filter or the search returns to page 1. The list keeps `?category=` and `?page=` in the URL (replaced, not pushed).
+
+**Dark band with stats** (`components/offers/OffersHero.tsx`): `AccountBand`'s band and type, then a `border-white/15` hairline and a row of numbers (40/56px medium, `tabular-nums`, 14px `white/75` labels under them; three equal columns on phones) with a 14px `white/60` note at the right. For pages without a hero photo that have figures worth showing.
+
+**Numbered steps** (`components/offers/HowToClaim.tsx`): Become a Mentor's numbered format cards, three across on `bg-dots` (white cards, `border-line`).
 
 **Pricing card pattern** (Mentorle Plus; plans come from the database via `src/lib/plans/queries.ts`, managed by admins on the platform):
 - **Grid:** the standard 3 × 433px grid. Two plans: 2 columns centred at `max-w-[57rem]`. Below `lg` the cards stack in one centred column (max 34rem).
@@ -275,6 +287,7 @@ Animations are declared with data attributes and run by `components/motion/Scrol
 | `data-hero="0..n"` | On load: fade up in order of `n` | Above-the-fold hero items (header bar = 0) |
 | `data-animate="fade-up"` | Fade + rise when scrolled into view | Single blocks |
 | `data-animate="stagger"` | Children fade up one after another | Card grids, section headers (already built into `SectionHeader`) |
+| `data-animate="batch"` | Each child fades up as it reaches the screen, a few at a time (`ScrollTrigger.batch`) | Long grids (the 100-card offers list), where one stagger would leave cards far down invisible for seconds |
 | `data-animate="image"` | Clip-path reveal + slow zoom-out of the inner image | Standalone photos |
 | `data-animate="rise"` | Rise only, no opacity change | Blocks that contain `backdrop-filter` (see §8) |
 | `data-animate="words"` | Word colour scrub (set by `ScrollRevealText`) | — |

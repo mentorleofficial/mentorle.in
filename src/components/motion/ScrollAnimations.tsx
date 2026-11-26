@@ -105,6 +105,19 @@ export function ScrollAnimations() {
             );
           });
 
+          // Long grids (e.g. 100 offers): each child fades up when it reaches the screen, in small groups, instead of
+          // one stagger across the whole list (which would leave cards far down invisible for seconds).
+          gsap.utils.toArray<HTMLElement>('[data-animate="batch"]').forEach((element) => {
+            const items = [...element.children] as HTMLElement[];
+            if (!items.length) return;
+            gsap.set(items, { y: 40, autoAlpha: 0 });
+            ScrollTrigger.batch(items, {
+              start: "top 90%",
+              once: true,
+              onEnter: (batch) => gsap.to(batch, { y: 0, autoAlpha: 1, duration: 0.8, ease: "power3.out", stagger: 0.08, overwrite: true }),
+            });
+          });
+
           gsap.utils.toArray<HTMLElement>('[data-animate="image"]').forEach((element) => {
             const media = element.querySelector("img, video");
             const timeline = gsap.timeline({

@@ -54,11 +54,23 @@ export function SiteHeader() {
         {/* Animate the bar itself: fading an ancestor would disable its backdrop blur until the fade completes. */}
         <div data-hero="0" className="relative flex h-16 items-center justify-between border border-white/5 bg-black/20 px-4 backdrop-blur-[6px] md:h-[5.4375rem] md:px-[1.875rem]">
           {/* Hidden until the session is read, so signed-in users don't see Login flash before their avatar. */}
-          <div className={`hidden items-center gap-[0.625rem] transition-opacity duration-300 lg:flex ${status === "loading" ? "opacity-0" : ""}`}>
+          <div className={`hidden items-center gap-[0.625rem] transition-opacity duration-300 xl:flex ${status === "loading" ? "opacity-0" : ""}`}>
             {signedIn ? (
               <>
                 <AccountMenu />
                 <NotificationBell className="ml-2" />
+                {/* Event mode, for new accounts: on the left with the account controls (the five nav links fill the
+                    right half at 1280px). */}
+                {luckyDraw && (
+                  <Link
+                    href={luckyDrawNav.href}
+                    prefetch={prefetchFor(luckyDrawNav.href)}
+                    className="relative ml-3 flex items-center gap-2 text-[0.9375rem] text-white after:absolute after:inset-x-0 after:-bottom-1 after:h-px after:origin-left after:scale-x-0 after:bg-white after:transition-transform after:duration-300 hover:after:scale-x-100"
+                  >
+                    <span className="size-2 animate-pulse bg-brand motion-reduce:animate-none" aria-hidden />
+                    {luckyDrawNav.label}
+                  </Link>
+                )}
               </>
             ) : (
               <>
@@ -75,26 +87,14 @@ export function SiteHeader() {
           <Link
             href="/"
             aria-label="Mentorle home"
-            className="lg:absolute lg:left-1/2 lg:-translate-x-1/2"
+            className="xl:absolute xl:left-1/2 xl:-translate-x-1/2"
             onClick={close}
           >
             <Image src="/homepage/logo.svg" alt="Mentorle" width={187} height={48} loading="eager" className="h-9 w-auto md:h-12" style={{ width: "auto" }} />
           </Link>
 
-          <nav aria-label="Primary" className="hidden lg:block">
+          <nav aria-label="Primary" className="hidden xl:block">
             <ul className="flex items-center gap-6">
-              {luckyDraw && (
-                <li>
-                  <Link
-                    href={luckyDrawNav.href}
-                    prefetch={prefetchFor(luckyDrawNav.href)}
-                    className="relative flex items-center gap-2 text-[0.9375rem] text-white after:absolute after:inset-x-0 after:-bottom-1 after:h-px after:origin-left after:scale-x-0 after:bg-white after:transition-transform after:duration-300 hover:after:scale-x-100"
-                  >
-                    <span className="size-2 animate-pulse bg-brand motion-reduce:animate-none" aria-hidden />
-                    {luckyDrawNav.label}
-                  </Link>
-                </li>
-              )}
               {primaryNav.map((item) => (
                 <li key={item.href}>
                   <Link
@@ -109,7 +109,7 @@ export function SiteHeader() {
             </ul>
           </nav>
 
-          <div className="flex items-center gap-1 lg:hidden">
+          <div className="flex items-center gap-1 xl:hidden">
           {signedIn && <NotificationBell fullWidth />}
           <button
             type="button"
@@ -128,7 +128,7 @@ export function SiteHeader() {
 
         <div
           id="mobile-menu"
-          className={`grid border-white/5 bg-black/80 backdrop-blur-md transition-[grid-template-rows,opacity] duration-300 ease-out lg:hidden ${
+          className={`grid border-white/5 bg-black/80 backdrop-blur-md transition-[grid-template-rows,opacity] duration-300 ease-out xl:hidden ${
             open ? "grid-rows-[1fr] border border-t-0 opacity-100" : "pointer-events-none grid-rows-[0fr] opacity-0"
           }`}
           inert={!open}

@@ -11,6 +11,7 @@ export const APP_ROUTES = [
   "/live",
   "/login",
   "/mentors",
+  "/offers",
   "/onboarding",
   "/payments/status",
   "/pricing",

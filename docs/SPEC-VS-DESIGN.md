@@ -379,3 +379,17 @@ No Figma or spec beyond the Speaker Hub's "Request a speaker" links. Platform mi
 | SR2 | Fields | No spec. | Speaker (pre-selected from `?speaker=`, or "Match me with the right speaker"), name, work email, optional phone, organisation, event name, type, optional date, audience size, format, city (not for online events), optional message (2,000 characters). | Check with senior |
 | SR3 | Reply time | — | No reply time is promised ("The Mentorle team will reply by email"). | Check copy |
 | SR4 | Abuse limits | — | 3 requests per email per hour, 30 per hour overall (checked in the database). | Built |
+
+## 20. Student offers (`/offers` and the homepage "Student offers" section) — built 2026-11-25
+
+No Figma or spec. The user asked for a page modelled on studentshere.com/offers in the site's theme; that site's terms forbid copying its catalogue, so the offers were researched at each brand's official page (or GitHub's official Student Pack page) and kept to what students in India can claim. Layout uses existing patterns (dark band, Find a Mentor's filter bar, cards, numbered steps). Data in `src/data/offers.ts` (not admin-managed, user decision).
+
+| # | Item | Spec / decision | What's built | Status |
+|---|---|---|---|---|
+| OF1 | Catalogue | User: "focus on what Indian students can actually claim". | 101 offers in 8 categories, 71 of them through the GitHub Student Pack. Research sheet: `local-docs/offers-catalog-draft.md`. | Built |
+| OF2 | Held-back offers | User: hold back offers whose price or terms couldn't be confirmed on the brand's own page. | 13 held back (Raycast, IBM SkillsBuild, Adobe, Lucidchart, SOLIDWORKS, Autodesk, Tableau, YouTube Premium, Apple Music, Akasa Air, IndiGo, Air India, SpiceJet), listed in the header of `offers.ts`. Add each once someone checks its page in a browser. | Open |
+| OF3 | Logos | User: whatever suits each brand; then "fix some logos" (missing or inaccurate). | Each brand's own logo from its site (SVG icon, largest PNG / app icon, or Google's favicon service), with overrides where the site icon isn't right (Simple Icons for Copilot, Unity, Sketch…; Wikimedia for Azure). 98 of 101 have a logo; SQLGate, .TECH and Pageclip keep lettered tiles (no usable logo on their sites). | Built |
+| OF4 | Navigation | User: header and footer. | "Offers" in the header nav, "Student Offers" in the footer's Platform column. The header now collapses below 1280px instead of 1024px so five links fit (DESIGN-SYSTEM `SiteHeader`). | Built |
+| OF5 | Homepage placement | User: "whichever is best". | After the Mentorle Plus plans (from paid perks to free offers), on `bg-dots`: six featured offers and "View all offers". | Built |
+| OF7 | Pagination | User: why no pagination? | 12 offers a page with page numbers (was one 10,000px list); category and page in the URL. | Built |
+| OF6 | Keeping it current | — | `npm run offers:check` monthly: fails on dead links, lists redirects and sites that block bots. Update `OFFERS_CHECKED_AT` after a review. | Built |

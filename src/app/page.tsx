@@ -9,6 +9,7 @@ import { MentorBanner } from "@/components/home/MentorBanner";
 import { MentorCommunity } from "@/components/home/MentorCommunity";
 import { MentorStories } from "@/components/home/MentorStories";
 import { PartnerStrip } from "@/components/home/PartnerStrip";
+import { StudentOffers } from "@/components/home/StudentOffers";
 import { PlansFallback } from "@/components/pricing/PlansFallback";
 import { PricingPlans } from "@/components/pricing/PricingPlans";
 import { ButtonLink } from "@/components/ui/ButtonLink";
@@ -50,6 +51,7 @@ export default function HomePage() {
       <Suspense fallback={<PlansFallback background="surface" className={homePlansPadding} />}>
         <PricingPlans header={homePlans} background="surface" className={homePlansPadding} />
       </Suspense>
+      <StudentOffers />
       <LifeAtMentorle />
       <HomeFaq />
     </>
